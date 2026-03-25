@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模板 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            transition: width 0.3s ease-in-out;
+            overflow-y: auto;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .sidebar > div, .sidebar nav {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .sidebar.collapsed {
+            width: 64px;
+        }
+        
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        
+        .sidebar.collapsed .sidebar-icon {
+            margin: 0 auto;
+        }
+        
+        .sidebar-item {
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+        }
+        
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+        }
+        
+        .menu-header h2 {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .drawer {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+        
+        .drawer.open {
+            transform: translateX(0);
+        }
+        
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 15;
+            display: none;
+        }
+        
+        .drawer-overlay.open {
+            display: block;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #003eb3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body class="bg-neutral">
+    <!-- 主容器 -->
+    <div class="flex h-screen">
+        <!-- 侧边栏 -->
+        <aside id="sidebar" class="sidebar gradient-bg text-white shadow-sm fixed left-0 top-0 bottom-0 w-64 overflow-y-auto z-10">
+            <div class="p-4 flex items-center justify-between border-b border-white/20">
+                <h1 class="text-xl font-semibold">财务中台</h1>
+                <button id="toggle-sidebar" class="p-2 rounded-md hover:bg-white/10">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+            <nav class="py-4">
+                <!-- 仪表盘 -->
+                <a href="index.html" class="sidebar-item flex items-center px-4 py-3 text-white/90 hover:text-white rounded-md">
+                    <i data-lucide="home" class="sidebar-icon w-5 h-5 mr-3"></i>
+                    <span class="sidebar-text">仪表盘</span>
+                </a>
+                
+                <!-- 基础资料 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="basic-data">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">基础资料</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="basic-data-content">
+                        <a href="financial-entity.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="building" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">财务主体</span>
+                        </a>
+                        <a href="merchant.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="users" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">客商</span>
+                        </a>
+                        <a href="project.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="clipboard-list" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">项目</span>
+                        </a>
+                        <a href="material.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="package" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">物料</span>
+                        </a>
+                        <a href="cost-ratio.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="pie-chart" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">成本比例配置</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 公共资料 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="public-data">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">公共资料</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="public-data-content">
+                        <a href="currency.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="dollar-sign" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">币别</span>
+                        </a>
+                        <a href="accounting-calendar.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="calendar" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">会计日历</span>
+                        </a>
+                        <a href="document-type.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="file-text" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">单据类型</span>
+                        </a>
+                        <a href="tax-rate.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="percent" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">税率</span>
+                        </a>
+                        <a href="invoice-type.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="file-invoice" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">发票类型</span>
+                        </a>
+                        <a href="unit.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="ruler" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">计量单位</span>
+                        </a>
+                        <a href="requirement-type.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="list-checks" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">需求类型</span>
+                        </a>
+                        <a href="source-system.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="cloud" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">来源系统</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 项目管理 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="project-management">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">项目管理</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="project-management-content">
+                        <a href="project-overview.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="bar-chart-3" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">项目概览</span>
+                        </a>
+                        <a href="process-acceptance.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="check-circle" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">工序验收管理</span>
+                        </a>
+                        <a href="accounting-method.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="calculator" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">核算方法管理</span>
+                        </a>
+                        <a href="project-accounting.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="book" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">项目核算</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 应收管理 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="receivable-management">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">应收管理</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="receivable-management-content">
+                        <a href="receivable.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="credit-card" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">应收单</span>
+                        </a>
+                        <a href="receipt.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="cash" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">收款单</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <!-- 页面内容 -->
+        </main>
+    </div>
+
+    <script>
+        // 初始化Lucide图标
+        lucide.createIcons();
+        
+        // 侧边栏折叠/展开功能
+        const toggleSidebar = document.getElementById('toggle-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            if (sidebar.classList.contains('collapsed')) {
+                mainContent.classList.remove('ml-64');
+                mainContent.classList.add('ml-16');
+            } else {
+                mainContent.classList.remove('ml-16');
+                mainContent.classList.add('ml-64');
+            }
+        });
+        
+        // 菜单展开/收拢功能
+        const menuHeaders = document.querySelectorAll('.menu-header');
+        
+        menuHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const menuName = header.getAttribute('data-menu');
+                const content = document.getElementById(`${menuName}-content`);
+                const icon = header.querySelector('.menu-icon');
+                
+                // 切换内容显示/隐藏
+                content.classList.toggle('hidden');
+                
+                // 切换图标旋转
+                if (content.classList.contains('hidden')) {
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+        
+        // 高亮当前页面的导航项
+        const currentPath = window.location.pathname;
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        
+        sidebarItems.forEach(item => {
+            const href = item.getAttribute('href');
+            if (currentPath.includes(href)) {
+                item.classList.add('active');
+                
+                // 展开包含当前页面的菜单
+                const menuContent = item.closest('.menu-content');
+                if (menuContent) {
+                    menuContent.classList.remove('hidden');
+                    const menuHeader = menuContent.previousElementSibling;
+                    if (menuHeader) {
+                        const icon = menuHeader.querySelector('.menu-icon');
+                        if (icon) {
+                            icon.style.transform = 'rotate(180deg)';
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

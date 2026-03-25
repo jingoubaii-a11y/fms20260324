@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目核算 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .sidebar {
+            transition: width 0.3s ease-in-out;
+            overflow-y: auto;
+            height: 100%;
+        }
+        
+        .sidebar.collapsed {
+            width: 64px;
+        }
+        
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        
+        .sidebar.collapsed .sidebar-icon {
+            margin: 0 auto;
+        }
+        
+        .sidebar-item {
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+        }
+        
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+        }
+        
+        .menu-header h2 {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .step-active {
+            background-color: #003eb3;
+            color: white;
+        }
+        
+        .step-completed {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .step-pending {
+            background-color: #e5e7eb;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body class="bg-neutral">
+
+    <!-- 主容器 -->
+    <div class="flex h-screen">
+        <!-- 侧边栏 -->
+        <div id="sidebar-container"></div>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-800">项目核算</h2>
+                    <p class="text-gray-600 mt-1">项目核算工作台</p>
+                </div>
+                
+                <!-- 核算步骤 -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="step-active flex items-center space-x-2">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center">1</div>
+                                <span>确定核算范围</span>
+                            </div>
+                            <div class="h-0.5 w-12 bg-gray-300"></div>
+                            <div class="step-pending flex items-center space-x-2">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center">2</div>
+                                <span>核算前检查</span>
+                            </div>
+                            <div class="h-0.5 w-12 bg-gray-300"></div>
+                            <div class="step-pending flex items-center space-x-2">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center">3</div>
+                                <span>核算中</span>
+                            </div>
+                            <div class="h-0.5 w-12 bg-gray-300"></div>
+                            <div class="step-pending flex items-center space-x-2">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center">4</div>
+                                <span>核算结果查询</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 步骤1：确定核算范围 -->
+                <div class="step-content">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">步骤1：确定本次核算范围</h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">核算组织</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="all">全部组织</option>
+                                    <option value="company1">成都分公司</option>
+                                    <option value="company2">朗润分公司</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">核算期间</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="2026-02">2026年02月</option>
+                                    <option value="2026-01">2026年01月</option>
+                                    <option value="2025-12">2025年12月</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">核算方法</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="all">全部方法</option>
+                                    <option value="completed-contract">完成合同法</option>
+                                    <option value="percentage-of-completion">完工百分比法</option>
+                                    <option value="collection">收款确收</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">项目类型</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="all">全部类型</option>
+                                    <option value="design">设计费</option>
+                                    <option value="decoration">整装</option>
+                                    <option value="soft">软装</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button class="px-6 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                                下一步
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 步骤2：核算前检查 -->
+                <div class="step-content hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">步骤2：核算前检查</h3>
+                    <div class="bg-gray-50 p-4 rounded-md border border-gray-200 mb-4">
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-green-500 mr-2"></i>
+                                <span>核算期间已设置</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-green-500 mr-2"></i>
+                                <span>核算方法已配置</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-green-500 mr-2"></i>
+                                <span>项目数据已就绪</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-green-500 mr-2"></i>
+                                <span>成本数据已同步</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-between">
+                        <button class="px-6 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            上一步
+                        </button>
+                        <button class="px-6 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                            下一步
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 步骤3：核算中 -->
+                <div class="step-content hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">步骤3：核算中</h3>
+                    <div class="bg-gray-50 p-6 rounded-md border border-gray-200 mb-4 text-center">
+                        <i data-lucide="loader-2" class="w-12 h-12 text-primary animate-spin mx-auto mb-4"></i>
+                        <p class="text-gray-700 mb-2">正在进行项目核算，请稍候...</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                            <div class="bg-primary h-2.5 rounded-full" style="width: 60%"></div>
+                        </div>
+                        <p class="text-sm text-gray-500">已完成 60%</p>
+                    </div>
+                    <div class="mt-6 flex justify-start">
+                        <button class="px-6 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            取消
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 步骤4：核算结果查询 -->
+                <div class="step-content hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">步骤4：核算结果查询</h3>
+                    <div class="mb-4">
+                        <div class="flex space-x-4">
+                            <input type="text" placeholder="项目编码" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <input type="text" placeholder="项目名称" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                                <i data-lucide="search" class="w-4 h-4 mr-2 inline"></i>
+                                查询
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">项目编码</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">项目名称</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">项目类型</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">核算方法</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">核算期间</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">确认收入</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">确认成本</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">PROJ-001</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">张三新房装修</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">整装</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">完成合同法</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-02</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">¥ 30,000.00</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">¥ 24,000.00</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700">查看详情</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">PROJ-002</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">李四设计咨询</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">设计费</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">收款确收</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-02</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">¥ 10,000.00</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">¥ 3,000.00</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700">查看详情</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-6 flex justify-between">
+                        <button class="px-6 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            上一步
+                        </button>
+                        <button class="px-6 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                            完成
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 加载侧边栏
+        function loadSidebar() {
+            fetch('common/sidebar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sidebar-container').innerHTML = data;
+                    // 加载通用脚本
+                    const script = document.createElement('script');
+                    script.src = 'common/scripts.js';
+                    script.onload = function() {
+                        // 初始化页面函数
+                        initPageFunctions();
+                    };
+                    document.head.appendChild(script);
+                })
+                .catch(error => console.error('加载侧边栏失败:', error));
+        }
+
+        // 页面特定功能初始化
+        function initPageFunctions() {
+            // 步骤切换功能
+            const stepButtons = document.querySelectorAll('.step-button');
+            const stepContents = document.querySelectorAll('.step-content');
+            
+            stepButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const stepIndex = parseInt(button.getAttribute('data-step')) - 1;
+                    
+                    // 隐藏所有步骤内容
+                    stepContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    // 显示当前步骤内容
+                    stepContents[stepIndex].classList.remove('hidden');
+                    
+                    // 更新步骤状态
+                    const steps = document.querySelectorAll('.step');
+                    steps.forEach((step, index) => {
+                        if (index < stepIndex) {
+                            step.classList.remove('step-pending', 'step-active');
+                            step.classList.add('step-completed');
+                        } else if (index === stepIndex) {
+                            step.classList.remove('step-pending', 'step-completed');
+                            step.classList.add('step-active');
+                        } else {
+                            step.classList.remove('step-active', 'step-completed');
+                            step.classList.add('step-pending');
+                        }
+                    });
+                });
+            });
+        }
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', loadSidebar);
+    </script>
+</body>
+</html>

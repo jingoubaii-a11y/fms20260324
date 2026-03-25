@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物料 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            transition: width 0.3s ease-in-out;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        
+        .sidebar.collapsed {
+            width: 64px;
+        }
+        
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        
+        .sidebar.collapsed .sidebar-icon {
+            margin: 0 auto;
+        }
+        
+        .sidebar-item {
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+        }
+        
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+        }
+        
+        .menu-header h2 {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .drawer {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+        
+        .drawer.open {
+            transform: translateX(0);
+        }
+        
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 15;
+            display: none;
+        }
+        
+        .drawer-overlay.open {
+            display: block;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #003eb3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        
+        .category-tree {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .category-tree li {
+            margin: 2px 0;
+        }
+        
+        .category-tree .category-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .category-tree .category-item:hover {
+            background-color: rgba(0, 62, 179, 0.1);
+        }
+        
+        .category-tree .category-item.active {
+            background-color: rgba(0, 62, 179, 0.2);
+            color: #003eb3;
+        }
+        
+        .category-tree .toggle {
+            margin-right: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .category-tree .children {
+            padding-left: 20px;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body class="bg-neutral">
+    <!-- 主容器 -->
+    <div class="flex h-screen">
+        <!-- 侧边栏 -->
+        <aside id="sidebar" class="sidebar gradient-bg text-white shadow-sm fixed left-0 top-0 bottom-0 w-64 overflow-y-auto z-10">
+            <div class="p-4 flex items-center justify-between border-b border-white/20">
+                <h1 class="text-xl font-semibold">财务中台</h1>
+                <button id="toggle-sidebar" class="p-2 rounded-md hover:bg-white/10">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+            <nav class="py-4">
+                <!-- 仪表盘 -->
+                <a href="index.html" class="sidebar-item flex items-center px-4 py-3 text-white/90 hover:text-white rounded-md">
+                    <i data-lucide="home" class="sidebar-icon w-5 h-5 mr-3"></i>
+                    <span class="sidebar-text">仪表盘</span>
+                </a>
+                
+                <!-- 基础资料 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="basic-data">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">基础资料</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="basic-data-content">
+                        <a href="financial-entity.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="building" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">财务主体</span>
+                        </a>
+                        <a href="merchant.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="users" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">客商</span>
+                        </a>
+                        <a href="project.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="clipboard-list" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">项目</span>
+                        </a>
+                        <a href="material.html" class="sidebar-item flex items-center px-4 py-2 text-white active rounded-md">
+                            <i data-lucide="package" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">物料</span>
+                        </a>
+                        <a href="cost-ratio.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="pie-chart" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">成本比例配置</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 公共资料 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="public-data">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">公共资料</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="public-data-content">
+                        <a href="currency.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="dollar-sign" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">币别</span>
+                        </a>
+                        <a href="accounting-calendar.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="calendar" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">会计日历</span>
+                        </a>
+                        <a href="document-type.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="file-text" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">单据类型</span>
+                        </a>
+                        <a href="tax-rate.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="percent" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">税率</span>
+                        </a>
+                        <a href="invoice-type.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="file-invoice" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">发票类型</span>
+                        </a>
+                        <a href="unit.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="ruler" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">计量单位</span>
+                        </a>
+                        <a href="requirement-type.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="list-checks" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">需求类型</span>
+                        </a>
+                        <a href="source-system.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="cloud" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">来源系统</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 项目管理 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="project-management">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">项目管理</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="project-management-content">
+                        <a href="project-overview.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="bar-chart-3" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">项目概览</span>
+                        </a>
+                        <a href="process-acceptance.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="check-circle" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">工序验收管理</span>
+                        </a>
+                        <a href="accounting-method.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="calculator" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">核算方法管理</span>
+                        </a>
+                        <a href="project-accounting.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="book" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">项目核算</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 应收管理 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="receivable-management">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">应收管理</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="receivable-management-content">
+                        <a href="receivable.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="credit-card" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">应收单</span>
+                        </a>
+                        <a href="receipt.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="cash" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">收款单</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-800">物料管理</h2>
+                    <p class="text-gray-600 mt-1">统一管理物料/商品基础信息，统一计价、核算与成本口径</p>
+                </div>
+                
+                <!-- 选项卡 -->
+                <div class="border-b border-gray-200 mb-6">
+                    <ul class="flex space-x-6">
+                        <li>
+                            <a href="#" id="tab-material-list" class="py-2 border-b-2 border-primary text-primary font-medium">物料列表</a>
+                        </li>
+                        <li>
+                            <a href="#" id="tab-unit-conversion" class="py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700">物料单位换算</a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- 物料列表内容 -->
+                <div id="material-list-content" class="flex">
+                    <!-- 左侧物料分类 -->
+                    <div class="w-1/4 pr-4">
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 h-[calc(100vh-240px)]">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-semibold text-gray-700">物料分类</h3>
+                                <div class="flex space-x-2">
+                                    <button id="add-category-btn" class="p-1 text-primary hover:bg-secondary rounded">
+                                        <i data-lucide="plus" class="w-4 h-4"></i>
+                                    </button>
+                                    <button id="edit-category-btn" class="p-1 text-primary hover:bg-secondary rounded">
+                                        <i data-lucide="edit" class="w-4 h-4"></i>
+                                    </button>
+                                    <button id="delete-category-btn" class="p-1 text-accent hover:bg-red-50 rounded">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <ul class="category-tree">
+                                <li>
+                                    <div class="category-item active">
+                                        <span class="toggle">▼</span>
+                                        <span>全部物料</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="category-item">
+                                        <span class="toggle">▼</span>
+                                        <span>装饰材料</span>
+                                    </div>
+                                    <ul class="children">
+                                        <li>
+                                            <div class="category-item">
+                                                <span class="toggle">▶</span>
+                                                <span>瓷砖</span>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="category-item">
+                                                <span class="toggle">▶</span>
+                                                <span>地板</span>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="category-item">
+                                                <span class="toggle">▶</span>
+                                                <span>涂料</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="category-item">
+                                        <span class="toggle">▼</span>
+                                        <span>电器设备</span>
+                                    </div>
+                                    <ul class="children">
+                                        <li>
+                                            <div class="category-item">
+                                                <span class="toggle">▶</span>
+                                                <span>LED灯具</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="category-item">
+                                        <span class="toggle">▼</span>
+                                        <span>五金配件</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧物料列表 -->
+                    <div class="w-3/4">
+                        <!-- 搜索条件和按钮栏 -->
+                        <div class="flex items-center justify-between mb-6 flex-nowrap">
+                            <div class="flex items-center space-x-2 flex-1">
+                                <select id="search-field" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="code">物料编码</option>
+                                    <option value="name">物料名称</option>
+                                    <option value="status">状态</option>
+                                </select>
+                                <input type="text" id="search-input" placeholder="按物料编码搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                    <i data-lucide="search" class="w-4 h-4"></i>
+                                </button>
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                    <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                </button>
+                                <button id="advanced-filter-btn" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center">
+                                    高级筛选
+                                    <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                </button>
+                            </div>
+                            <button id="add-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center">
+                                <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                                新增
+                            </button>
+                        </div>
+                        
+                        <!-- 高级筛选展开区域 -->
+                        <div id="advanced-filter-content" class="hidden bg-gray-50 p-4 rounded-md border border-gray-200 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">物料编码</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">物料名称</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">状态</label>
+                                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="">全部状态</option>
+                                        <option value="enabled">启用</option>
+                                        <option value="disabled">停用</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex justify-end space-x-2">
+                                <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                                    重置
+                                </button>
+                                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    查询
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 列表 -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">物料编码</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">物料名称</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">主单位</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">销售单位</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">物料分组</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">WL-001</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">防滑瓷砖</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">块</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">平方米</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">装饰材料/瓷砖</td>
+                                        <td class="px-4 py-2">
+                                            <label class="switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:text-blue-700" onclick="editMaterial('WL-001')">编辑</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">WL-002</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">实木地板</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">平方米</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">平方米</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">装饰材料/地板</td>
+                                        <td class="px-4 py-2">
+                                            <label class="switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:text-blue-700" onclick="editMaterial('WL-002')">编辑</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">WL-003</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">乳胶漆</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">桶</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">桶</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">装饰材料/涂料</td>
+                                        <td class="px-4 py-2">
+                                            <label class="switch">
+                                                <input type="checkbox">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:text-blue-700" onclick="editMaterial('WL-003')">编辑</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">WL-004</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">LED灯具</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">个</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">个</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">电器设备</td>
+                                        <td class="px-4 py-2">
+                                            <label class="switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:text-blue-700" onclick="editMaterial('WL-004')">编辑</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- 分页 -->
+                        <div class="mt-6 flex items-center justify-between">
+                            <div class="text-sm text-gray-500">
+                                显示 1-4 条，共 12 条
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                                    上一页
+                                </button>
+                                <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">2</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">3</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 物料单位换算内容 -->
+                <div id="unit-conversion-content" class="hidden">
+                    <!-- 搜索条件和新增按钮 -->
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex space-x-4">
+                            <div>
+                                <input type="text" placeholder="物料编码" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <input type="text" placeholder="物料名称" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                                <i data-lucide="search" class="w-4 h-4 mr-2 inline"></i>
+                                查询
+                            </button>
+                        </div>
+                        <button id="add-unit-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                            新增
+                        </button>
+                    </div>
+                    
+                    <!-- 列表 -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">物料编码</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">物料名称</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">主单位</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">销售单位</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">换算系数</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">WL-001</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">防滑瓷砖</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">块</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">平方米</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">1.0</td>
+                                    <td class="px-4 py-2">
+                                        <label class="switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700 edit-unit">编辑</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">WL-002</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">实木地板</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">平方米</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">平方米</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">1.0</td>
+                                    <td class="px-4 py-2">
+                                        <label class="switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700 edit-unit">编辑</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">WL-003</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">乳胶漆</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">桶</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">桶</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">1.0</td>
+                                    <td class="px-4 py-2">
+                                        <label class="switch">
+                                            <input type="checkbox">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700 edit-unit">编辑</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页 -->
+                    <div class="mt-6 flex items-center justify-between">
+                        <div class="text-sm text-gray-500">
+                            显示 1-3 条，共 8 条
+                        </div>
+                        <div class="flex space-x-1">
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                                上一页
+                            </button>
+                            <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">2</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">3</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">下一页</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 抽屉遮罩层 -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+
+    <!-- 新增/编辑分类抽屉 -->
+    <div id="category-drawer" class="drawer fixed top-0 right-0 h-full w-96 bg-white shadow-lg z-20 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800" id="category-drawer-title">新增分类</h3>
+            <button id="close-category-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <form>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">分类编码 <span class="text-accent">*</span></label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" maxlength="32" pattern="[a-zA-Z0-9_]+" required>
+                    <p class="text-xs text-gray-500 mt-1">支持字母、数字、下划线，全局唯一</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">分类名称 <span class="text-accent">*</span></label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" maxlength="64" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">上级分类</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="">无（根节点）</option>
+                        <option value="decorative">装饰材料</option>
+                        <option value="electrical">电器设备</option>
+                        <option value="hardware">五金配件</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">创建人</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50" disabled value="系统当前用户">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">创建时间</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50" disabled value="2026-03-14 10:00:00">
+                </div>
+            </div>
+            <div class="mt-6 flex space-x-3">
+                <button type="button" id="cancel-category-btn" class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    关闭
+                </button>
+                <button type="button" id="save-category-btn" class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                    保存
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 新增/编辑物料抽屉 -->
+    <div id="material-drawer" class="drawer fixed top-0 right-0 h-full w-96 bg-white shadow-lg z-20 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800" id="material-drawer-title">新增物料</h3>
+            <button id="close-material-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <form>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">物料编码 <span class="text-accent">*</span></label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="material-code" maxlength="32" pattern="[a-zA-Z0-9_]+" required>
+                    <p class="text-xs text-gray-500 mt-1">支持字母、数字、下划线</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">物料名称 <span class="text-accent">*</span></label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="material-name" maxlength="64" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">主单位 <span class="text-accent">*</span></label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="material-main-unit" required>
+                        <option value="">请选择</option>
+                        <option value="piece">块</option>
+                        <option value="square">平方米</option>
+                        <option value="set">套</option>
+                        <option value="bucket">桶</option>
+                        <option value="piece">个</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">销售单位 <span class="text-accent">*</span></label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="material-sale-unit" required>
+                        <option value="">请选择</option>
+                        <option value="piece">块</option>
+                        <option value="square">平方米</option>
+                        <option value="set">套</option>
+                        <option value="bucket">桶</option>
+                        <option value="piece">个</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">物料分组</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="material-group">
+                        <option value="">请选择</option>
+                        <option value="decorative/tile">装饰材料/瓷砖</option>
+                        <option value="decorative/floor">装饰材料/地板</option>
+                        <option value="decorative/paint">装饰材料/涂料</option>
+                        <option value="electrical/led">电器设备/LED灯具</option>
+                        <option value="hardware">五金配件</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">默认税率</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="">请选择</option>
+                        <option value="0.03">3%</option>
+                        <option value="0.06">6%</option>
+                        <option value="0.09">9%</option>
+                        <option value="0.13">13%</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">状态 <span class="text-accent">*</span></label>
+                    <label class="switch">
+                        <input type="checkbox" checked id="material-status">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">创建人</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50" disabled value="系统当前用户">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">创建时间</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50" disabled value="2026-03-14 10:00:00">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">修改人</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">修改时间</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50" disabled>
+                </div>
+            </div>
+            <div class="mt-6 flex space-x-3">
+                <button type="button" id="cancel-material-btn" class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    关闭
+                </button>
+                <button type="button" id="save-material-btn" class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                    保存
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 物料单位换算抽屉 -->
+    <div id="unit-drawer" class="drawer fixed top-0 right-0 h-full w-96 bg-white shadow-lg z-20 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">物料单位换算</h3>
+            <button id="close-unit-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <form>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">物料编码 <span class="text-accent">*</span></label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        <option value="">请选择</option>
+                        <option value="WL-001">WL-001 - 防滑瓷砖</option>
+                        <option value="WL-002">WL-002 - 实木地板</option>
+                        <option value="WL-003">WL-003 - 乳胶漆</option>
+                        <option value="WL-004">WL-004 - LED灯具</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">物料名称</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">主单位</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">销售单位 <span class="text-accent">*</span></label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        <option value="">请选择</option>
+                        <option value="piece">块</option>
+                        <option value="square">平方米</option>
+                        <option value="set">套</option>
+                        <option value="bucket">桶</option>
+                        <option value="piece">个</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">换算系数 <span class="text-accent">*</span></label>
+                    <input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" min="0.0001" step="0.0001" required>
+                    <p class="text-xs text-gray-500 mt-1">大于0，最多4位小数</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">状态 <span class="text-accent">*</span></label>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">创建人</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50" disabled value="系统当前用户">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">创建时间</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50" disabled value="2026-03-14 10:00:00">
+                </div>
+            </div>
+            <div class="mt-6 flex space-x-3">
+                <button type="button" id="cancel-unit-btn" class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    关闭
+                </button>
+                <button type="button" id="save-unit-btn" class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                    保存
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // 初始化Lucide图标
+        lucide.createIcons();
+        
+        // 侧边栏折叠/展开功能
+        const toggleSidebar = document.getElementById('toggle-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            if (sidebar.classList.contains('collapsed')) {
+                mainContent.classList.remove('ml-64');
+                mainContent.classList.add('ml-16');
+            } else {
+                mainContent.classList.remove('ml-16');
+                mainContent.classList.add('ml-64');
+            }
+        });
+        
+        // 菜单展开/收拢功能
+        const menuHeaders = document.querySelectorAll('.menu-header');
+        
+        menuHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const menuName = header.getAttribute('data-menu');
+                const content = document.getElementById(`${menuName}-content`);
+                const icon = header.querySelector('.menu-icon');
+                
+                // 切换内容显示/隐藏
+                content.classList.toggle('hidden');
+                
+                // 切换图标旋转
+                if (content.classList.contains('hidden')) {
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+        
+        // 高亮当前页面的导航项
+        const currentPath = window.location.pathname;
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        
+        // 搜索字段切换功能
+        const searchField = document.getElementById('search-field');
+        const searchInput = document.getElementById('search-input');
+        
+        if (searchField && searchInput) {
+            searchField.addEventListener('change', function() {
+                const field = this.value;
+                let placeholder = '';
+                
+                switch(field) {
+                    case 'code':
+                        placeholder = '按物料编码搜索';
+                        break;
+                    case 'name':
+                        placeholder = '按物料名称搜索';
+                        break;
+                    case 'status':
+                        placeholder = '按状态搜索';
+                        break;
+                    default:
+                        placeholder = '请输入搜索内容';
+                }
+                
+                searchInput.placeholder = placeholder;
+            });
+        }
+        
+        // 高级筛选展开/收起功能
+        const advancedFilterBtn = document.getElementById('advanced-filter-btn');
+        const advancedFilterContent = document.getElementById('advanced-filter-content');
+        
+        if (advancedFilterBtn && advancedFilterContent) {
+            advancedFilterBtn.addEventListener('click', function() {
+                advancedFilterContent.classList.toggle('hidden');
+                
+                // 切换箭头图标
+                const icon = this.querySelector('i');
+                if (advancedFilterContent.classList.contains('hidden')) {
+                    icon.setAttribute('data-lucide', 'chevron-down');
+                } else {
+                    icon.setAttribute('data-lucide', 'chevron-up');
+                }
+                
+                // 重新渲染图标
+                lucide.createIcons();
+            });
+        }
+        
+        // 高亮当前页面的导航项
+        sidebarItems.forEach(item => {
+            const href = item.getAttribute('href');
+            if (currentPath.includes(href)) {
+                item.classList.add('active');
+                
+                // 展开包含当前页面的菜单
+                const menuContent = item.closest('.menu-content');
+                if (menuContent) {
+                    menuContent.classList.remove('hidden');
+                    const menuHeader = menuContent.previousElementSibling;
+                    if (menuHeader) {
+                        const icon = menuHeader.querySelector('.menu-icon');
+                        if (icon) {
+                            icon.style.transform = 'rotate(180deg)';
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 抽屉遮罩层
+        const drawerOverlay = document.getElementById('drawer-overlay');
+        
+        function openDrawer(drawer) {
+            drawer.classList.add('open');
+            drawerOverlay.classList.add('open');
+        }
+        
+        function closeDrawer(drawer) {
+            drawer.classList.remove('open');
+            drawerOverlay.classList.remove('open');
+        }
+        
+        // 点击遮罩层关闭所有抽屉
+        drawerOverlay.addEventListener('click', () => {
+            document.querySelectorAll('.drawer').forEach(drawer => {
+                drawer.classList.remove('open');
+            });
+            drawerOverlay.classList.remove('open');
+        });
+        
+        // 分类抽屉功能
+        const addCategoryBtn = document.getElementById('add-category-btn');
+        const editCategoryBtn = document.getElementById('edit-category-btn');
+        const deleteCategoryBtn = document.getElementById('delete-category-btn');
+        const categoryDrawer = document.getElementById('category-drawer');
+        const closeCategoryDrawer = document.getElementById('close-category-drawer');
+        const cancelCategoryBtn = document.getElementById('cancel-category-btn');
+        const saveCategoryBtn = document.getElementById('save-category-btn');
+        const categoryDrawerTitle = document.getElementById('category-drawer-title');
+        
+        addCategoryBtn.addEventListener('click', () => {
+            categoryDrawerTitle.textContent = '新增分类';
+            openDrawer(categoryDrawer);
+        });
+        
+        editCategoryBtn.addEventListener('click', () => {
+            categoryDrawerTitle.textContent = '编辑分类';
+            openDrawer(categoryDrawer);
+        });
+        
+        deleteCategoryBtn.addEventListener('click', () => {
+            if (confirm('确定要删除选中的分类吗？')) {
+                alert('删除成功');
+            }
+        });
+        
+        closeCategoryDrawer.addEventListener('click', () => {
+            closeDrawer(categoryDrawer);
+        });
+        
+        cancelCategoryBtn.addEventListener('click', () => {
+            closeDrawer(categoryDrawer);
+        });
+        
+        saveCategoryBtn.addEventListener('click', () => {
+            alert('保存成功');
+            closeDrawer(categoryDrawer);
+        });
+        
+        // 物料抽屉功能
+        const addBtn = document.getElementById('add-btn');
+        const materialDrawer = document.getElementById('material-drawer');
+        const closeMaterialDrawer = document.getElementById('close-material-drawer');
+        const cancelMaterialBtn = document.getElementById('cancel-material-btn');
+        const saveMaterialBtn = document.getElementById('save-material-btn');
+        const materialDrawerTitle = document.getElementById('material-drawer-title');
+        
+        addBtn.addEventListener('click', () => {
+            materialDrawerTitle.textContent = '新增物料';
+            document.getElementById('material-code').value = '';
+            document.getElementById('material-name').value = '';
+            document.getElementById('material-main-unit').value = 'piece';
+            document.getElementById('material-sale-unit').value = 'piece';
+            document.getElementById('material-group').value = 'building/tile';
+            document.getElementById('material-status').checked = true;
+            openDrawer(materialDrawer);
+        });
+        
+        function editMaterial(code) {
+            materialDrawerTitle.textContent = '编辑物料';
+            // 模拟数据填充
+            if (code === 'MAT001') {
+                document.getElementById('material-code').value = 'MAT001';
+                document.getElementById('material-name').value = '抛光砖';
+                document.getElementById('material-main-unit').value = 'piece';
+                document.getElementById('material-sale-unit').value = 'square';
+                document.getElementById('material-group').value = 'building/tile';
+                document.getElementById('material-status').checked = true;
+            } else if (code === 'MAT002') {
+                document.getElementById('material-code').value = 'MAT002';
+                document.getElementById('material-name').value = '强化地板';
+                document.getElementById('material-main-unit').value = 'square';
+                document.getElementById('material-sale-unit').value = 'square';
+                document.getElementById('material-group').value = 'building/floor';
+                document.getElementById('material-status').checked = true;
+            } else if (code === 'MAT003') {
+                document.getElementById('material-code').value = 'MAT003';
+                document.getElementById('material-name').value = '真皮沙发';
+                document.getElementById('material-main-unit').value = 'set';
+                document.getElementById('material-sale-unit').value = 'set';
+                document.getElementById('material-group').value = 'furniture/sofa';
+                document.getElementById('material-status').checked = false;
+            }
+            openDrawer(materialDrawer);
+        }
+        
+        closeMaterialDrawer.addEventListener('click', () => {
+            closeDrawer(materialDrawer);
+        });
+        
+        cancelMaterialBtn.addEventListener('click', () => {
+            closeDrawer(materialDrawer);
+        });
+        
+        saveMaterialBtn.addEventListener('click', () => {
+            alert('保存成功');
+            closeDrawer(materialDrawer);
+        });
+        
+        // 选项卡切换
+        const tabMaterialList = document.getElementById('tab-material-list');
+        const tabUnitConversion = document.getElementById('tab-unit-conversion');
+        const materialListContent = document.getElementById('material-list-content');
+        const unitConversionContent = document.getElementById('unit-conversion-content');
+        const unitDrawer = document.getElementById('unit-drawer');
+        const closeUnitDrawer = document.getElementById('close-unit-drawer');
+        const cancelUnitBtn = document.getElementById('cancel-unit-btn');
+        const saveUnitBtn = document.getElementById('save-unit-btn');
+        const addUnitBtn = document.getElementById('add-unit-btn');
+        
+        tabMaterialList.addEventListener('click', (e) => {
+            e.preventDefault();
+            tabMaterialList.classList.add('border-primary', 'text-primary');
+            tabMaterialList.classList.remove('border-transparent', 'text-gray-500');
+            tabUnitConversion.classList.add('border-transparent', 'text-gray-500');
+            tabUnitConversion.classList.remove('border-primary', 'text-primary');
+            materialListContent.style.display = 'flex';
+            unitConversionContent.style.display = 'none';
+        });
+        
+        tabUnitConversion.addEventListener('click', (e) => {
+            e.preventDefault();
+            tabUnitConversion.classList.add('border-primary', 'text-primary');
+            tabUnitConversion.classList.remove('border-transparent', 'text-gray-500');
+            tabMaterialList.classList.add('border-transparent', 'text-gray-500');
+            tabMaterialList.classList.remove('border-primary', 'text-primary');
+            materialListContent.style.display = 'none';
+            unitConversionContent.style.display = 'block';
+        });
+        
+        // 物料单位换算抽屉
+        addUnitBtn.addEventListener('click', () => {
+            openDrawer(unitDrawer);
+        });
+        
+        closeUnitDrawer.addEventListener('click', () => {
+            closeDrawer(unitDrawer);
+        });
+        
+        cancelUnitBtn.addEventListener('click', () => {
+            closeDrawer(unitDrawer);
+        });
+        
+        saveUnitBtn.addEventListener('click', () => {
+            alert('保存成功');
+            closeDrawer(unitDrawer);
+        });
+        
+        // 物料单位换算编辑按钮点击事件
+        document.querySelectorAll('#unit-conversion-content .edit-unit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                openDrawer(unitDrawer);
+                // 这里可以添加数据填充逻辑
+            });
+        });
+        
+        // 分类树展开/折叠
+        const toggles = document.querySelectorAll('.toggle');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const parent = toggle.parentElement;
+                const children = parent.nextElementSibling;
+                if (children && children.classList.contains('children')) {
+                    if (children.style.display === 'none') {
+                        children.style.display = 'block';
+                        toggle.textContent = '▼';
+                    } else {
+                        children.style.display = 'none';
+                        toggle.textContent = '▶';
+                    }
+                }
+            });
+        });
+        
+        // 分类选择
+        const categoryItems = document.querySelectorAll('.category-item');
+        categoryItems.forEach(item => {
+            item.addEventListener('click', () => {
+                categoryItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

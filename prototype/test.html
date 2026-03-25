@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试项目 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="common/styles.css">
+</head>
+<body class="bg-neutral">
+
+    <!-- 主容器 -->
+    <div class="flex h-screen">
+        <!-- 侧边栏 -->
+        <div id="sidebar-container"></div>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="border-b border-gray-200 pb-4 mb-6">
+                    <h1 class="text-xl font-semibold text-gray-800">测试项目</h1>
+                </div>
+                
+                <div class="mb-6">
+                    <p class="text-gray-600 mb-4">这是一个测试页面，用于验证母版更新功能。</p>
+                    <p class="text-gray-600">当您修改公共侧边栏文件时，所有引用该母版的页面都会自动更新，包括此页面。</p>
+                </div>
+                
+                <div class="bg-secondary p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-primary mb-2">测试功能</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li>侧边栏折叠/展开功能</li>
+                        <li>菜单展开/收拢功能</li>
+                        <li>当前页面高亮显示</li>
+                        <li>母版自动更新功能</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 加载侧边栏
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html');
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+                
+                // 加载公共脚本
+                const script = document.createElement('script');
+                script.src = 'common/scripts.js';
+                script.onload = function() {
+                    // 脚本加载完成后初始化
+                    if (typeof initCommonFunctions === 'function') {
+                        initCommonFunctions();
+                    }
+                };
+                document.body.appendChild(script);
+            } catch (error) {
+                console.error('加载侧边栏失败:', error);
+            }
+        }
+        
+        // 页面加载完成后加载侧边栏
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadSidebar);
+        } else {
+            loadSidebar();
+        }
+    </script>
+</body>
+</html>

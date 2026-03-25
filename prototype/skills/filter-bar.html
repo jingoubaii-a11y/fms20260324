@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>筛选条件和按钮标准</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-neutral min-h-screen">
+    <div class="max-w-7xl mx-auto p-6">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-6">筛选条件和按钮标准设计</h1>
+        
+        <!-- 标准筛选条件和按钮区域 -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">标准布局</h2>
+            
+            <!-- 搜索条件和按钮 -->
+            <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex-1 flex items-center space-x-2">
+                    <!-- 筛选条件选择器 -->
+                    <select id="filter-select" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                        <option value="code">编码</option>
+                        <option value="name">名称</option>
+                        <option value="status">状态</option>
+                    </select>
+                    
+                    <!-- 输入框 -->
+                    <input type="text" id="filter-input" placeholder="按编码搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    
+                    <!-- 搜索按钮 -->
+                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                        <i data-lucide="search" class="w-4 h-4"></i>
+                    </button>
+                    
+                    <!-- 刷新按钮 -->
+                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                    </button>
+                    
+                    <!-- 高级筛选按钮 -->
+                    <button id="advanced-filter-btn" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center">
+                        高级筛选
+                        <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                    </button>
+                </div>
+                
+                <!-- 按钮组 -->
+                <div class="flex space-x-3">
+                    <button id="add-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                        新增
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 高级筛选条件 -->
+            <div id="advanced-filter" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">编码</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">名称</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">状态</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="">全部</option>
+                        <option value="enabled">启用</option>
+                        <option value="disabled">停用</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 使用说明 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">使用说明</h2>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="font-medium text-gray-700 mb-2">HTML结构</h3>
+                    <pre class="bg-gray-100 p-4 rounded-md text-sm overflow-x-auto">
+&lt;!-- 搜索条件和按钮 --&gt;
+&lt;div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4"&gt;
+    &lt;div class="flex-1 flex items-center space-x-2"&gt;
+        &lt;!-- 筛选条件选择器 --&gt;
+        &lt;select id="filter-select" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm"&gt;
+            &lt;option value="code"&gt;编码&lt;/option&gt;
+            &lt;option value="name"&gt;名称&lt;/option&gt;
+            &lt;option value="status"&gt;状态&lt;/option&gt;
+        &lt;/select&gt;
+        
+        &lt;!-- 输入框 --&gt;
+        &lt;input type="text" id="filter-input" placeholder="按编码搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"&gt;
+        
+        &lt;!-- 搜索按钮 --&gt;
+        &lt;button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors"&gt;
+            &lt;i data-lucide="search" class="w-4 h-4"&gt;&lt;/i&gt;
+        &lt;/button&gt;
+        
+        &lt;!-- 刷新按钮 --&gt;
+        &lt;button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors"&gt;
+            &lt;i data-lucide="refresh-ccw" class="w-4 h-4"&gt;&lt;/i&gt;
+        &lt;/button&gt;
+        
+        &lt;!-- 高级筛选按钮 --&gt;
+        &lt;button id="advanced-filter-btn" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center"&gt;
+            高级筛选
+            &lt;i data-lucide="chevron-down" class="w-4 h-4 ml-1"&gt;&lt;/i&gt;
+        &lt;/button&gt;
+    &lt;/div&gt;
+    
+    &lt;!-- 按钮组 --&gt;
+    &lt;div class="flex space-x-3"&gt;
+        &lt;button id="add-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"&gt;
+            &lt;i data-lucide="plus" class="w-4 h-4 mr-2"&gt;&lt;/i&gt;
+            新增
+        &lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- 高级筛选条件 --&gt;
+&lt;div id="advanced-filter" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 hidden"&gt;
+    &lt;!-- 筛选字段 --&gt;
+&lt;/div&gt;
+                    </pre>
+                </div>
+                
+                <div>
+                    <h3 class="font-medium text-gray-700 mb-2">JavaScript功能</h3>
+                    <pre class="bg-gray-100 p-4 rounded-md text-sm overflow-x-auto">
+// 筛选条件选择器功能
+const filterSelect = document.getElementById('filter-select');
+const filterInput = document.getElementById('filter-input');
+
+filterSelect.addEventListener('change', function() {
+    const selectedValue = this.value;
+    
+    // 根据选择的筛选条件更新占位符
+    if (selectedValue === 'code') {
+        filterInput.placeholder = '按编码搜索';
+    } else if (selectedValue === 'name') {
+        filterInput.placeholder = '按名称搜索';
+    } else if (selectedValue === 'status') {
+        filterInput.placeholder = '按状态搜索';
+    }
+    
+    // 清空输入框
+    filterInput.value = '';
+});
+
+// 高级筛选功能
+const advancedFilterBtn = document.getElementById('advanced-filter-btn');
+const advancedFilter = document.getElementById('advanced-filter');
+
+advancedFilterBtn.addEventListener('click', function() {
+    advancedFilter.classList.toggle('hidden');
+    
+    // 切换按钮文本和图标
+    if (!advancedFilter.classList.contains('hidden')) {
+        this.innerHTML = '收起筛选 &lt;i data-lucide="chevron-up" class="w-4 h-4 ml-1"&gt;&lt;/i&gt;';
+    } else {
+        this.innerHTML = '高级筛选 &lt;i data-lucide="chevron-down" class="w-4 h-4 ml-1"&gt;&lt;/i&gt;';
+    }
+    
+    // 重新初始化图标
+    lucide.createIcons();
+});
+                    </pre>
+                </div>
+                
+                <div>
+                    <h3 class="font-medium text-gray-700 mb-2">自定义说明</h3>
+                    <ul class="list-disc pl-5 space-y-2 text-sm text-gray-600">
+                        <li>根据页面需求修改筛选条件下拉选项</li>
+                        <li>调整高级筛选区域的字段数量和类型</li>
+                        <li>根据功能需要添加或修改右侧按钮组</li>
+                        <li>确保引入了Tailwind CSS和Lucide图标库</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 初始化Lucide图标
+        lucide.createIcons();
+        
+        // 筛选条件选择器功能
+        const filterSelect = document.getElementById('filter-select');
+        const filterInput = document.getElementById('filter-input');
+        
+        filterSelect.addEventListener('change', function() {
+            const selectedValue = this.value;
+            
+            // 根据选择的筛选条件更新占位符
+            if (selectedValue === 'code') {
+                filterInput.placeholder = '按编码搜索';
+            } else if (selectedValue === 'name') {
+                filterInput.placeholder = '按名称搜索';
+            } else if (selectedValue === 'status') {
+                filterInput.placeholder = '按状态搜索';
+            }
+            
+            // 清空输入框
+            filterInput.value = '';
+        });
+        
+        // 高级筛选功能
+        const advancedFilterBtn = document.getElementById('advanced-filter-btn');
+        const advancedFilter = document.getElementById('advanced-filter');
+        
+        advancedFilterBtn.addEventListener('click', function() {
+            advancedFilter.classList.toggle('hidden');
+            
+            // 切换按钮文本和图标
+            if (!advancedFilter.classList.contains('hidden')) {
+                this.innerHTML = '收起筛选 <i data-lucide="chevron-up" class="w-4 h-4 ml-1"></i>';
+            } else {
+                this.innerHTML = '高级筛选 <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>';
+            }
+            
+            // 重新初始化图标
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

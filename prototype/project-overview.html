@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目概览 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .sidebar {
+            transition: width 0.3s ease-in-out;
+            overflow-y: auto;
+            height: 100%;
+        }
+        
+        .sidebar.collapsed {
+            width: 64px;
+        }
+        
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        
+        .sidebar.collapsed .sidebar-icon {
+            margin: 0 auto;
+        }
+        
+        .sidebar-item {
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+        }
+        
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+        }
+        
+        .menu-header h2 {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .drawer {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+        
+        .drawer.open {
+            transform: translateX(0);
+        }
+        
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 15;
+            display: none;
+        }
+        
+        .drawer-overlay.open {
+            display: block;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #003eb3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body class="bg-neutral">
+
+
+    <!-- 主容器 -->
+    <div class="flex h-screen">
+        <!-- 侧边栏 -->
+        <div id="sidebar-container"></div>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="border-b border-gray-200 pb-4 mb-6">
+                    <h1 class="text-xl font-semibold text-gray-800">项目概览</h1>
+                    <p class="text-gray-600 mt-1">根据合同状态区分页签，展示不同项目列表</p>
+                </div>
+                
+                <!-- 状态页签 -->
+                <div class="border-b border-gray-200 mb-6">
+                    <ul class="flex space-x-6">
+                        <li>
+                            <a href="#" class="py-2 border-b-2 border-primary text-primary font-medium">全部 <span class="bg-primary text-white text-xs px-2 py-1 rounded-full ml-1">12</span></a>
+                        </li>
+                        <li>
+                            <a href="#" class="py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700">未开工 <span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full ml-1">3</span></a>
+                        </li>
+                        <li>
+                            <a href="#" class="py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700">在建 <span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full ml-1">6</span></a>
+                        </li>
+                        <li>
+                            <a href="#" class="py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700">竣工 <span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full ml-1">3</span></a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- 搜索条件 -->
+                <div class="bg-gray-50 p-4 rounded-md border border-gray-200 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">公司</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="">全部公司</option>
+                                <option value="company1">成都分公司</option>
+                                <option value="company2">朗润分公司</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">项目类型</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="">全部类型</option>
+                                <option value="design">设计费</option>
+                                <option value="decoration">整装</option>
+                                <option value="soft">软装</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">客户名称</label>
+                            <input type="text" placeholder="客户名称" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">订单号</label>
+                            <input type="text" placeholder="订单号" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
+                            <input type="text" placeholder="合同号" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">合同状态</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="">全部状态</option>
+                                <option value="open">打开</option>
+                                <option value="close">关闭</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end space-x-2">
+                        <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            重置
+                        </button>
+                        <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                            查询
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 列表 -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">公司</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">项目类型</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">需求类型</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">客户名称</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">订单号</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">合同号</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">合同状态</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-4 py-2 text-sm text-gray-700">成都分公司</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">整装</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">新房装修</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">张三</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">ORD-2026-001</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">CON-2026-001</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">打开</td>
+                                <td class="px-4 py-2 text-sm">
+                                    <div class="flex space-x-2">
+                                        <button class="text-primary hover:text-blue-700" onclick="viewProjectDetails('CON-2026-001')">项目详情</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="viewProjectAccounting('CON-2026-001')">项目核算明细</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="viewProcessAcceptance('CON-2026-001')">工序验收明细</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="viewPaymentDetails('CON-2026-001')">收退款明细</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-sm text-gray-700">朗润分公司</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">设计费</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">设计咨询</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">李四</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">ORD-2026-002</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">CON-2026-002</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">打开</td>
+                                <td class="px-4 py-2 text-sm">
+                                    <div class="flex space-x-2">
+                                        <button class="text-primary hover:text-blue-700" onclick="viewProjectDetails('CON-2026-002')">项目详情</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="viewProjectAccounting('CON-2026-002')">项目核算明细</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="viewProcessAcceptance('CON-2026-002')">工序验收明细</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="viewPaymentDetails('CON-2026-002')">收退款明细</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-sm text-gray-700">成都分公司</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">软装</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">家居软装</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">王五</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">ORD-2026-003</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">CON-2026-003</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">关闭</td>
+                                <td class="px-4 py-2 text-sm">
+                                    <div class="flex space-x-2">
+                                        <button class="text-primary hover:text-blue-700" onclick="viewProjectDetails('CON-2026-003')">项目详情</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="viewProjectAccounting('CON-2026-003')">项目核算明细</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="viewProcessAcceptance('CON-2026-003')">工序验收明细</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="viewPaymentDetails('CON-2026-003')">收退款明细</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 分页 -->
+                <div class="mt-6 flex items-center justify-between">
+                    <div class="text-sm text-gray-500">
+                        显示 1-3 条，共 12 条
+                    </div>
+                    <div class="flex space-x-1">
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                            上一页
+                        </button>
+                        <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">2</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">3</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">4</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 抽屉遮罩层 -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+
+    <!-- 项目详情抽屉 -->
+    <div id="project-details-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-20 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">项目详情</h3>
+            <button id="close-project-details-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <h4 class="text-sm font-medium text-gray-700 mb-2">基础信息</h4>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">公司</span>
+                        <span class="text-sm text-gray-700">成都分公司</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">项目类型</span>
+                        <span class="text-sm text-gray-700">整装</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">需求类型</span>
+                        <span class="text-sm text-gray-700">新房装修</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">客户名称</span>
+                        <span class="text-sm text-gray-700">张三</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">客户编码</span>
+                        <span class="text-sm text-gray-700">CUST001</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">订单号</span>
+                        <span class="text-sm text-gray-700">ORD-2026-001</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">合同号</span>
+                        <span class="text-sm text-gray-700">CON-2026-001</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">合同名称</span>
+                        <span class="text-sm text-gray-700">成都分公司-张三-新房装修合同</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">业务线</span>
+                        <span class="text-sm text-gray-700">住宅装修</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">产品分类</span>
+                        <span class="text-sm text-gray-700">大宅装</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">产品名称</span>
+                        <span class="text-sm text-gray-700">艺境名品5.0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">省市区</span>
+                        <span class="text-sm text-gray-700">四川省成都市武侯区</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">楼盘名称</span>
+                        <span class="text-sm text-gray-700">天府花园</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">楼盘地址</span>
+                        <span class="text-sm text-gray-700">天府大道123号</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">签单日期</span>
+                        <span class="text-sm text-gray-700">2026-01-15</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">创建日期</span>
+                        <span class="text-sm text-gray-700">2026-01-15</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">修改日期</span>
+                        <span class="text-sm text-gray-700">2026-01-16</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">来源系统</span>
+                        <span class="text-sm text-gray-700">SVI</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-sm font-medium text-gray-700 mb-2">核算信息</h4>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">预计总收入</span>
+                        <span class="text-sm text-gray-700">¥ 100,000.00</span>
+                    </div>
+                    <div class="pl-4 space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">开工前收入</span>
+                            <span class="text-sm text-gray-700">¥ 80,000.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">增减项收入</span>
+                            <span class="text-sm text-gray-700">¥ 15,000.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">附加收入</span>
+                            <span class="text-sm text-gray-700">¥ 5,000.00</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">预计总成本</span>
+                        <span class="text-sm text-gray-700">¥ 80,000.00</span>
+                    </div>
+                    <div class="pl-4 space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">开工前成本</span>
+                            <span class="text-sm text-gray-700">¥ 65,000.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">增减项目成本</span>
+                            <span class="text-sm text-gray-700">¥ 15,000.00</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">应收总额</span>
+                        <span class="text-sm text-gray-700">¥ 100,000.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">累计确认收入金额</span>
+                        <span class="text-sm text-gray-700">¥ 30,000.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">累计计税金额</span>
+                        <span class="text-sm text-gray-700">¥ 27,272.73</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">发包模式</span>
+                        <span class="text-sm text-gray-700">项目经理</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-sm font-medium text-gray-700 mb-2">状态信息</h4>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">项目状态</span>
+                        <span class="text-sm text-gray-700">在建</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">开工日期</span>
+                        <span class="text-sm text-gray-700">2026-02-01</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">竣工日期</span>
+                        <span class="text-sm text-gray-700">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">财务确认竣工日期</span>
+                        <span class="text-sm text-gray-700">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">设计费待确认收金额</span>
+                        <span class="text-sm text-gray-700">¥ 0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">关闭状态</span>
+                        <span class="text-sm text-gray-700">打开</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">最后核算期间</span>
+                        <span class="text-sm text-gray-700">2026-02</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-6">
+            <button id="close-project-details-btn" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                关闭
+            </button>
+        </div>
+    </div>
+
+    <!-- 项目核算明细抽屉 -->
+    <div id="project-accounting-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-20 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">项目核算明细</h3>
+            <button id="close-project-accounting-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="mb-4">
+            <div class="flex space-x-2">
+                <input type="text" placeholder="核算单号" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <input type="text" placeholder="会计期间" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <button class="px-3 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">核算单号</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">会计期间</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">累计确认收入</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">累计完工百分比</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <tr>
+                        <td class="px-4 py-2 text-sm text-gray-700">ACC-2026-001</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">2026-02</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">¥ 30,000.00</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">30%</td>
+                        <td class="px-4 py-2 text-sm">
+                            <button class="text-primary hover:text-blue-700">查看</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-6">
+            <button id="close-project-accounting-btn" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                关闭
+            </button>
+        </div>
+    </div>
+
+    <!-- 工序验收明细抽屉 -->
+    <div id="process-acceptance-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-20 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">工序验收明细</h3>
+            <button id="close-process-acceptance-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="mb-4">
+            <div class="flex space-x-2">
+                <input type="text" placeholder="工序" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <input type="text" placeholder="合同号" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <button class="px-3 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">单据编码</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">合同号</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">合同状态</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">工序</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">仓库</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">仓位</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">出库单号</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <tr>
+                        <td class="px-4 py-2 text-sm text-gray-700">PA-2026-001</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">CON-2026-001</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">打开</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">水电改造</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">成都仓库</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">A-1-1</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">OUT-2026-001</td>
+                        <td class="px-4 py-2 text-sm">
+                            <button class="text-primary hover:text-blue-700">查看出库</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-6">
+            <button id="close-process-acceptance-btn" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                关闭
+            </button>
+        </div>
+    </div>
+
+    <!-- 收退款明细抽屉 -->
+    <div id="payment-details-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-20 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">收退款明细</h3>
+            <button id="close-payment-details-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="mb-4">
+            <div class="flex space-x-2">
+                <input type="text" placeholder="收款单号" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <input type="text" placeholder="到账日期" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <button class="px-3 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">收款单号</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">收款金额</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">公司</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">到账日期</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建日期</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">是否计税</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">收款账号</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">退款金额</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <tr>
+                        <td class="px-4 py-2 text-sm text-gray-700">RCV-2026-001</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">¥ 30,000.00</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">成都分公司</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">2026-02-01</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">2026-02-01</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">是</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">6222****1234</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">¥ 0.00</td>
+                        <td class="px-4 py-2 text-sm">
+                            <button class="text-primary hover:text-blue-700">查看</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-6">
+            <button id="close-payment-details-btn" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                关闭
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 加载侧边栏
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html');
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+                
+                // 等待DOM更新完成
+                setTimeout(() => {
+                    // 加载公共脚本
+                    const script = document.createElement('script');
+                    script.src = 'common/scripts.js';
+                    script.onload = function() {
+                        // 脚本加载完成后初始化
+                        if (typeof initCommonFunctions === 'function') {
+                            initCommonFunctions();
+                        }
+                        // 初始化页面特定功能
+                        initPageFunctions();
+                    };
+                    document.body.appendChild(script);
+                }, 100);
+            } catch (error) {
+                console.error('加载侧边栏失败:', error);
+            }
+        }
+        
+        // 初始化页面特定功能
+        function initPageFunctions() {
+            // 抽屉功能
+            const projectDetailsDrawer = document.getElementById('project-details-drawer');
+            const projectAccountingDrawer = document.getElementById('project-accounting-drawer');
+            const processAcceptanceDrawer = document.getElementById('process-acceptance-drawer');
+            const paymentDetailsDrawer = document.getElementById('payment-details-drawer');
+            
+            window.viewProjectDetails = function(contractNo) {
+                if (typeof openDrawer === 'function') {
+                    openDrawer(projectDetailsDrawer);
+                } else {
+                    projectDetailsDrawer.classList.add('open');
+                    document.getElementById('drawer-overlay').classList.add('open');
+                }
+            };
+            
+            window.viewProjectAccounting = function(contractNo) {
+                if (typeof openDrawer === 'function') {
+                    openDrawer(projectAccountingDrawer);
+                } else {
+                    projectAccountingDrawer.classList.add('open');
+                    document.getElementById('drawer-overlay').classList.add('open');
+                }
+            };
+            
+            window.viewProcessAcceptance = function(contractNo) {
+                if (typeof openDrawer === 'function') {
+                    openDrawer(processAcceptanceDrawer);
+                } else {
+                    processAcceptanceDrawer.classList.add('open');
+                    document.getElementById('drawer-overlay').classList.add('open');
+                }
+            };
+            
+            window.viewPaymentDetails = function(contractNo) {
+                if (typeof openDrawer === 'function') {
+                    openDrawer(paymentDetailsDrawer);
+                } else {
+                    paymentDetailsDrawer.classList.add('open');
+                    document.getElementById('drawer-overlay').classList.add('open');
+                }
+            };
+            
+            // 关闭抽屉事件
+            document.getElementById('close-project-details-drawer').addEventListener('click', () => {
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(projectDetailsDrawer);
+                } else {
+                    projectDetailsDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+            
+            document.getElementById('close-project-details-btn').addEventListener('click', () => {
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(projectDetailsDrawer);
+                } else {
+                    projectDetailsDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+            
+            document.getElementById('close-project-accounting-drawer').addEventListener('click', () => {
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(projectAccountingDrawer);
+                } else {
+                    projectAccountingDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+            
+            document.getElementById('close-project-accounting-btn').addEventListener('click', () => {
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(projectAccountingDrawer);
+                } else {
+                    projectAccountingDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+            
+            document.getElementById('close-process-acceptance-drawer').addEventListener('click', () => {
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(processAcceptanceDrawer);
+                } else {
+                    processAcceptanceDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+            
+            document.getElementById('close-process-acceptance-btn').addEventListener('click', () => {
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(processAcceptanceDrawer);
+                } else {
+                    processAcceptanceDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+            
+            document.getElementById('close-payment-details-drawer').addEventListener('click', () => {
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(paymentDetailsDrawer);
+                } else {
+                    paymentDetailsDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+            
+            document.getElementById('close-payment-details-btn').addEventListener('click', () => {
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(paymentDetailsDrawer);
+                } else {
+                    paymentDetailsDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+            
+            document.getElementById('drawer-overlay').addEventListener('click', () => {
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(projectDetailsDrawer);
+                    closeDrawer(projectAccountingDrawer);
+                    closeDrawer(processAcceptanceDrawer);
+                    closeDrawer(paymentDetailsDrawer);
+                } else {
+                    projectDetailsDrawer.classList.remove('open');
+                    projectAccountingDrawer.classList.remove('open');
+                    processAcceptanceDrawer.classList.remove('open');
+                    paymentDetailsDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+        }
+        
+        // 初始化Lucide图标
+        lucide.createIcons();
+        
+        // 加载侧边栏
+        loadSidebar();
+    </script>
+</body>
+</html>

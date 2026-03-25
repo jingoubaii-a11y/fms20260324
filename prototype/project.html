@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            transition: width 0.3s ease-in-out;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        
+        .sidebar.collapsed {
+            width: 64px;
+        }
+        
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        
+        .sidebar.collapsed .sidebar-icon {
+            margin: 0 auto;
+        }
+        
+        .sidebar-item {
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+        }
+        
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .menu-header h2 {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+        }
+        
+        .drawer {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+        
+        .drawer.open {
+            transform: translateX(0);
+        }
+        
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 15;
+            display: none;
+        }
+        
+        .drawer-overlay.open {
+            display: block;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #003eb3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body class="bg-neutral">
+
+
+    <!-- 主容器 -->
+    <div class="flex h-screen">
+        <!-- 侧边栏 -->
+        <div id="sidebar-container"></div>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="border-b border-gray-200 pb-4 mb-6">
+                    <h1 class="text-xl font-semibold text-gray-800">项目</h1>
+                </div>
+                
+                <!-- 搜索条件和按钮 -->
+                <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex-1 flex items-center space-x-2">
+                        <!-- 筛选条件选择器 -->
+                        <select id="filter-select" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                            <option value="code">合同号</option>
+                            <option value="name">客户</option>
+                            <option value="company">公司</option>
+                            <option value="type">项目类型</option>
+                        </select>
+                        
+                        <!-- 输入框 -->
+                        <input type="text" id="filter-input" placeholder="按合同号搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        
+                        <!-- 搜索按钮 -->
+                        <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </button>
+                        
+                        <!-- 刷新按钮 -->
+                        <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                            <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                        </button>
+                        
+                        <!-- 高级筛选按钮 -->
+                        <button id="advanced-filter-btn" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center">
+                            高级筛选
+                            <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 按钮组 -->
+                    <div class="flex space-x-3">
+                        <button id="add-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                            新增
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 高级筛选条件 -->
+                <div id="advanced-filter" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">公司</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="">全部</option>
+                            <option value="cd">成都总公司</option>
+                            <option value="lr">朗润分公司</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">项目类型</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="">全部</option>
+                            <option value="design">设计费</option>
+                            <option value="decoration">整装</option>
+                            <option value="soft">软装</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">客户</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <div class="md:col-span-3 flex justify-end space-x-2">
+                        <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            重置
+                        </button>
+                        <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                            查询
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 列表 -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">公司</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">项目类型</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">需求类型</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">合同号</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">订单号</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">客户</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">合同状态</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">关闭状态</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-4 py-2 text-sm text-gray-700">成都总公司</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">设计费</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">家装设计</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">HT20260001</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">OD20260001</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">张三</td>
+                                <td class="px-4 py-2">
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-700">打开</td>
+                                <td class="px-4 py-2 text-sm">
+                                    <div class="flex space-x-2">
+                                        <button class="text-primary hover:text-blue-700" onclick="viewProject('PRO001')">查看</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="editProject('PRO001')">编辑</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-sm text-gray-700">朗润分公司</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">整装</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">全屋整装</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">HT20260002</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">OD20260002</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">成都建材有限公司</td>
+                                <td class="px-4 py-2">
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-700">打开</td>
+                                <td class="px-4 py-2 text-sm">
+                                    <div class="flex space-x-2">
+                                        <button class="text-primary hover:text-blue-700" onclick="viewProject('PRO002')">查看</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="editProject('PRO002')">编辑</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-sm text-gray-700">成都总公司</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">软装</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">软装设计</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">HT20260003</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">OD20260003</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">北京装饰工程公司</td>
+                                <td class="px-4 py-2">
+                                    <label class="switch">
+                                        <input type="checkbox">
+                                        <span class="slider"></span>
+                                    </label>
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-700">关闭</td>
+                                <td class="px-4 py-2 text-sm">
+                                    <div class="flex space-x-2">
+                                        <button class="text-primary hover:text-blue-700" onclick="viewProject('PRO003')">查看</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="editProject('PRO003')">编辑</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 分页 -->
+                <div class="mt-6 flex items-center justify-between">
+                    <div class="text-sm text-gray-500">
+                        显示 1-3 条，共 15 条
+                    </div>
+                    <div class="flex space-x-1">
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                            上一页
+                        </button>
+                        <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">2</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">3</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 查看/编辑项目抽屉 -->
+    <div id="project-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-20 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800" id="project-drawer-title">项目详情</h3>
+            <button id="close-project-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        
+        <!-- 页签 -->
+        <div class="border-b border-gray-200 mb-4">
+            <ul class="flex space-x-6" id="project-tabs">
+                <li><button class="py-2 border-b-2 border-primary text-primary font-medium" data-tab="basic">基础信息</button></li>
+                <li><button class="py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="accounting">核算信息</button></li>
+                <li><button class="py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="design">设计费信息</button></li>
+                <li><button class="py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="status">状态信息</button></li>
+                <li><button class="py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="log">变更日志</button></li>
+            </ul>
+        </div>
+        
+        <!-- 基础信息页签 -->
+        <div id="basic-tab" class="tab-content space-y-4 mb-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">公司</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-company" value="成都总公司">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">项目类型 <span class="text-red-500">*</span></label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-type">
+                    <option value="design">设计费</option>
+                    <option value="decoration">整装</option>
+                    <option value="soft">软装</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">需求类型 <span class="text-red-500">*</span></label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-requirement">
+                    <option value="decoration">整装</option>
+                    <option value="partial">局改</option>
+                    <option value="soft">软装</option>
+                    <option value="support">配套</option>
+                    <option value="custom">定制</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">客户名称 <span class="text-red-500">*</span></label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-customer" value="张三">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">客户编码 <span class="text-red-500">*</span></label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-customer-code" value="MER001">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">订单号 <span class="text-red-500">*</span></label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-order" value="OD20260001">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">合同号 <span class="text-red-500">*</span></label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-contract" value="HT20260001">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">合同名称 <span class="text-red-500">*</span></label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-contract-name" value="家装设计合同">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">业务线 <span class="text-red-500">*</span></label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-business">
+                    <option value="retail-shj-decoration">零售–零售–SHJ–整装业务</option>
+                    <option value="retail-shj-partial">零售–零售–SHJ–局改业务</option>
+                    <option value="retail-shj-soft">零售–零售–SHJ–软装业务</option>
+                    <option value="retail-shj-custom">零售–零售–SHJ–定制业务</option>
+                    <option value="retail-shj-design">零售–零售–SHJ–设计业务</option>
+                    <option value="retail-shj-retail">零售–零售–SHJ–零售业务</option>
+                    <option value="retail-shj-service">零售–零售–SHJ–服务业务</option>
+                    <option value="retail-shj-other">零售–零售–SHJ–其他业务</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">产品分类 <span class="text-red-500">*</span></label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-product-category">
+                    <option value="villa">大宅装</option>
+                    <option value="chinese">国潮装</option>
+                    <option value="luxury">轻奢装</option>
+                    <option value="appliance">电器包</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">产品名称 <span class="text-red-500">*</span></label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-product" value="艺境名品5.0">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">签约门店</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-sign-store" value="成都旗舰店">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">到店门店</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-visit-store" value="成都旗舰店">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">线索门店</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-lead-store" value="成都旗舰店">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">省市区 <span class="text-red-500">*</span></label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-location" value="四川省成都市武侯区">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">楼盘名称 <span class="text-red-500">*</span></label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-building" value="万科金色家园">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">楼盘地址 <span class="text-red-500">*</span></label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-address" value="四川省成都市武侯区万科路1号">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">签单日期 <span class="text-red-500">*</span></label>
+                <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-sign-date" value="2026-01-15">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">创建日期</label>
+                <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-create-date" value="2026-01-15" disabled>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">修改日期</label>
+                <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-modify-date" value="2026-01-16" disabled>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">来源系统</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-source">
+                    <option value="svi">svi</option>
+                    <option value="积木云装">积木云装</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- 核算信息页签 -->
+        <div id="accounting-tab" class="tab-content space-y-4 mb-6 hidden">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">预计总收入</label>
+                <div class="space-y-2 pl-4">
+                    <div>
+                        <label class="block text-xs text-gray-500">开工前收入</label>
+                        <input type="text" class="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="100000">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500">增减项收入</label>
+                        <input type="text" class="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="5000">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500">附加收入</label>
+                        <input type="text" class="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="2000">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">预计总成本</label>
+                <div class="space-y-2 pl-4">
+                    <div>
+                        <label class="block text-xs text-gray-500">开工前成本</label>
+                        <input type="text" class="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="60000">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500">增减项目成本</label>
+                        <input type="text" class="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="3000">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">应收总额</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="107000">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">收款总额</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="50000">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">累计确认收入金额</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="50000">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">累计计税金额</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="45454.55">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">计税方式 <span class="text-red-500">*</span></label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="general">一般计税</option>
+                    <option value="simple">简易计税</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">税率 <span class="text-red-500">*</span></label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="3">3%</option>
+                    <option value="6">6%</option>
+                    <option value="13">13%</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">发包模式</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="project-manager">项目经理</option>
+                    <option value="engineer">工程师</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- 设计费信息页签 -->
+        <div id="design-tab" class="tab-content space-y-4 mb-6 hidden">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">所属整软定合同号</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-parent-contract" value="HT20260000">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">设计费提成比例 <span class="text-red-500">*</span></label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-commission" value="10%">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">设计费待确认收金额</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="57000">
+            </div>
+        </div>
+        
+        <!-- 状态信息页签 -->
+        <div id="status-tab" class="tab-content space-y-4 mb-6 hidden">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">项目状态 <span class="text-red-500">*</span></label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="pending">待开工</option>
+                    <option value="ongoing">在建</option>
+                    <option value="stopped">停工</option>
+                    <option value="completed">竣工</option>
+                    <option value="cancelled">退单</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">实际开工日期</label>
+                <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="2026-02-01">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">实际竣工日期</label>
+                <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">财务确认竣工日期</label>
+                <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">关闭状态</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="open">打开</option>
+                    <option value="closed">关闭</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">最后核算期间</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="202601">202601</option>
+                    <option value="202602">202602</option>
+                    <option value="202603">202603</option>
+                    <option value="202604">202604</option>
+                    <option value="202605">202605</option>
+                    <option value="202606">202606</option>
+                    <option value="202607">202607</option>
+                    <option value="202608">202608</option>
+                    <option value="202609">202609</option>
+                    <option value="202610">202610</option>
+                    <option value="202611">202611</option>
+                    <option value="202612">202612</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- 变更日志页签 -->
+        <div id="log-tab" class="tab-content space-y-4 mb-6 hidden">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">搜索条件：变更对象</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="输入变更对象">
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">变更对象</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">变更前</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">变更后</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作人</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-4 py-2 text-sm text-gray-700">项目状态</td>
+                            <td class="px-4 py-2 text-sm text-gray-700">待开工</td>
+                            <td class="px-4 py-2 text-sm text-gray-700">在建</td>
+                            <td class="px-4 py-2 text-sm text-gray-700">用户</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-2 text-sm text-gray-700">预计总收入</td>
+                            <td class="px-4 py-2 text-sm text-gray-700">100000</td>
+                            <td class="px-4 py-2 text-sm text-gray-700">107000</td>
+                            <td class="px-4 py-2 text-sm text-gray-700">用户</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="mt-6 flex space-x-3">
+            <button type="button" id="cancel-project-btn" class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                关闭
+            </button>
+            <button type="button" id="save-project-btn" class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                保存
+            </button>
+        </div>
+    </div>
+
+
+
+    <script>
+        // 加载侧边栏
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html');
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+                
+                // 加载公共脚本
+                const script = document.createElement('script');
+                script.src = 'common/scripts.js';
+                script.onload = function() {
+                    // 脚本加载完成后初始化
+                    if (typeof initCommonFunctions === 'function') {
+                        initCommonFunctions();
+                    }
+                    // 初始化页面特定功能
+                    initPageFunctions();
+                };
+                document.body.appendChild(script);
+            } catch (error) {
+                console.error('加载侧边栏失败:', error);
+            }
+        }
+        
+        // 页面加载完成后加载侧边栏
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadSidebar);
+        } else {
+            loadSidebar();
+        }
+        
+        // 页面特定功能
+        function initPageFunctions() {
+            // 初始化Lucide图标
+            lucide.createIcons();
+            
+            // 筛选条件选择器功能
+            const filterSelect = document.getElementById('filter-select');
+            const filterInput = document.getElementById('filter-input');
+
+            filterSelect.addEventListener('change', function() {
+                const selectedValue = this.value;
+                
+                // 根据选择的筛选条件更新占位符
+                if (selectedValue === 'code') {
+                    filterInput.placeholder = '按合同号搜索';
+                } else if (selectedValue === 'name') {
+                    filterInput.placeholder = '按客户搜索';
+                } else if (selectedValue === 'company') {
+                    filterInput.placeholder = '按公司搜索';
+                } else if (selectedValue === 'type') {
+                    filterInput.placeholder = '按项目类型搜索';
+                }
+                
+                // 清空输入框
+                filterInput.value = '';
+            });
+
+            // 高级筛选功能
+            const advancedFilterBtn = document.getElementById('advanced-filter-btn');
+            const advancedFilter = document.getElementById('advanced-filter');
+
+            advancedFilterBtn.addEventListener('click', function() {
+                advancedFilter.classList.toggle('hidden');
+                
+                // 切换按钮文本和图标
+                if (!advancedFilter.classList.contains('hidden')) {
+                    this.innerHTML = '收起筛选 <i data-lucide="chevron-up" class="w-4 h-4 ml-1"></i>';
+                } else {
+                    this.innerHTML = '高级筛选 <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>';
+                }
+                
+                // 重新初始化图标
+                lucide.createIcons();
+            });
+            
+
+            
+            // 项目抽屉功能
+            const addBtn = document.getElementById('add-btn');
+            const projectDrawer = document.getElementById('project-drawer');
+            const closeProjectDrawer = document.getElementById('close-project-drawer');
+            const cancelProjectBtn = document.getElementById('cancel-project-btn');
+            const saveProjectBtn = document.getElementById('save-project-btn');
+            const projectDrawerTitle = document.getElementById('project-drawer-title');
+            
+            addBtn.addEventListener('click', () => {
+                projectDrawerTitle.textContent = '新增项目';
+                // 重置表单
+                
+                // 启用所有表单字段（除了创建日期和修改日期）
+                const formFields = projectDrawer.querySelectorAll('input, select, textarea');
+                formFields.forEach(field => {
+                    if (!field.id.includes('create-date') && !field.id.includes('modify-date')) {
+                        field.disabled = false;
+                    }
+                });
+                
+                // 显示保存和关闭按钮
+                document.getElementById('cancel-project-btn').style.display = 'block';
+                document.getElementById('save-project-btn').style.display = 'block';
+                
+                openDrawer(projectDrawer);
+            });
+            
+            // 将函数添加到window对象，使它们全局可见
+            window.viewProject = function(code) {
+                projectDrawerTitle.textContent = '项目详情';
+                // 模拟数据填充
+                if (code === 'PRO001') {
+                    document.getElementById('project-company').value = '成都总公司';
+                    document.getElementById('project-type').value = 'design';
+                    document.getElementById('project-requirement').value = 'decoration';
+                    document.getElementById('project-customer').value = '张三';
+                    document.getElementById('project-customer-code').value = 'MER001';
+                    document.getElementById('project-order').value = 'OD20260001';
+                    document.getElementById('project-contract').value = 'HT20260001';
+                    document.getElementById('project-contract-name').value = '家装设计合同';
+                    document.getElementById('project-business').value = 'retail-shj-design';
+                    document.getElementById('project-product-category').value = 'villa';
+                    document.getElementById('project-product').value = '艺境名品5.0';
+                    document.getElementById('project-parent-contract').value = 'HT20260000';
+                    document.getElementById('project-commission').value = '10%';
+                    document.getElementById('project-location').value = '四川省成都市武侯区';
+                    document.getElementById('project-building').value = '万科金色家园';
+                    document.getElementById('project-address').value = '四川省成都市武侯区万科路1号';
+                    document.getElementById('project-sign-date').value = '2026-01-15';
+                    document.getElementById('project-create-date').value = '2026-01-15';
+                    document.getElementById('project-modify-date').value = '2026-01-16';
+                    document.getElementById('project-source').value = 'svi';
+                }
+                
+                // 禁用所有表单字段
+                const formFields = projectDrawer.querySelectorAll('input, select, textarea');
+                formFields.forEach(field => {
+                    field.disabled = true;
+                });
+                
+                // 隐藏保存和关闭按钮
+                document.getElementById('cancel-project-btn').style.display = 'none';
+                document.getElementById('save-project-btn').style.display = 'none';
+                
+                openDrawer(projectDrawer);
+            };
+            
+            window.editProject = function(code) {
+                projectDrawerTitle.textContent = '编辑项目';
+                // 模拟数据填充
+                if (code === 'PRO001') {
+                    document.getElementById('project-company').value = '成都总公司';
+                    document.getElementById('project-type').value = 'design';
+                    document.getElementById('project-requirement').value = 'decoration';
+                    document.getElementById('project-customer').value = '张三';
+                    document.getElementById('project-customer-code').value = 'MER001';
+                    document.getElementById('project-order').value = 'OD20260001';
+                    document.getElementById('project-contract').value = 'HT20260001';
+                    document.getElementById('project-contract-name').value = '家装设计合同';
+                    document.getElementById('project-business').value = 'retail-shj-design';
+                    document.getElementById('project-product-category').value = 'villa';
+                    document.getElementById('project-product').value = '艺境名品5.0';
+                    document.getElementById('project-parent-contract').value = 'HT20260000';
+                    document.getElementById('project-commission').value = '10%';
+                    document.getElementById('project-location').value = '四川省成都市武侯区';
+                    document.getElementById('project-building').value = '万科金色家园';
+                    document.getElementById('project-address').value = '四川省成都市武侯区万科路1号';
+                    document.getElementById('project-sign-date').value = '2026-01-15';
+                    document.getElementById('project-create-date').value = '2026-01-15';
+                    document.getElementById('project-modify-date').value = '2026-01-16';
+                    document.getElementById('project-source').value = 'svi';
+                }
+                
+                // 启用所有表单字段（除了创建日期和修改日期）
+                const formFields = projectDrawer.querySelectorAll('input, select, textarea');
+                formFields.forEach(field => {
+                    if (!field.id.includes('create-date') && !field.id.includes('modify-date')) {
+                        field.disabled = false;
+                    }
+                });
+                
+                // 显示保存和关闭按钮
+                document.getElementById('cancel-project-btn').style.display = 'block';
+                document.getElementById('save-project-btn').style.display = 'block';
+                
+                openDrawer(projectDrawer);
+            };
+            
+            closeProjectDrawer.addEventListener('click', () => {
+                closeDrawer(projectDrawer);
+            });
+            
+            cancelProjectBtn.addEventListener('click', () => {
+                closeDrawer(projectDrawer);
+            });
+            
+            saveProjectBtn.addEventListener('click', () => {
+                alert('保存成功');
+                closeDrawer(projectDrawer);
+            });
+            
+            // 页签切换
+            const tabs = document.querySelectorAll('#project-tabs button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const projectTypeSelect = document.getElementById('project-type');
+            const designTab = document.querySelector('[data-tab="design"]');
+            
+            // 处理设计费信息页签的显示/隐藏逻辑
+            function handleProjectTypeChange() {
+                const projectType = projectTypeSelect.value;
+                if (projectType === 'design') {
+                    // 显示设计费信息页签
+                    designTab.parentElement.classList.remove('hidden');
+                } else {
+                    // 隐藏设计费信息页签
+                    designTab.parentElement.classList.add('hidden');
+                    // 如果当前选中的是设计费信息页签，切换到基础信息页签
+                    if (designTab.classList.contains('border-primary')) {
+                        document.querySelector('[data-tab="basic"]').click();
+                    }
+                }
+            }
+            
+            // 初始化设计费信息页签的显示状态
+            handleProjectTypeChange();
+            
+            // 监听项目类型变化
+            if (projectTypeSelect) {
+                projectTypeSelect.addEventListener('change', handleProjectTypeChange);
+            }
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // 移除所有页签的激活状态
+                    tabs.forEach(t => {
+                        t.classList.remove('border-primary', 'text-primary');
+                        t.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    
+                    // 激活当前页签
+                    tab.classList.remove('border-transparent', 'text-gray-500');
+                    tab.classList.add('border-primary', 'text-primary');
+                    
+                    // 隐藏所有内容
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    // 显示当前内容
+                    document.getElementById(`${tabId}-tab`).classList.remove('hidden');
+                });
+            });
+        }
+    </script>
+</body>
+</html>

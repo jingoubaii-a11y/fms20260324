@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客商 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            transition: width 0.3s ease-in-out;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        
+        .sidebar.collapsed {
+            width: 64px;
+        }
+        
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        
+        .sidebar.collapsed .sidebar-icon {
+            margin: 0 auto;
+        }
+        
+        .sidebar-item {
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+        }
+        
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+        }
+        
+        .menu-header h2 {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .drawer {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+        
+        .drawer.open {
+            transform: translateX(0);
+        }
+        
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 15;
+            display: none;
+        }
+        
+        .drawer-overlay.open {
+            display: block;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #003eb3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        
+        .group-tree {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .group-tree li {
+            margin: 2px 0;
+        }
+        
+        .group-tree .group-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .group-tree .group-item:hover {
+            background-color: rgba(0, 62, 179, 0.1);
+        }
+        
+        .group-tree .group-item.active {
+            background-color: rgba(0, 62, 179, 0.2);
+            color: #003eb3;
+        }
+        
+        .group-tree .toggle {
+            margin-right: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .group-tree .children {
+            padding-left: 20px;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body class="bg-neutral">
+    <!-- 主容器 -->
+    <div class="flex h-screen">
+        <!-- 侧边栏 -->
+        <aside id="sidebar" class="sidebar gradient-bg text-white shadow-sm fixed left-0 top-0 bottom-0 w-64 overflow-y-auto z-10">
+            <div class="p-4 flex items-center justify-between border-b border-white/20">
+                <h1 class="text-xl font-semibold">财务中台</h1>
+                <button id="toggle-sidebar" class="p-2 rounded-md hover:bg-white/10">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+            <nav class="py-4">
+                <!-- 仪表盘 -->
+                <a href="index.html" class="sidebar-item flex items-center px-4 py-3 text-white/90 hover:text-white rounded-md">
+                    <i data-lucide="home" class="sidebar-icon w-5 h-5 mr-3"></i>
+                    <span class="sidebar-text">仪表盘</span>
+                </a>
+                
+                <!-- 基础资料 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="basic-data">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">基础资料</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="basic-data-content">
+                        <a href="financial-entity.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="building" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">财务主体</span>
+                        </a>
+                        <a href="merchant.html" class="sidebar-item flex items-center px-4 py-2 text-white active rounded-md">
+                            <i data-lucide="users" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">客商</span>
+                        </a>
+                        <a href="project.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="clipboard-list" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">项目</span>
+                        </a>
+                        <a href="material.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="package" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">物料</span>
+                        </a>
+                        <a href="cost-ratio.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="pie-chart" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">成本比例配置</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 公共资料 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="public-data">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">公共资料</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="public-data-content">
+                        <a href="currency.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="dollar-sign" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">币别</span>
+                        </a>
+                        <a href="accounting-calendar.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="calendar" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">会计日历</span>
+                        </a>
+                        <a href="document-type.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="file-text" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">单据类型</span>
+                        </a>
+                        <a href="tax-rate.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="percent" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">税率</span>
+                        </a>
+                        <a href="invoice-type.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="file-invoice" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">发票类型</span>
+                        </a>
+                        <a href="unit.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="ruler" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">计量单位</span>
+                        </a>
+                        <a href="requirement-type.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="list-checks" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">需求类型</span>
+                        </a>
+                        <a href="source-system.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="cloud" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">来源系统</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 项目管理 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="project-management">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">项目管理</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="project-management-content">
+                        <a href="project-overview.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="bar-chart-3" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">项目概览</span>
+                        </a>
+                        <a href="process-acceptance.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="check-circle" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">工序验收管理</span>
+                        </a>
+                        <a href="accounting-method.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="calculator" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">核算方法管理</span>
+                        </a>
+                        <a href="project-accounting.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="book" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">项目核算</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 应收管理 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="receivable-management">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">应收管理</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="receivable-management-content">
+                        <a href="receivable.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="credit-card" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">应收单</span>
+                        </a>
+                        <a href="receipt.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="cash" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">收款单</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="border-b border-gray-200 pb-4 mb-6">
+                    <h1 class="text-xl font-semibold text-gray-800">客商</h1>
+                </div>
+                
+                <div class="flex">
+                    <!-- 左侧客商分组 -->
+                    <div class="w-1/4 pr-4">
+                        <div class="bg-white border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-semibold text-gray-700">客商分组</h3>
+                                <div class="flex space-x-2">
+                                    <button id="add-group-btn" class="p-1 text-primary hover:bg-secondary rounded">
+                                        <i data-lucide="plus" class="w-4 h-4"></i>
+                                    </button>
+                                    <button id="edit-group-btn" class="p-1 text-primary hover:bg-secondary rounded">
+                                        <i data-lucide="edit" class="w-4 h-4"></i>
+                                    </button>
+                                    <button id="delete-group-btn" class="p-1 text-accent hover:bg-red-50 rounded">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <ul class="group-tree">
+                                <li>
+                                    <div class="group-item active">
+                                        <span class="toggle">▼</span>
+                                        <span>全部客商</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="group-item">
+                                        <span class="toggle">▼</span>
+                                        <span>客户</span>
+                                    </div>
+                                    <ul class="children">
+                                        <li>
+                                            <div class="group-item">
+                                                <span class="toggle">▶</span>
+                                                <span>个人客户</span>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="group-item">
+                                                <span class="toggle">▶</span>
+                                                <span>企业客户</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="group-item">
+                                        <span class="toggle">▼</span>
+                                        <span>供应商</span>
+                                    </div>
+                                    <ul class="children">
+                                        <li>
+                                            <div class="group-item">
+                                                <span class="toggle">▶</span>
+                                                <span>材料供应商</span>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="group-item">
+                                                <span class="toggle">▶</span>
+                                                <span>服务供应商</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧客商列表 -->
+                    <div class="w-3/4">
+                        <!-- 搜索条件和按钮 -->
+                        <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex-1 flex items-center space-x-2">
+                                <!-- 筛选条件选择器 -->
+                                <select id="filter-select" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                                    <option value="name">客商名称</option>
+                                    <option value="code">客商编码</option>
+                                    <option value="nature">客商性质</option>
+                                    <option value="type">客商类型</option>
+                                </select>
+                                
+                                <!-- 输入框 -->
+                                <input type="text" id="filter-input" placeholder="按客商名称搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                
+                                <!-- 搜索按钮 -->
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                    <i data-lucide="search" class="w-4 h-4"></i>
+                                </button>
+                                
+                                <!-- 刷新按钮 -->
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                    <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                </button>
+                                
+                                <!-- 高级筛选按钮 -->
+                                <button id="advanced-filter-btn" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center">
+                                    高级筛选
+                                    <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- 按钮组 -->
+                            <div class="flex space-x-3">
+                                <button id="add-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center">
+                                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                                    新增
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 高级筛选条件 -->
+                        <div id="advanced-filter" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">客商名称</label>
+                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">客商编码</label>
+                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">客商性质</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="">全部</option>
+                                    <option value="legal">法人</option>
+                                    <option value="natural">自然人</option>
+                                    <option value="individual">个体户</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">客商类型</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="">全部</option>
+                                    <option value="customer">客户</option>
+                                    <option value="supplier">供应商</option>
+                                    <option value="both">客供一体</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-3 flex justify-end space-x-2">
+                                <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                                    重置
+                                </button>
+                                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    查询
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 列表 -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">客商分组</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">客商类型</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名称</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">客商性质</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">编码</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">客户</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">客户</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">张三</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">自然人</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">MER001</td>
+                                        <td class="px-4 py-2">
+                                            <label class="switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:text-blue-700" onclick="editMerchant('MER001')">编辑</button>
+                                                <button class="text-primary hover:text-blue-700" onclick="viewLog('MER001')">变更日志</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">供应商</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">供应商</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">成都建材有限公司</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">法人</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">MER002</td>
+                                        <td class="px-4 py-2">
+                                            <label class="switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:text-blue-700" onclick="editMerchant('MER002')">编辑</button>
+                                                <button class="text-primary hover:text-blue-700" onclick="viewLog('MER002')">变更日志</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">客户</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">客供一体</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">北京装饰工程公司</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">法人</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">MER003</td>
+                                        <td class="px-4 py-2">
+                                            <label class="switch">
+                                                <input type="checkbox">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:text-blue-700" onclick="editMerchant('MER003')">编辑</button>
+                                                <button class="text-primary hover:text-blue-700" onclick="viewLog('MER003')">变更日志</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- 分页 -->
+                        <div class="mt-6 flex items-center justify-between">
+                            <div class="text-sm text-gray-500">
+                                显示 1-3 条，共 25 条
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                                    上一页
+                                </button>
+                                <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">2</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">3</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">4</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 抽屉遮罩层 -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+
+    <!-- 新增/编辑分组抽屉 -->
+    <div id="group-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-20 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800" id="group-drawer-title">新增分组</h3>
+            <button id="close-group-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <form>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">分组编码 <span class="text-accent">*</span></label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" maxlength="32" placeholder="支持字母/数字/下划线">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">分组名称 <span class="text-accent">*</span></label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" maxlength="64">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">上级分组</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="">无</option>
+                        <option value="customer">客户</option>
+                        <option value="supplier">供应商</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <textarea class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="3" maxlength="256"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">创建人</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">创建时间</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">修改人</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">修改时间</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" disabled>
+                </div>
+            </div>
+            <div class="mt-6 flex space-x-3">
+                <button type="button" id="cancel-group-btn" class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    关闭
+                </button>
+                <button type="button" id="save-group-btn" class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                    保存
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 新增/编辑客商抽屉 -->
+    <div id="merchant-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-20 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800" id="merchant-drawer-title">新增客商</h3>
+            <button id="close-merchant-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <form>
+            <!-- 页签 -->
+            <div class="border-b border-gray-200 mb-4">
+                <ul class="flex space-x-6" id="merchant-tabs">
+                    <li><button class="py-2 border-b-2 border-primary text-primary font-medium" data-tab="basic">基础信息</button></li>
+                    <li><button class="py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="invoice">开票信息</button></li>
+                </ul>
+            </div>
+            
+            <!-- 基础信息页签 -->
+            <div id="basic-tab" class="tab-content space-y-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">客商编码 <span class="text-accent">*</span></label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="merchant-code" maxlength="32" placeholder="字母/数字/下划线">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">客商名称 <span class="text-accent">*</span></label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="merchant-name" maxlength="64">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">客商分组 <span class="text-accent">*</span></label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="merchant-group">
+                        <option value="">请选择</option>
+                        <option value="customer">客户</option>
+                        <option value="supplier">供应商</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">客商类型 <span class="text-accent">*</span></label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="merchant-type">
+                        <option value="customer">客户</option>
+                        <option value="supplier">供应商</option>
+                        <option value="both">客供一体</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">客商性质 <span class="text-accent">*</span></label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="merchant-nature">
+                        <option value="legal">法人</option>
+                        <option value="natural">自然人</option>
+                        <option value="individual">个体户</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">统一社会信用代码</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="credit-code" maxlength="18">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">状态 <span class="text-accent">*</span></label>
+                    <label class="switch">
+                        <input type="checkbox" checked id="merchant-status">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">来源系统 <span class="text-accent">*</span></label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="source-system">
+                        <option value="svi">SVI云</option>
+                        <option value="jimu">积木云装</option>
+                        <option value="wms">WMS</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">创建人</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="create-by" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">创建时间</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="create-time" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">修改人</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="update-by" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">修改时间</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="update-time" disabled>
+                </div>
+            </div>
+            
+            <!-- 开票信息页签 -->
+            <div id="invoice-tab" class="tab-content space-y-4 mb-6 hidden">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">发票抬头</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="invoice-title" maxlength="64">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">纳税登记号</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="invoice-tax-id">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">开户银行</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="bank-name" maxlength="64">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">银行账号</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="bank-account">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">开票地址</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="invoice-address">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">开票联系电话</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="invoice-phone">
+                </div>
+            </div>
+            
+            <div class="mt-6 flex space-x-3">
+                <button type="button" id="cancel-merchant-btn" class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    关闭
+                </button>
+                <button type="button" id="save-merchant-btn" class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                    保存
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 变更日志抽屉 -->
+    <div id="log-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-20 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">变更日志</h3>
+            <button id="close-log-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">变更对象</label>
+            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">变更对象</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">变更前</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">变更后</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作人</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作时间</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">来源系统</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <tr>
+                        <td class="px-4 py-2 text-sm text-gray-700">客商名称</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">张三</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">张三丰</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">用户</td>
+                        <td class="px-4 py-2 text-sm text-gray-500">2026-03-12 10:30</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">svi</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-2 text-sm text-gray-700">客商类型</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">客户</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">客供一体</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">用户</td>
+                        <td class="px-4 py-2 text-sm text-gray-500">2026-03-11 16:45</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">积木云装</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-6">
+            <button id="close-log-btn" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                关闭
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 初始化Lucide图标
+        lucide.createIcons();
+        
+        // 侧边栏折叠/展开功能
+        const toggleSidebar = document.getElementById('toggle-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            if (sidebar.classList.contains('collapsed')) {
+                mainContent.classList.remove('ml-64');
+                mainContent.classList.add('ml-16');
+            } else {
+                mainContent.classList.remove('ml-16');
+                mainContent.classList.add('ml-64');
+            }
+        });
+        
+        // 菜单展开/收拢功能
+        const menuHeaders = document.querySelectorAll('.menu-header');
+        
+        menuHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const menuName = header.getAttribute('data-menu');
+                const content = document.getElementById(`${menuName}-content`);
+                const icon = header.querySelector('.menu-icon');
+                
+                // 切换内容显示/隐藏
+                content.classList.toggle('hidden');
+                
+                // 切换图标旋转
+                if (content.classList.contains('hidden')) {
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+        
+        // 筛选条件选择器功能
+        const filterSelect = document.getElementById('filter-select');
+        const filterInput = document.getElementById('filter-input');
+
+        filterSelect.addEventListener('change', function() {
+            const selectedValue = this.value;
+            
+            // 根据选择的筛选条件更新占位符
+            if (selectedValue === 'name') {
+                filterInput.placeholder = '按客商名称搜索';
+            } else if (selectedValue === 'code') {
+                filterInput.placeholder = '按客商编码搜索';
+            } else if (selectedValue === 'nature') {
+                filterInput.placeholder = '按客商性质搜索';
+            } else if (selectedValue === 'type') {
+                filterInput.placeholder = '按客商类型搜索';
+            }
+            
+            // 清空输入框
+            filterInput.value = '';
+        });
+
+        // 高级筛选功能
+        const advancedFilterBtn = document.getElementById('advanced-filter-btn');
+        const advancedFilter = document.getElementById('advanced-filter');
+
+        advancedFilterBtn.addEventListener('click', function() {
+            advancedFilter.classList.toggle('hidden');
+            
+            // 切换按钮文本和图标
+            if (!advancedFilter.classList.contains('hidden')) {
+                this.innerHTML = '收起筛选 <i data-lucide="chevron-up" class="w-4 h-4 ml-1"></i>';
+            } else {
+                this.innerHTML = '高级筛选 <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>';
+            }
+            
+            // 重新初始化图标
+            lucide.createIcons();
+        });
+        
+        // 高亮当前页面的导航项
+        const currentPath = window.location.pathname;
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        
+        sidebarItems.forEach(item => {
+            const href = item.getAttribute('href');
+            if (currentPath.includes(href)) {
+                item.classList.add('active');
+                
+                // 展开包含当前页面的菜单
+                const menuContent = item.closest('.menu-content');
+                if (menuContent) {
+                    menuContent.classList.remove('hidden');
+                    const menuHeader = menuContent.previousElementSibling;
+                    if (menuHeader) {
+                        const icon = menuHeader.querySelector('.menu-icon');
+                        if (icon) {
+                            icon.style.transform = 'rotate(180deg)';
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 抽屉遮罩层
+        const drawerOverlay = document.getElementById('drawer-overlay');
+        
+        function openDrawer(drawer) {
+            drawer.classList.add('open');
+            drawerOverlay.classList.add('open');
+        }
+        
+        function closeDrawer(drawer) {
+            drawer.classList.remove('open');
+            drawerOverlay.classList.remove('open');
+        }
+        
+        // 点击遮罩层关闭所有抽屉
+        drawerOverlay.addEventListener('click', () => {
+            document.querySelectorAll('.drawer').forEach(drawer => {
+                drawer.classList.remove('open');
+            });
+            drawerOverlay.classList.remove('open');
+        });
+        
+
+        
+        // 分组抽屉功能
+        const addGroupBtn = document.getElementById('add-group-btn');
+        const editGroupBtn = document.getElementById('edit-group-btn');
+        const deleteGroupBtn = document.getElementById('delete-group-btn');
+        const groupDrawer = document.getElementById('group-drawer');
+        const closeGroupDrawer = document.getElementById('close-group-drawer');
+        const cancelGroupBtn = document.getElementById('cancel-group-btn');
+        const saveGroupBtn = document.getElementById('save-group-btn');
+        const groupDrawerTitle = document.getElementById('group-drawer-title');
+        
+        addGroupBtn.addEventListener('click', () => {
+            groupDrawerTitle.textContent = '新增分组';
+            openDrawer(groupDrawer);
+        });
+        
+        editGroupBtn.addEventListener('click', () => {
+            groupDrawerTitle.textContent = '编辑分组';
+            openDrawer(groupDrawer);
+        });
+        
+        deleteGroupBtn.addEventListener('click', () => {
+            if (confirm('确定要删除选中的分组吗？')) {
+                alert('删除成功');
+            }
+        });
+        
+        closeGroupDrawer.addEventListener('click', () => {
+            closeDrawer(groupDrawer);
+        });
+        
+        cancelGroupBtn.addEventListener('click', () => {
+            closeDrawer(groupDrawer);
+        });
+        
+        saveGroupBtn.addEventListener('click', () => {
+            alert('保存成功');
+            closeDrawer(groupDrawer);
+        });
+        
+        // 客商抽屉功能
+        const addBtn = document.getElementById('add-btn');
+        const merchantDrawer = document.getElementById('merchant-drawer');
+        const closeMerchantDrawer = document.getElementById('close-merchant-drawer');
+        const cancelMerchantBtn = document.getElementById('cancel-merchant-btn');
+        const saveMerchantBtn = document.getElementById('save-merchant-btn');
+        const merchantDrawerTitle = document.getElementById('merchant-drawer-title');
+        
+        addBtn.addEventListener('click', () => {
+            merchantDrawerTitle.textContent = '新增客商';
+            document.getElementById('merchant-code').value = '';
+            document.getElementById('merchant-name').value = '';
+            document.getElementById('merchant-group').value = '';
+            document.getElementById('merchant-type').value = 'customer';
+            document.getElementById('merchant-status').checked = true;
+            document.getElementById('source-system').value = 'svi';
+            document.getElementById('credit-code').value = '';
+            document.getElementById('merchant-nature').value = 'legal';
+            document.getElementById('invoice-title').value = '';
+            document.getElementById('invoice-tax-id').value = '';
+            document.getElementById('bank-name').value = '';
+            document.getElementById('bank-account').value = '';
+            document.getElementById('invoice-phone').value = '';
+            document.getElementById('invoice-address').value = '';
+            document.getElementById('create-by').value = '';
+            document.getElementById('create-time').value = '';
+            document.getElementById('update-by').value = '';
+            document.getElementById('update-time').value = '';
+            // 切换到基本信息页签
+            document.getElementById('basic-tab').classList.remove('hidden');
+            document.getElementById('invoice-tab').classList.add('hidden');
+            document.querySelector('[data-tab="basic"]').classList.add('border-primary', 'text-primary', 'font-medium');
+            document.querySelector('[data-tab="basic"]').classList.remove('border-transparent', 'text-gray-500');
+            document.querySelector('[data-tab="invoice"]').classList.add('border-transparent', 'text-gray-500');
+            document.querySelector('[data-tab="invoice"]').classList.remove('border-primary', 'text-primary', 'font-medium');
+            openDrawer(merchantDrawer);
+        });
+        
+        function editMerchant(code) {
+            merchantDrawerTitle.textContent = '编辑客商';
+            // 模拟数据填充
+            if (code === 'MER001') {
+                document.getElementById('merchant-code').value = 'MER001';
+                document.getElementById('merchant-name').value = '张三';
+                document.getElementById('merchant-group').value = 'customer';
+                document.getElementById('merchant-type').value = 'customer';
+                document.getElementById('merchant-status').checked = true;
+                document.getElementById('source-system').value = 'svi';
+                document.getElementById('credit-code').value = '123456789012345678';
+                document.getElementById('merchant-nature').value = 'natural';
+                document.getElementById('invoice-title').value = '张三';
+                document.getElementById('invoice-tax-id').value = '123456789012345678';
+                document.getElementById('bank-name').value = '工商银行';
+                document.getElementById('bank-account').value = '6222021234567890123';
+                document.getElementById('invoice-phone').value = '13800138000';
+                document.getElementById('invoice-address').value = '北京市朝阳区';
+                document.getElementById('create-by').value = 'admin';
+                document.getElementById('create-time').value = '2026-03-01 10:00:00';
+                document.getElementById('update-by').value = 'admin';
+                document.getElementById('update-time').value = '2026-03-02 14:30:00';
+            } else if (code === 'MER002') {
+                document.getElementById('merchant-code').value = 'MER002';
+                document.getElementById('merchant-name').value = '成都建材有限公司';
+                document.getElementById('merchant-group').value = 'supplier';
+                document.getElementById('merchant-type').value = 'supplier';
+                document.getElementById('merchant-status').checked = true;
+                document.getElementById('source-system').value = 'jimu';
+                document.getElementById('credit-code').value = '91510100MA62N12345';
+                document.getElementById('merchant-nature').value = 'legal';
+                document.getElementById('invoice-title').value = '成都建材有限公司';
+                document.getElementById('invoice-tax-id').value = '91510100MA62N12345';
+                document.getElementById('bank-name').value = '建设银行';
+                document.getElementById('bank-account').value = '6227003812345678901';
+                document.getElementById('invoice-phone').value = '13900139000';
+                document.getElementById('invoice-address').value = '成都市武侯区';
+                document.getElementById('create-by').value = 'admin';
+                document.getElementById('create-time').value = '2026-03-01 11:00:00';
+                document.getElementById('update-by').value = 'admin';
+                document.getElementById('update-time').value = '2026-03-02 15:00:00';
+            } else if (code === 'MER003') {
+                document.getElementById('merchant-code').value = 'MER003';
+                document.getElementById('merchant-name').value = '北京装饰工程公司';
+                document.getElementById('merchant-group').value = 'customer';
+                document.getElementById('merchant-type').value = 'both';
+                document.getElementById('merchant-status').checked = false;
+                document.getElementById('source-system').value = 'wms';
+                document.getElementById('credit-code').value = '91110100MA62N54321';
+                document.getElementById('merchant-nature').value = 'legal';
+                document.getElementById('invoice-title').value = '北京装饰工程公司';
+                document.getElementById('invoice-tax-id').value = '91110100MA62N54321';
+                document.getElementById('bank-name').value = '中国银行';
+                document.getElementById('bank-account').value = '6228481234567890123';
+                document.getElementById('invoice-phone').value = '13700137000';
+                document.getElementById('invoice-address').value = '北京市海淀区';
+                document.getElementById('create-by').value = 'admin';
+                document.getElementById('create-time').value = '2026-03-01 12:00:00';
+                document.getElementById('update-by').value = 'admin';
+                document.getElementById('update-time').value = '2026-03-02 16:00:00';
+            }
+            // 切换到基本信息页签
+            document.getElementById('basic-tab').classList.remove('hidden');
+            document.getElementById('invoice-tab').classList.add('hidden');
+            document.querySelector('[data-tab="basic"]').classList.add('border-primary', 'text-primary', 'font-medium');
+            document.querySelector('[data-tab="basic"]').classList.remove('border-transparent', 'text-gray-500');
+            document.querySelector('[data-tab="invoice"]').classList.add('border-transparent', 'text-gray-500');
+            document.querySelector('[data-tab="invoice"]').classList.remove('border-primary', 'text-primary', 'font-medium');
+            openDrawer(merchantDrawer);
+        }
+        
+        function viewLog(code) {
+            openDrawer(logDrawer);
+        }
+        
+        closeMerchantDrawer.addEventListener('click', () => {
+            closeDrawer(merchantDrawer);
+        });
+        
+        cancelMerchantBtn.addEventListener('click', () => {
+            closeDrawer(merchantDrawer);
+        });
+        
+        saveMerchantBtn.addEventListener('click', () => {
+            alert('保存成功');
+            closeDrawer(merchantDrawer);
+        });
+        
+        // 页签切换功能
+        const merchantTabs = document.querySelectorAll('#merchant-tabs button');
+        
+        merchantTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault(); // 阻止表单提交
+                const tabId = tab.getAttribute('data-tab');
+                
+                // 隐藏所有页签内容
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // 显示当前页签内容
+                document.getElementById(`${tabId}-tab`).classList.remove('hidden');
+                
+                // 更新页签样式
+                merchantTabs.forEach(t => {
+                    t.classList.remove('border-primary', 'text-primary', 'font-medium');
+                    t.classList.add('border-transparent', 'text-gray-500');
+                });
+                
+                tab.classList.add('border-primary', 'text-primary', 'font-medium');
+                tab.classList.remove('border-transparent', 'text-gray-500');
+            });
+        });
+        
+        // 变更日志抽屉功能
+        const logDrawer = document.getElementById('log-drawer');
+        const closeLogDrawer = document.getElementById('close-log-drawer');
+        const closeLogBtn = document.getElementById('close-log-btn');
+        
+        closeLogDrawer.addEventListener('click', () => {
+            closeDrawer(logDrawer);
+        });
+        
+        closeLogBtn.addEventListener('click', () => {
+            closeDrawer(logDrawer);
+        });
+    </script>
+</body>
+</html>

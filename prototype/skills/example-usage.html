@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>筛选条件和按钮标准 - 使用示例</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="filter-bar.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-neutral min-h-screen">
+    <div class="max-w-7xl mx-auto p-6">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-6">筛选条件和按钮标准 - 使用示例</h1>
+        
+        <!-- 示例1：基本使用 -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">示例1：基本使用</h2>
+            <div id="filter-bar-1"></div>
+        </div>
+        
+        <!-- 示例2：自定义筛选条件和按钮 -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">示例2：自定义筛选条件和按钮</h2>
+            <div id="filter-bar-2"></div>
+        </div>
+        
+        <!-- 示例3：带高级筛选 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">示例3：带高级筛选</h2>
+            <div id="filter-bar-3"></div>
+        </div>
+    </div>
+    
+    <script>
+        // 初始化Lucide图标
+        lucide.createIcons();
+        
+        // 示例1：基本使用
+        new FilterBar({
+            container: '#filter-bar-1',
+            onSearch: function(data) {
+                console.log('搜索:', data);
+                alert(`搜索 ${data.filter}: ${data.keyword}`);
+            },
+            onRefresh: function() {
+                console.log('刷新');
+                alert('刷新数据');
+            }
+        });
+        
+        // 示例2：自定义筛选条件和按钮
+        new FilterBar({
+            container: '#filter-bar-2',
+            filters: [
+                { value: 'name', label: '名称' },
+                { value: 'code', label: '编码' },
+                { value: 'type', label: '类型' },
+                { value: 'status', label: '状态' }
+            ],
+            buttons: [
+                {
+                    id: 'import-btn',
+                    label: '导入',
+                    icon: 'upload',
+                    primary: false,
+                    onClick: function() {
+                        alert('导入数据');
+                    }
+                },
+                {
+                    id: 'export-btn',
+                    label: '导出',
+                    icon: 'download',
+                    primary: false,
+                    onClick: function() {
+                        alert('导出数据');
+                    }
+                },
+                {
+                    id: 'add-btn',
+                    label: '新增',
+                    icon: 'plus',
+                    primary: true,
+                    onClick: function() {
+                        alert('新增数据');
+                    }
+                }
+            ],
+            onSearch: function(data) {
+                console.log('搜索:', data);
+                alert(`搜索 ${data.filter}: ${data.keyword}`);
+            },
+            onRefresh: function() {
+                console.log('刷新');
+                alert('刷新数据');
+            }
+        });
+        
+        // 示例3：带高级筛选
+        new FilterBar({
+            container: '#filter-bar-3',
+            filters: [
+                { value: 'name', label: '名称' },
+                { value: 'code', label: '编码' },
+                { value: 'status', label: '状态' }
+            ],
+            buttons: [
+                {
+                    id: 'add-btn',
+                    label: '新增',
+                    icon: 'plus',
+                    primary: true,
+                    onClick: function() {
+                        alert('新增数据');
+                    }
+                }
+            ],
+            advancedFilters: [
+                {
+                    label: '名称',
+                    type: 'text'
+                },
+                {
+                    label: '编码',
+                    type: 'text'
+                },
+                {
+                    label: '状态',
+                    type: 'select',
+                    options: [
+                        { value: '', label: '全部' },
+                        { value: 'enabled', label: '启用' },
+                        { value: 'disabled', label: '停用' }
+                    ]
+                },
+                {
+                    label: '类型',
+                    type: 'select',
+                    options: [
+                        { value: '', label: '全部' },
+                        { value: 'type1', label: '类型1' },
+                        { value: 'type2', label: '类型2' }
+                    ]
+                },
+                {
+                    label: '创建日期',
+                    type: 'date'
+                }
+            ],
+            onSearch: function(data) {
+                console.log('搜索:', data);
+                alert(`搜索 ${data.filter}: ${data.keyword}`);
+            },
+            onRefresh: function() {
+                console.log('刷新');
+                alert('刷新数据');
+            }
+        });
+    </script>
+</body>
+</html>

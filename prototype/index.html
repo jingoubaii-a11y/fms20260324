@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="common/styles.css">
+</head>
+<body class="bg-neutral">
+
+    <!-- 主容器 -->
+    <div class="flex h-screen">
+        <!-- 侧边栏 -->
+        <div id="sidebar-container"></div>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">财务中台</h2>
+                <p class="text-gray-600 mb-6">欢迎使用财务中台系统，您可以通过左侧导航栏访问各个功能模块。</p>
+                
+                <!-- 概览卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-gradient-to-r from-primary to-blue-600 text-white rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium opacity-80">财务主体</p>
+                                <h3 class="text-2xl font-bold mt-1">12</h3>
+                            </div>
+                            <i data-lucide="building" class="w-8 h-8"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium opacity-80">客商</p>
+                                <h3 class="text-2xl font-bold mt-1">256</h3>
+                            </div>
+                            <i data-lucide="users" class="w-8 h-8"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium opacity-80">项目</p>
+                                <h3 class="text-2xl font-bold mt-1">158</h3>
+                            </div>
+                            <i data-lucide="clipboard-list" class="w-8 h-8"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-purple-500 to-violet-600 text-white rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium opacity-80">物料</p>
+                                <h3 class="text-2xl font-bold mt-1">892</h3>
+                            </div>
+                            <i data-lucide="package" class="w-8 h-8"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 最近操作 -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">最近操作</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">模块</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">时间</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作人</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">新增财务主体</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">财务主体</td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">2026-03-12 10:30</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">用户</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">编辑客商信息</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">客商</td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">2026-03-12 09:15</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">用户</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">新增项目</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">项目</td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">2026-03-11 16:45</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">用户</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">启用物料</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">物料</td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">2026-03-11 14:20</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">用户</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 加载侧边栏
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html');
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+                
+                // 加载公共脚本
+                const script = document.createElement('script');
+                script.src = 'common/scripts.js';
+                script.onload = function() {
+                    // 脚本加载完成后初始化
+                    if (typeof initCommonFunctions === 'function') {
+                        initCommonFunctions();
+                    }
+                };
+                document.body.appendChild(script);
+            } catch (error) {
+                console.error('加载侧边栏失败:', error);
+            }
+        }
+        
+        // 页面加载完成后加载侧边栏
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadSidebar);
+        } else {
+            loadSidebar();
+        }
+    </script>
+</body>
+</html>
