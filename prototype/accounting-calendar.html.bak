@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会计日历 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="common/styles.css">
+</head>
+<body class="bg-neutral">
+    <!-- 主容器 -->
+    <div class="flex h-screen">
+        <!-- 侧边栏 -->
+        <div id="sidebar-container"></div>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 h-full" id="main-content">
+            <div class="h-full">
+                <div class="bg-white rounded-lg shadow-sm p-6 h-full flex flex-col">
+                    <div class="border-b border-gray-200 pb-4 mb-6">
+                        <h1 class="text-xl font-semibold text-gray-800">会计日历管理</h1>
+                    </div>
+                    <!-- 筛选条件和按钮栏 -->
+                    <div class="flex items-center justify-between mb-6 flex-nowrap">
+                        <div class="flex items-center space-x-2 flex-1">
+                            <select id="filter-field-accounting-calendar" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="code">编码</option>
+                                <option value="name">名称</option>
+                                <option value="status">状态</option>
+                            </select>
+                            <input type="text" id="filter-value-accounting-calendar" placeholder="按编码搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                <i data-lucide="search" class="w-4 h-4"></i>
+                            </button>
+                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                            </button>
+                            <button id="advanced-filter-btn-accounting-calendar" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center">
+                                高级筛选
+                                <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button id="add-calendar" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center">
+                                <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                                新增
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 高级筛选展开区域 -->
+                    <div id="advanced-filter-accounting-calendar" class="hidden bg-gray-50 p-4 rounded-md border border-gray-200 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">编码</label>
+                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">名称</label>
+                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">状态</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="">全部</option>
+                                    <option value="enabled">启用</option>
+                                    <option value="disabled">停用</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex justify-end space-x-2">
+                            <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                                重置
+                            </button>
+                            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                                查询
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 列表 -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">编码</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名称</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">起始会计年度</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">期间类型</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">开始日期</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">结束日期</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">AC2024</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2024年会计日历</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2024</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">自然月</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2024-01-01</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2024-12-31</td>
+                                    <td class="px-4 py-2">
+                                        <label class="switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700 edit-calendar">编辑</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">AC2025</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2025年会计日历</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2025</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">自然月</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2025-01-01</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2025-12-31</td>
+                                    <td class="px-4 py-2">
+                                        <label class="switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700 edit-calendar">编辑</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">AC2023</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2023年会计日历</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2023</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">自然月</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2023-01-01</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2023-12-31</td>
+                                    <td class="px-4 py-2">
+                                        <label class="switch">
+                                            <input type="checkbox">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700 edit-calendar">编辑</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页 -->
+                    <div class="mt-auto flex items-center justify-between">
+                        <div class="text-sm text-gray-500">
+                            显示 1-3 条，共 3 条
+                        </div>
+                        <div class="flex space-x-1">
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                                上一页
+                            </button>
+                            <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                                下一页
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 新增/编辑会计日历抽屉 -->
+    <div id="calendar-drawer" class="drawer fixed top-0 right-0 h-full w-96 bg-white shadow-lg z-50 overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="drawer-title" class="text-lg font-semibold text-gray-900">新增会计日历</h3>
+                <button id="close-drawer" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <form id="calendar-form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">编码 <span class="text-red-500">*</span></label>
+                        <input type="text" id="calendar-code" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">名称 <span class="text-red-500">*</span></label>
+                        <input type="text" id="calendar-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">起始会计年度 <span class="text-red-500">*</span></label>
+                        <input type="number" id="start-year" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" min="2000" max="2100" value="2024" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">期间类型 <span class="text-red-500">*</span></label>
+                        <select id="period-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                            <option value="natural">自然月</option>
+                            <option value="month">月</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">开始日期 <span class="text-red-500">*</span></label>
+                        <input type="date" id="start-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">结束日期</label>
+                        <input type="date" id="end-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" disabled>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">状态</label>
+                        <div class="flex items-center">
+                            <label class="switch">
+                                <input type="checkbox" id="calendar-status" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span class="ml-2 text-sm text-gray-700" id="status-text">启用</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">适用财务主体 <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <div id="entity-tags" class="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md min-h-[40px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <!-- 标签将在这里动态生成 -->
+                            </div>
+                            <div id="entity-dropdown" class="hidden absolute z-10 top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                <div class="p-2">
+                                    <div class="flex items-center mb-2">
+                                        <input type="text" id="entity-search" placeholder="搜索财务主体" class="w-full px-2 py-1 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="all">
+                                            <input type="checkbox" class="mr-2" id="entity-all">
+                                            <label for="entity-all">全选</label>
+                                        </div>
+                                        <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="entity1">
+                                            <input type="checkbox" class="mr-2" id="entity-entity1">
+                                            <label for="entity-entity1">财务主体1</label>
+                                        </div>
+                                        <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="entity2">
+                                            <input type="checkbox" class="mr-2" id="entity-entity2">
+                                            <label for="entity-entity2">财务主体2</label>
+                                        </div>
+                                        <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="entity3">
+                                            <input type="checkbox" class="mr-2" id="entity-entity3">
+                                            <label for="entity-entity3">财务主体3</label>
+                                        </div>
+                                        <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="entity4">
+                                            <input type="checkbox" class="mr-2" id="entity-entity4">
+                                            <label for="entity-entity4">财务主体4</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selected-entities" name="selected-entities">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">创建人</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" disabled>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">创建时间</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" disabled>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">修改人</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" disabled>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">修改时间</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" disabled>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 会计期间明细 -->
+                <div class="mt-6">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3">会计期间明细</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border border-gray-200">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">会计年度</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">会计期间</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">开始日期</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">结束日期</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">季度</th>
+                                </tr>
+                            </thead>
+                            <tbody id="period-details">
+                                <!-- 期间明细将在这里动态生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" id="cancel-btn" class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                        取消
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 抽屉遮罩层 -->
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+
+    <script>
+        // 加载侧边栏
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html');
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+                
+                // 等待DOM更新完成
+                setTimeout(() => {
+                    // 加载公共脚本
+                    const script = document.createElement('script');
+                    script.src = 'common/scripts.js';
+                    script.onload = function() {
+                        // 脚本加载完成后初始化
+                        if (typeof initCommonFunctions === 'function') {
+                            initCommonFunctions();
+                        }
+                    };
+                    document.body.appendChild(script);
+                }, 100);
+            } catch (error) {
+                console.error('加载侧边栏失败:', error);
+            }
+        }
+        
+        // 页面加载完成后加载侧边栏
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadSidebar);
+        } else {
+            loadSidebar();
+        }
+    </script>
+</body>
+</html>
