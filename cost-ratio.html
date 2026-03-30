@@ -81,11 +81,38 @@
                                 <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                             </div>
                             <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">项目类型</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="">全部</option>
+                                    <option value="design">设计费</option>
+                                    <option value="whole">整装</option>
+                                    <option value="soft">软装</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">品类</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="">全部</option>
+                                    <option value="mansion">大宅装</option>
+                                    <option value="chinese">国潮装</option>
+                                    <option value="luxury">轻奢装</option>
+                                    <option value="appliance">电器包</option>
+                                </select>
+                            </div>
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">状态</label>
                                 <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                                     <option value="">全部</option>
                                     <option value="enabled">启用</option>
                                     <option value="disabled">停用</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">适用财务主体</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="">全部</option>
+                                    <option value="chengdu">成都分公司</option>
+                                    <option value="langrun">朗润分公司</option>
                                 </select>
                             </div>
                         </div>
@@ -106,24 +133,34 @@
                                 <tr>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">编码</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名称</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">成本类型</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">比例值</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">项目类型</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">品类</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">设计费服务税率</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">设计费成本比例</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">开始日期</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">结束日期</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">适用财务主体</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
                                 <tr>
                                     <td class="px-4 py-2 text-sm text-gray-700">CR001</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">直接材料成本</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">原材料</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">60%</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">大宅装设计费成本比例</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">设计费</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">大宅装</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">6%</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">70%</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-01-01</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-12-31</td>
                                     <td class="px-4 py-2">
                                         <label class="switch">
                                             <input type="checkbox" checked>
                                             <span class="slider"></span>
                                         </label>
                                     </td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">成都分公司, 朗润分公司</td>
                                     <td class="px-4 py-2 text-sm">
                                         <div class="flex space-x-2">
                                             <button class="text-primary hover:text-blue-700 edit-cost-ratio">编辑</button>
@@ -132,15 +169,20 @@
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-2 text-sm text-gray-700">CR002</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">直接人工成本</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">人工</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">20%</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">国潮装设计费成本比例</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">设计费</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">国潮装</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">6%</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">65%</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-01-01</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-12-31</td>
                                     <td class="px-4 py-2">
                                         <label class="switch">
                                             <input type="checkbox" checked>
                                             <span class="slider"></span>
                                         </label>
                                     </td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">成都分公司</td>
                                     <td class="px-4 py-2 text-sm">
                                         <div class="flex space-x-2">
                                             <button class="text-primary hover:text-blue-700 edit-cost-ratio">编辑</button>
@@ -149,15 +191,20 @@
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-2 text-sm text-gray-700">CR003</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">制造费用</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">间接成本</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">15%</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">轻奢装设计费成本比例</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">设计费</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">轻奢装</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">6%</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">75%</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-01-01</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-12-31</td>
                                     <td class="px-4 py-2">
                                         <label class="switch">
                                             <input type="checkbox" checked>
                                             <span class="slider"></span>
                                         </label>
                                     </td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">朗润分公司</td>
                                     <td class="px-4 py-2 text-sm">
                                         <div class="flex space-x-2">
                                             <button class="text-primary hover:text-blue-700 edit-cost-ratio">编辑</button>
@@ -166,15 +213,20 @@
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-2 text-sm text-gray-700">CR004</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">管理费用</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">间接成本</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">5%</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">电器包设计费成本比例</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">设计费</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">电器包</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">6%</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">60%</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-01-01</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-12-31</td>
                                     <td class="px-4 py-2">
                                         <label class="switch">
                                             <input type="checkbox">
                                             <span class="slider"></span>
                                         </label>
                                     </td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">成都分公司, 朗润分公司</td>
                                     <td class="px-4 py-2 text-sm">
                                         <div class="flex space-x-2">
                                             <button class="text-primary hover:text-blue-700 edit-cost-ratio">编辑</button>
@@ -226,27 +278,47 @@
                         <input type="text" id="cost-ratio-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">成本类型 <span class="text-red-500">*</span></label>
-                        <select id="cost-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
-                            <option value="raw_material">原材料</option>
-                            <option value="labor">人工</option>
-                            <option value="manufacturing">制造费用</option>
-                            <option value="management">管理费用</option>
-                            <option value="other">其他</option>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">项目类型 <span class="text-red-500">*</span></label>
+                        <select id="project-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                            <option value="design">设计费</option>
+                            <option value="whole">整装</option>
+                            <option value="soft">软装</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">比例值 <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">品类 <span class="text-red-500">*</span></label>
+                        <select id="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                            <option value="mansion">大宅装</option>
+                            <option value="chinese">国潮装</option>
+                            <option value="luxury">轻奢装</option>
+                            <option value="appliance">电器包</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">设计费服务税率 <span class="text-red-500">*</span></label>
                         <div class="relative">
-                            <input type="number" id="ratio-value" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" min="0" max="100" step="0.01" required>
+                            <input type="number" id="service-tax-rate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" min="0" max="100" step="0.01" required>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <span class="text-gray-500">%</span>
                             </div>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
-                        <textarea id="cost-ratio-description" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="3"></textarea>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">设计费成本比例 <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <input type="number" id="design-cost-ratio" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" min="0" max="100" step="0.01" required>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-gray-500">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">开始日期 <span class="text-red-500">*</span></label>
+                        <input type="date" id="start-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">结束日期 <span class="text-red-500">*</span></label>
+                        <input type="date" id="end-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">状态</label>
@@ -257,6 +329,31 @@
                             </label>
                             <span class="ml-2 text-sm text-gray-700" id="status-text">启用</span>
                         </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">适用财务主体 <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <div id="entity-tags" class="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md min-h-[40px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <!-- 标签将在这里动态生成 -->
+                            </div>
+                            <div id="entity-dropdown" class="hidden absolute z-10 top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                <div class="p-2">
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="all">
+                                        <input type="checkbox" class="mr-2" id="entity-all">
+                                        <label for="entity-all">全选</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="chengdu">
+                                        <input type="checkbox" class="mr-2" id="entity-chengdu">
+                                        <label for="entity-chengdu">成都分公司</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="langrun">
+                                        <input type="checkbox" class="mr-2" id="entity-langrun">
+                                        <label for="entity-langrun">朗润分公司</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selected-entities" name="selected-entities">
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -396,6 +493,127 @@
                     // 这里可以添加填充编辑数据的逻辑
                 });
             });
+            
+            // 适用财务主体标签选择器功能
+            const entityTags = drawer.querySelector('#entity-tags');
+            const entityDropdown = drawer.querySelector('#entity-dropdown');
+            const entityCheckboxes = drawer.querySelectorAll('#entity-dropdown input[type="checkbox"]');
+            const selectedEntities = drawer.querySelector('#selected-entities');
+            
+            if (entityTags && entityDropdown) {
+                // 点击标签容器显示/隐藏下拉框
+                entityTags.addEventListener('click', function() {
+                    entityDropdown.classList.toggle('hidden');
+                });
+                
+                // 点击下拉框外区域关闭下拉框
+                document.addEventListener('click', function(event) {
+                    if (!entityTags.contains(event.target) && !entityDropdown.contains(event.target)) {
+                        entityDropdown.classList.add('hidden');
+                    }
+                });
+                
+                // 处理复选框变化
+                entityCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const value = this.closest('div[data-value]').dataset.value;
+                        const label = this.nextElementSibling.textContent;
+                        
+                        if (value === 'all') {
+                            // 全选/取消全选
+                            if (this.checked) {
+                                // 全选
+                                entityCheckboxes.forEach(cb => {
+                                    cb.checked = true;
+                                });
+                                // 清空现有标签
+                                entityTags.innerHTML = '';
+                                // 添加所有标签
+                                entityCheckboxes.forEach(cb => {
+                                    const cbValue = cb.closest('div[data-value]').dataset.value;
+                                    if (cbValue !== 'all') {
+                                        const cbLabel = cb.nextElementSibling.textContent;
+                                        addEntityTag(cbValue, cbLabel);
+                                    }
+                                });
+                            } else {
+                                // 取消全选
+                                entityCheckboxes.forEach(cb => {
+                                    cb.checked = false;
+                                });
+                                // 清空所有标签
+                                entityTags.innerHTML = '';
+                            }
+                        } else {
+                            // 单个公司选择
+                            if (this.checked) {
+                                addEntityTag(value, label);
+                            } else {
+                                removeEntityTag(value);
+                            }
+                            
+                            // 检查是否所有公司都被选中
+                            const allSelected = Array.from(entityCheckboxes).every(cb => {
+                                const cbValue = cb.closest('div[data-value]').dataset.value;
+                                return cbValue === 'all' || cb.checked;
+                            });
+                            entityCheckboxes[0].checked = allSelected;
+                        }
+                        
+                        // 更新隐藏输入值
+                        updateSelectedEntities();
+                    });
+                });
+                
+                // 添加标签函数
+                function addEntityTag(value, label) {
+                    if (!entityTags.querySelector(`[data-value="${value}"]`)) {
+                        const tag = document.createElement('div');
+                        tag.className = 'flex items-center bg-secondary text-primary px-2 py-1 rounded-full text-sm';
+                        tag.dataset.value = value;
+                        tag.innerHTML = `
+                            <span>${label}</span>
+                            <button type="button" class="ml-1 text-primary hover:text-red-500">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
+                        `;
+                        // 标签移除按钮点击事件
+                        tag.querySelector('button').addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            removeEntityTag(value);
+                            // 取消对应复选框
+                            const checkbox = drawer.querySelector(`#entity-dropdown input[type="checkbox"]`);
+                            const entityCheckbox = drawer.querySelector(`#entity-${value}`);
+                            if (entityCheckbox) {
+                                entityCheckbox.checked = false;
+                            }
+                            // 检查全选状态
+                            const allSelected = Array.from(entityCheckboxes).every(cb => {
+                                const cbValue = cb.closest('div[data-value]').dataset.value;
+                                return cbValue === 'all' || cb.checked;
+                            });
+                            entityCheckboxes[0].checked = allSelected;
+                            // 更新隐藏输入值
+                            updateSelectedEntities();
+                        });
+                        entityTags.appendChild(tag);
+                    }
+                }
+                
+                // 移除标签函数
+                function removeEntityTag(value) {
+                    const tag = entityTags.querySelector(`[data-value="${value}"]`);
+                    if (tag) {
+                        tag.remove();
+                    }
+                }
+                
+                // 更新选中实体值
+                function updateSelectedEntities() {
+                    const selected = Array.from(entityTags.children).map(tag => tag.dataset.value);
+                    selectedEntities.value = selected.join(',');
+                }
+            }
         }
         
         // 页面加载完成后初始化页面特定功能
