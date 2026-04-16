@@ -418,11 +418,31 @@
                 <form id="soft-revenue-form" class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">财务组织 <span class="text-red-500">*</span></label>
-                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" multiple>
-                            <option value="org1">财务组织1</option>
-                            <option value="org2">财务组织2</option>
-                            <option value="org3">财务组织3</option>
-                        </select>
+                        <div class="relative">
+                            <div id="soft-revenue-org-tags" class="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md min-h-[40px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div id="soft-revenue-org-dropdown" class="hidden absolute z-10 top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                <div class="p-2">
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="all">
+                                        <input type="checkbox" class="mr-2" id="soft-revenue-org-all">
+                                        <label for="soft-revenue-org-all">全选</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="org1">
+                                        <input type="checkbox" class="mr-2" id="soft-revenue-org1">
+                                        <label for="soft-revenue-org1">财务组织1</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="org2">
+                                        <input type="checkbox" class="mr-2" id="soft-revenue-org2">
+                                        <label for="soft-revenue-org2">财务组织2</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="org3">
+                                        <input type="checkbox" class="mr-2" id="soft-revenue-org3">
+                                        <label for="soft-revenue-org3">财务组织3</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="soft-revenue-selected-orgs" name="soft-revenue-selected-orgs">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">核算期间</label>
@@ -470,11 +490,31 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">财务组织 <span class="text-red-500">*</span></label>
-                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" multiple>
-                            <option value="org1">财务组织1</option>
-                            <option value="org2">财务组织2</option>
-                            <option value="org3">财务组织3</option>
-                        </select>
+                        <div class="relative">
+                            <div id="project-revenue-org-tags" class="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md min-h-[40px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div id="project-revenue-org-dropdown" class="hidden absolute z-10 top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                <div class="p-2">
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="all">
+                                        <input type="checkbox" class="mr-2" id="project-revenue-org-all">
+                                        <label for="project-revenue-org-all">全选</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="org1">
+                                        <input type="checkbox" class="mr-2" id="project-revenue-org1">
+                                        <label for="project-revenue-org1">财务组织1</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="org2">
+                                        <input type="checkbox" class="mr-2" id="project-revenue-org2">
+                                        <label for="project-revenue-org2">财务组织2</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="org3">
+                                        <input type="checkbox" class="mr-2" id="project-revenue-org3">
+                                        <label for="project-revenue-org3">财务组织3</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="project-revenue-selected-orgs" name="project-revenue-selected-orgs">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">核算期间</label>
@@ -742,6 +782,12 @@
                 lucide.createIcons();
             });
             
+            // 初始化软装收入计算任务的财务组织多选组件
+            initOrgSelector('soft-revenue-org-tags', 'soft-revenue-org-dropdown', 'soft-revenue-selected-orgs');
+            
+            // 初始化项目收入核算任务的财务组织多选组件
+            initOrgSelector('project-revenue-org-tags', 'project-revenue-org-dropdown', 'project-revenue-selected-orgs');
+            
             document.getElementById('add-soft-revenue-task').addEventListener('click', () => {
                 softRevenueModal.classList.remove('hidden');
             });
@@ -910,6 +956,130 @@
                     projectRevenueModal.classList.add('hidden');
                 }
             });
+        }
+        
+        // 通用的财务组织多选组件初始化函数
+        function initOrgSelector(tagsId, dropdownId, hiddenInputId) {
+            const entityTags = document.getElementById(tagsId);
+            const entityDropdown = document.getElementById(dropdownId);
+            const entityCheckboxes = entityDropdown.querySelectorAll('input[type="checkbox"]');
+            const selectedEntities = document.getElementById(hiddenInputId);
+            
+            if (entityTags && entityDropdown) {
+                // 点击标签容器显示/隐藏下拉框
+                entityTags.addEventListener('click', function() {
+                    entityDropdown.classList.toggle('hidden');
+                });
+                
+                // 点击下拉框外区域关闭下拉框
+                document.addEventListener('click', function(event) {
+                    if (!entityTags.contains(event.target) && !entityDropdown.contains(event.target)) {
+                        entityDropdown.classList.add('hidden');
+                    }
+                });
+                
+                // 处理复选框变化
+                entityCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const value = this.closest('div[data-value]').dataset.value;
+                        const label = this.nextElementSibling.textContent;
+                        
+                        if (value === 'all') {
+                            // 全选/取消全选
+                            if (this.checked) {
+                                // 全选
+                                entityCheckboxes.forEach(cb => {
+                                    cb.checked = true;
+                                });
+                                // 清空现有标签
+                                entityTags.innerHTML = '';
+                                // 添加所有标签
+                                entityCheckboxes.forEach(cb => {
+                                    const cbValue = cb.closest('div[data-value]').dataset.value;
+                                    if (cbValue !== 'all') {
+                                        const cbLabel = cb.nextElementSibling.textContent;
+                                        addEntityTag(cbValue, cbLabel);
+                                    }
+                                });
+                            } else {
+                                // 取消全选
+                                entityCheckboxes.forEach(cb => {
+                                    cb.checked = false;
+                                });
+                                // 清空所有标签
+                                entityTags.innerHTML = '';
+                            }
+                        } else {
+                            // 单个组织选择
+                            if (this.checked) {
+                                addEntityTag(value, label);
+                            } else {
+                                removeEntityTag(value);
+                            }
+                            
+                            // 检查是否所有组织都被选中
+                            const allSelected = Array.from(entityCheckboxes).every(cb => {
+                                const cbValue = cb.closest('div[data-value]').dataset.value;
+                                return cbValue === 'all' || cb.checked;
+                            });
+                            entityCheckboxes[0].checked = allSelected;
+                        }
+                        
+                        // 更新隐藏输入值
+                        updateSelectedEntities();
+                    });
+                });
+                
+                // 添加标签函数
+                function addEntityTag(value, label) {
+                    if (!entityTags.querySelector(`[data-value="${value}"]`)) {
+                        const tag = document.createElement('div');
+                        tag.className = 'flex items-center bg-secondary text-primary px-2 py-1 rounded-full text-sm';
+                        tag.dataset.value = value;
+                        tag.innerHTML = `
+                            <span>${label}</span>
+                            <button type="button" class="ml-1 text-primary hover:text-red-500">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
+                        `;
+                        // 标签移除按钮点击事件
+                        tag.querySelector('button').addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            removeEntityTag(value);
+                            // 取消对应复选框
+                            const entityCheckbox = entityDropdown.querySelector(`#${dropdownId.replace('-dropdown', '-' + value)}`);
+                            if (entityCheckbox) {
+                                entityCheckbox.checked = false;
+                            }
+                            // 检查全选状态
+                            const allSelected = Array.from(entityCheckboxes).every(cb => {
+                                const cbValue = cb.closest('div[data-value]').dataset.value;
+                                return cbValue === 'all' || cb.checked;
+                            });
+                            entityCheckboxes[0].checked = allSelected;
+                            // 更新隐藏输入值
+                            updateSelectedEntities();
+                        });
+                        entityTags.appendChild(tag);
+                        // 重新初始化图标
+                        lucide.createIcons();
+                    }
+                }
+                
+                // 移除标签函数
+                function removeEntityTag(value) {
+                    const tag = entityTags.querySelector(`[data-value="${value}"]`);
+                    if (tag) {
+                        tag.remove();
+                    }
+                }
+                
+                // 更新选中实体值
+                function updateSelectedEntities() {
+                    const selected = Array.from(entityTags.children).map(tag => tag.dataset.value);
+                    selectedEntities.value = selected.join(',');
+                }
+            }
         }
         
         if (document.readyState === 'loading') {
