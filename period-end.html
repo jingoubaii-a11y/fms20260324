@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>期末处理 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="common/styles.css">
+</head>
+<body class="bg-neutral">
+    <div class="flex h-screen">
+        <div id="sidebar-container"></div>
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="space-y-6">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h1 class="text-xl font-semibold text-gray-800">期末处理</h1>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="border-b border-gray-200 mb-6">
+                        <nav class="flex space-x-8">
+                            <button id="tab-enable" class="py-3 px-1 border-b-2 border-primary text-primary font-medium">启用管理</button>
+                            <button id="tab-params" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">参数管理</button>
+                            <button id="tab-stock-close" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">库存关账</button>
+                            <button id="tab-project-close" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">项目关账</button>
+                            <button id="tab-period-close" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">期末结账</button>
+                        </nav>
+                    </div>
+
+                    <div id="content-enable" class="tab-content">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">启用管理</h2>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务组织</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用模块</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用期间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">是否生效</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">库存管理、项目管理</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">202601</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700"><span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">是</span></td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体2</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">库存管理</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <select class="px-2 py-1 border border-gray-300 rounded-md text-sm">
+                                                <option value="">请选择</option>
+                                                <option value="202601">202601</option>
+                                                <option value="202602">202602</option>
+                                                <option value="202603">202603</option>
+                                            </select>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700"><span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">否</span></td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <button class="text-blue-600 hover:text-blue-800">启用</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="content-params" class="tab-content hidden">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">参数管理</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div>
+                                    <h3 class="font-medium text-gray-800">软装出库是否校验对账状态</h3>
+                                    <p class="text-sm text-gray-500">勾选后，出库前会校验对账状态</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div>
+                                    <h3 class="font-medium text-gray-800">强制校验当期应核算项目是否全部核算完成</h3>
+                                    <p class="text-sm text-gray-500">勾选后，关账前会校验所有应核算项目是否已完成核算</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="content-stock-close" class="tab-content hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-medium text-gray-800">库存关账</h2>
+                            <div class="flex items-center space-x-3">
+                                <button id="batch-anti-stock-close" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">批量反关账</button>
+                                <button id="batch-stock-close" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700">批量关账</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <input type="checkbox" class="rounded">
+                                        </th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务组织</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用期间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">当前期间</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-2">
+                                            <input type="checkbox" class="rounded">
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">202601</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">202604</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2">
+                                            <input type="checkbox" class="rounded">
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体2</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">202602</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">202603</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="content-project-close" class="tab-content hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-medium text-gray-800">项目关账</h2>
+                            <div class="flex items-center space-x-3">
+                                <button id="batch-project-close-check" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">批量关账检查</button>
+                                <button id="batch-anti-project-close" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">批量反关账</button>
+                                <button id="batch-project-close" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700">批量关账</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <input type="checkbox" class="rounded">
+                                        </th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务组织</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用期间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">当前期间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">检查结果</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-2">
+                                            <input type="checkbox" class="rounded">
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">202601</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">202604</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700"><span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">检查通过</span></td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2">检查结果</button>
+                                            <button class="text-blue-600 hover:text-blue-800">启用</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2">
+                                            <input type="checkbox" class="rounded">
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体2</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <select class="px-2 py-1 border border-gray-300 rounded-md text-sm">
+                                                <option value="">请选择</option>
+                                                <option value="202601">202601</option>
+                                                <option value="202602">202602</option>
+                                            </select>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">-</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">-</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <button class="text-blue-600 hover:text-blue-800">启用</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="content-period-close" class="tab-content hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-medium text-gray-800">期末结账</h2>
+                            <div class="flex items-center space-x-3">
+                                <button id="batch-anti-period-close" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">批量反结账</button>
+                                <button id="batch-period-close" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700">批量结账</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <input type="checkbox" class="rounded">
+                                        </th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务组织</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用期间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">当前期间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">结账报告</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-2">
+                                            <input type="checkbox" class="rounded">
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">202601</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">202604</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <button class="text-blue-600 hover:text-blue-800">查看</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2">
+                                            <input type="checkbox" class="rounded">
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体2</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">202602</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">202603</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <button class="text-blue-600 hover:text-blue-800">查看</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html');
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+                
+                const script = document.createElement('script');
+                script.src = 'common/scripts.js';
+                script.onload = function() {
+                    if (typeof initCommonFunctions === 'function') {
+                        initCommonFunctions();
+                    }
+                };
+                document.body.appendChild(script);
+            } catch (error) {
+                console.error('加载侧边栏失败:', error);
+            }
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadSidebar);
+        } else {
+            loadSidebar();
+        }
+
+        const tabs = {
+            'enable': 'content-enable',
+            'params': 'content-params',
+            'stock-close': 'content-stock-close',
+            'project-close': 'content-project-close',
+            'period-close': 'content-period-close'
+        };
+
+        Object.keys(tabs).forEach(tabId => {
+            document.getElementById(`tab-${tabId}`)?.addEventListener('click', function() {
+                Object.keys(tabs).forEach(id => {
+                    const tabBtn = document.getElementById(`tab-${id}`);
+                    const tabContent = document.getElementById(tabs[id]);
+                    if (id === tabId) {
+                        tabBtn?.classList.add('border-primary', 'text-primary', 'font-medium');
+                        tabBtn?.classList.remove('border-transparent', 'text-gray-500');
+                        tabContent?.classList.remove('hidden');
+                    } else {
+                        tabBtn?.classList.remove('border-primary', 'text-primary', 'font-medium');
+                        tabBtn?.classList.add('border-transparent', 'text-gray-500');
+                        tabContent?.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调整单 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="common/styles.css">
+</head>
+<body class="bg-neutral">
+    <div class="flex h-screen">
+        <div id="sidebar-container"></div>
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="space-y-6">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h1 class="text-xl font-semibold text-gray-800">调整单</h1>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <!-- 筛选条件和按钮栏 -->
+                    <div class="flex items-center justify-between mb-6 flex-nowrap">
+                        <div class="flex items-center space-x-2 flex-1">
+                            <select id="filter-field-adjustment-order" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="code">单据编号</option>
+                                <option value="contract">合同号</option>
+                                <option value="entity">财务主体</option>
+                                <option value="status">单据状态</option>
+                            </select>
+                            <input type="text" id="filter-value-adjustment-order" placeholder="按单据编号搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                <i data-lucide="search" class="w-4 h-4"></i>
+                            </button>
+                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                            </button>
+                            <button id="advanced-filter-btn-adjustment-order" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center">
+                                高级筛选
+                                <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button id="import-order" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 flex items-center">
+                                <i data-lucide="upload" class="w-4 h-4 mr-2"></i>
+                                导入
+                            </button>
+                            <button id="export-order" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 flex items-center">
+                                <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+                                导出
+                            </button>
+                            <button id="add-order" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
+                                <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                                新增
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 高级筛选展开区域 -->
+                    <div id="advanced-filter-adjustment-order" class="hidden bg-gray-50 p-4 rounded-md border border-gray-200 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option value="">全部</option>
+                                    <option value="org1">财务主体1</option>
+                                    <option value="org2">财务主体2</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">会计期间</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option value="">全部</option>
+                                    <option value="2026-04">2026-04</option>
+                                    <option value="2026-03">2026-03</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">单据编号</label>
+                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
+                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">单据状态</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option value="">全部</option>
+                                    <option value="draft">草稿</option>
+                                    <option value="active">生效</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">是否参与核算</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option value="">全部</option>
+                                    <option value="yes">是</option>
+                                    <option value="no">否</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex justify-end space-x-2">
+                            <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">重置</button>
+                            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700">查询</button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">会计期间</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据编号</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">收入调整金额</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">成本调整金额</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">调整原因</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据状态</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">是否参与核算</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">核算单号</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建人</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-3 py-2 text-sm text-gray-700">财务主体1</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">2026-04</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">TZD2604150001</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">HT202603001</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">5,000.00</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">2,000.00</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">收入调整</td>
+                                    <td class="px-3 py-2 text-sm">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">生效</span>
+                                    </td>
+                                    <td class="px-3 py-2 text-sm">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">否</span>
+                                    </td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">-</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">用户</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">2026-04-15 10:30</td>
+                                    <td class="px-3 py-2 text-sm">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700 edit-order">编辑</button>
+                                            <button class="text-red-500 hover:text-red-700 delete-order">删除</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-3 py-2 text-sm text-gray-700">财务主体1</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">2026-04</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">TZD2604140001</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">HT202603002</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">3,000.00</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">1,500.00</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">成本调整</td>
+                                    <td class="px-3 py-2 text-sm">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">草稿</span>
+                                    </td>
+                                    <td class="px-3 py-2 text-sm">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">否</span>
+                                    </td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">-</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">用户</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700">2026-04-14 15:45</td>
+                                    <td class="px-3 py-2 text-sm">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700 edit-order">编辑</button>
+                                            <button class="text-red-500 hover:text-red-700 delete-order">删除</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-6 flex items-center justify-between">
+                        <div class="text-sm text-gray-500">
+                            显示 1-2 条，共 2 条
+                        </div>
+                        <div class="flex space-x-1">
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>上一页</button>
+                            <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>下一页</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="order-drawer" class="drawer fixed top-0 right-0 h-full w-96 bg-white shadow-lg z-50 overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="drawer-title" class="text-lg font-semibold text-gray-900">新增调整单</h3>
+                <button id="close-drawer" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <form id="order-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">财务主体 <span class="text-red-500">*</span></label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">请选择财务主体</option>
+                        <option value="org1">财务主体1</option>
+                        <option value="org2">财务主体2</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">单据编号</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" disabled value="自动生成">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">会计期间 <span class="text-red-500">*</span></label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">请选择会计期间</option>
+                        <option value="2026-04">2026-04</option>
+                        <option value="2026-03">2026-03</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">合同号 <span class="text-red-500">*</span></label>
+                    <input type="text" placeholder="请输入合同号" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">收入调整金额</label>
+                    <input type="number" placeholder="请输入收入调整金额" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">成本调整金额</label>
+                    <input type="number" placeholder="请输入成本调整金额" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">调整原因</label>
+                    <textarea placeholder="请输入调整原因" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">单据状态</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="draft">草稿</option>
+                        <option value="active">生效</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">是否参与核算</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="no">否</option>
+                        <option value="yes">是</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">核算单号</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" disabled>
+                </div>
+            </form>
+            
+            <div class="mt-6 flex justify-end space-x-3">
+                <button id="cancel-drawer" class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">取消</button>
+                <button id="save-drawer" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700">保存</button>
+                <button id="active-drawer" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">生效</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+
+    <script>
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html');
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+                
+                setTimeout(() => {
+                    const script = document.createElement('script');
+                    script.src = 'common/scripts.js';
+                    script.onload = function() {
+                        if (typeof initCommonFunctions === 'function') {
+                            initCommonFunctions();
+                        }
+                        initPageFunctions();
+                    };
+                    document.body.appendChild(script);
+                }, 100);
+            } catch (error) {
+                console.error('加载侧边栏失败:', error);
+            }
+        }
+        
+        function initPageFunctions() {
+            const orderDrawer = document.getElementById('order-drawer');
+            const drawerTitle = document.getElementById('drawer-title');
+            
+            // 筛选条件选择器功能
+            const filterSelect = document.getElementById('filter-field-adjustment-order');
+            const filterInput = document.getElementById('filter-value-adjustment-order');
+            
+            filterSelect.addEventListener('change', function() {
+                const selectedValue = this.value;
+                
+                // 根据选择的筛选条件更新占位符
+                if (selectedValue === 'code') {
+                    filterInput.placeholder = '按单据编号搜索';
+                } else if (selectedValue === 'contract') {
+                    filterInput.placeholder = '按合同号搜索';
+                } else if (selectedValue === 'entity') {
+                    filterInput.placeholder = '按财务主体搜索';
+                } else if (selectedValue === 'status') {
+                    filterInput.placeholder = '按单据状态搜索';
+                }
+                
+                // 清空输入框
+                filterInput.value = '';
+            });
+            
+            // 高级筛选功能
+            const advancedFilterBtn = document.getElementById('advanced-filter-btn-adjustment-order');
+            const advancedFilter = document.getElementById('advanced-filter-adjustment-order');
+            
+            advancedFilterBtn.addEventListener('click', function() {
+                advancedFilter.classList.toggle('hidden');
+                
+                // 切换按钮文本和图标
+                if (!advancedFilter.classList.contains('hidden')) {
+                    this.innerHTML = '收起筛选 <i data-lucide="chevron-up" class="w-4 h-4 ml-1"></i>';
+                } else {
+                    this.innerHTML = '高级筛选 <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>';
+                }
+                
+                // 重新初始化图标
+                lucide.createIcons();
+            });
+            
+            document.getElementById('add-order').addEventListener('click', () => {
+                drawerTitle.textContent = '新增调整单';
+                if (typeof openDrawer === 'function') {
+                    openDrawer(orderDrawer);
+                } else {
+                    orderDrawer.classList.add('open');
+                    document.getElementById('drawer-overlay').classList.add('open');
+                }
+            });
+            
+            document.getElementById('close-drawer').addEventListener('click', () => {
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(orderDrawer);
+                } else {
+                    orderDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+            
+            document.getElementById('cancel-drawer').addEventListener('click', () => {
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(orderDrawer);
+                } else {
+                    orderDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+            
+            document.getElementById('save-drawer').addEventListener('click', () => {
+                alert('保存成功');
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(orderDrawer);
+                } else {
+                    orderDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+            
+            document.getElementById('active-drawer').addEventListener('click', () => {
+                alert('生效成功');
+                if (typeof closeDrawer === 'function') {
+                    closeDrawer(orderDrawer);
+                } else {
+                    orderDrawer.classList.remove('open');
+                    document.getElementById('drawer-overlay').classList.remove('open');
+                }
+            });
+            
+            document.querySelectorAll('.edit-order').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    drawerTitle.textContent = '编辑调整单';
+                    if (typeof openDrawer === 'function') {
+                        openDrawer(orderDrawer);
+                    } else {
+                        orderDrawer.classList.add('open');
+                        document.getElementById('drawer-overlay').classList.add('open');
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.delete-order').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (confirm('确定要删除这条记录吗？')) {
+                        alert('删除成功');
+                    }
+                });
+            });
+            
+            document.getElementById('import-order').addEventListener('click', () => {
+                alert('导入功能执行中...');
+            });
+            
+            document.getElementById('export-order').addEventListener('click', () => {
+                alert('导出功能执行中...');
+            });
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadSidebar);
+        } else {
+            loadSidebar();
+        }
+    </script>
+</body>
+</html>
