@@ -38,177 +38,437 @@
                 </div>
 
                 <div class="bg-white rounded-lg shadow-sm p-6">
-                    <!-- 筛选条件和按钮栏 -->
-                    <div class="flex items-center justify-between mb-6 flex-nowrap">
-                        <div class="flex items-center space-x-2 flex-1">
-                            <select id="filter-field-inventory-detail" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                <option value="contract">合同号</option>
-                                <option value="material">物料编码</option>
-                                <option value="entity">财务主体</option>
-                                <option value="doc">单据类型</option>
-                            </select>
-                            <input type="text" id="filter-value-inventory-detail" placeholder="按合同号搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
-                                <i data-lucide="search" class="w-4 h-4"></i>
-                            </button>
-                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
-                                <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
-                            </button>
-                            <button id="advanced-filter-btn-inventory-detail" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center">
-                                高级筛选
-                                <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
-                            </button>
-                        </div>
-                        <button id="export-inventory" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
-                            <i data-lucide="download" class="w-4 h-4 mr-2"></i>
-                            导出
-                        </button>
+                    <div class="border-b border-gray-200 mb-6">
+                        <nav class="flex space-x-8">
+                            <button id="tab-kingdee" class="py-3 px-1 border-b-2 border-primary text-primary font-medium">金蝶</button>
+                            <button id="tab-business" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">业务系统</button>
+                            <button id="tab-ebs" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">EBS</button>
+                        </nav>
                     </div>
-                    
-                    <!-- 高级筛选展开区域 -->
-                    <div id="advanced-filter-inventory-detail" class="hidden bg-gray-50 p-4 rounded-md border border-gray-200 mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
-                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    <option value="">全部</option>
-                                    <option value="org1">财务主体1</option>
-                                    <option value="org2">财务主体2</option>
+
+                    <div id="content-kingdee" class="tab-content">
+                        <div class="flex items-center justify-between mb-6 flex-nowrap">
+                            <div class="flex items-center space-x-2 flex-1">
+                                <select id="filter-field-kingdee" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="entity">财务主体</option>
+                                    <option value="contract">合同号</option>
+                                    <option value="material">物料编码</option>
+                                    <option value="docType">单据类型</option>
+                                    <option value="period">会计期间</option>
                                 </select>
+                                <input type="text" id="filter-value-kingdee" placeholder="按财务主体搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                    <i data-lucide="search" class="w-4 h-4"></i>
+                                </button>
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                    <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                </button>
+                                <button id="advanced-filter-btn-kingdee" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center">
+                                    高级筛选
+                                    <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                </button>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
-                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <button id="export-kingdee" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
+                                <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+                                导出
+                            </button>
+                        </div>
+                        
+                        <div id="advanced-filter-kingdee" class="hidden bg-gray-50 p-4 rounded-md border border-gray-200 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="">全部</option>
+                                        <option value="org1">财务主体1</option>
+                                        <option value="org2">财务主体2</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">物料编码</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">单据类型</label>
+                                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="">全部</option>
+                                        <option value="purchaseIn">采购入库单</option>
+                                        <option value="purchaseOut">采购退货单</option>
+                                        <option value="transfer">直接调拨单</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">会计期间</label>
+                                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="">全部</option>
+                                        <option value="2026-04">2026-04</option>
+                                        <option value="2026-03">2026-03</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">物料编码</label>
-                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">单据类型</label>
-                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    <option value="">全部</option>
-                                    <option value="type1">采购入库单</option>
-                                    <option value="type2">采购退货单</option>
-                                    <option value="type3">直接调拨单</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">会计期间</label>
-                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    <option value="">全部</option>
-                                    <option value="2026-04">2026-04</option>
-                                    <option value="2026-03">2026-03</option>
-                                </select>
+                            <div class="mt-4 flex justify-end space-x-2">
+                                <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                                    重置
+                                </button>
+                                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    查询
+                                </button>
                             </div>
                         </div>
-                        <div class="mt-4 flex justify-end space-x-2">
-                            <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-                                重置
-                            </button>
-                            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
-                                查询
-                            </button>
+
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">会计期间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务确认竣工日期</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">业务日期</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据编号</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据类型</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">物料编码</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">物料名称</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">批号</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">数量</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">库存单位</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">客户价</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">项目经理价</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">对账单号</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">对账状态</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">来源系统</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">销售出库单号</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">修改时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">HT202603001</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-10</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-08</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">RKD2604080001</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">采购入库单</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">WL001</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">木材</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">P2026040801</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">10</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">根</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">200.00</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">180.00</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">DZD2604150001</td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">对账成功</span>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">金蝶</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">CKD2604150001</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-08 10:30</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-08 10:30</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">HT202603001</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-10</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-07</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">RKD2604070001</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">采购入库单</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">WL002</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">板材</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">P2026040701</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">5</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">张</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">300.00</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">280.00</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">DZD2604150001</td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">待对账</span>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">金蝶</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">-</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-07 14:20</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-07 14:20</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-6 flex items-center justify-between">
+                            <div class="text-sm text-gray-500">
+                                显示 1-2 条，共 2 条
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>下一页</button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">会计期间</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务确认竣工日期</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">业务日期</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据编号</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据类型</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">物料编码</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">物料名称</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">批号</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">数量</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">库存单位</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">客户价</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">项目经理价</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">对账单号</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">来源系统</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">修改时间</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">HT202603001</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-10</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-08</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">RKD2604080001</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">采购入库单</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">WL001</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">木材</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">P2026040801</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">10</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">根</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">200.00</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">180.00</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">DZD2604150001</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">金蝶</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-08 10:30</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-08 10:30</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">HT202603001</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-10</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-07</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">RKD2604070001</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">采购入库单</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">WL002</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">板材</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">P2026040701</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">5</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">张</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">300.00</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">280.00</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">DZD2604150001</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">金蝶</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-07 14:20</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-07 14:20</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-2 text-sm text-gray-700">财务主体2</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">HT202603003</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-05</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-03</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">DBD2604030001</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">直接调拨单</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">WL003</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">五金件</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">P2026040301</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">20</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">套</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">50.00</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">45.00</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">DZD2604130001</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">金蝶</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-03 09:15</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-03 09:15</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div id="content-business" class="tab-content hidden">
+                        <div class="flex items-center justify-between mb-6 flex-nowrap">
+                            <div class="flex items-center space-x-2 flex-1">
+                                <select id="filter-field-business" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="entity">财务主体</option>
+                                    <option value="contract">合同号</option>
+                                    <option value="material">物料编码</option>
+                                    <option value="docType">单据类型</option>
+                                    <option value="stockDate">库存截止日期</option>
+                                </select>
+                                <input type="text" id="filter-value-business" placeholder="按财务主体搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                    <i data-lucide="search" class="w-4 h-4"></i>
+                                </button>
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                    <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                </button>
+                                <button id="advanced-filter-btn-business" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center">
+                                    高级筛选
+                                    <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                </button>
+                            </div>
+                            <button id="export-business" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
+                                <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+                                导出
+                            </button>
+                        </div>
+                        
+                        <div id="advanced-filter-business" class="hidden bg-gray-50 p-4 rounded-md border border-gray-200 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="">全部</option>
+                                        <option value="org1">财务主体1</option>
+                                        <option value="org2">财务主体2</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">物料编码</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">单据类型</label>
+                                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="">全部</option>
+                                        <option value="type1">单据类型1</option>
+                                        <option value="type2">单据类型2</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">库存截止日期</label>
+                                    <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                            </div>
+                            <div class="mt-4 flex justify-end space-x-2">
+                                <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                                    重置
+                                </button>
+                                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    查询
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">库存截止日期</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">物料编码</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">数量</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">对账状态</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">来源系统</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">修改时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-30</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">HT202603001</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">WL001</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">10</td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">对账成功</span>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">svi</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-08 10:30</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-08 10:30</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体2</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-30</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">HT202603002</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">WL003</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">20</td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">未对账</span>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">积木云装</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-07 14:20</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-07 14:20</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-6 flex items-center justify-between">
+                            <div class="text-sm text-gray-500">
+                                显示 1-2 条，共 2 条
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>下一页</button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="mt-6 flex items-center justify-between">
-                        <div class="text-sm text-gray-500">
-                            显示 1-3 条，共 3 条
+                    <div id="content-ebs" class="tab-content hidden">
+                        <div class="flex items-center justify-between mb-6 flex-nowrap">
+                            <div class="flex items-center space-x-2 flex-1">
+                                <select id="filter-field-ebs" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="entity">财务主体</option>
+                                    <option value="contract">合同号</option>
+                                    <option value="material">物料编码</option>
+                                    <option value="docType">单据类型</option>
+                                    <option value="period">会计期间</option>
+                                </select>
+                                <input type="text" id="filter-value-ebs" placeholder="按财务主体搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                    <i data-lucide="search" class="w-4 h-4"></i>
+                                </button>
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                    <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                </button>
+                                <button id="advanced-filter-btn-ebs" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center">
+                                    高级筛选
+                                    <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                </button>
+                            </div>
+                            <button id="export-ebs" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
+                                <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+                                导出
+                            </button>
                         </div>
-                        <div class="flex space-x-1">
-                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>上一页</button>
-                            <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
-                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>下一页</button>
+                        
+                        <div id="advanced-filter-ebs" class="hidden bg-gray-50 p-4 rounded-md border border-gray-200 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="">全部</option>
+                                        <option value="org1">财务主体1</option>
+                                        <option value="org2">财务主体2</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">物料编码</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">单据类型</label>
+                                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="">全部</option>
+                                        <option value="type1">单据类型1</option>
+                                        <option value="type2">单据类型2</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">会计期间</label>
+                                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="">全部</option>
+                                        <option value="2026-04">2026-04</option>
+                                        <option value="2026-03">2026-03</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex justify-end space-x-2">
+                                <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                                    重置
+                                </button>
+                                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    查询
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">库存截止日期</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">物料编码</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">批号</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">数量</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">对账状态</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">来源系统</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">修改时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-30</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">HT202603001</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">WL001</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">P2026040801</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">10</td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">对账失败</span>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">EBS</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-08 10:30</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-08 10:30</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体2</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-30</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">HT202603002</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">WL003</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">P2026040701</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">20</td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">对账成功</span>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">EBS</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-07 14:20</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-07 14:20</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-6 flex items-center justify-between">
+                            <div class="text-sm text-gray-500">
+                                显示 1-2 条，共 2 条
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>下一页</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -240,48 +500,66 @@
         }
         
         function initPageFunctions() {
-            document.getElementById('export-inventory').addEventListener('click', () => {
-                alert('导出功能执行中...');
+            const tabs = {
+                'kingdee': 'content-kingdee',
+                'business': 'content-business',
+                'ebs': 'content-ebs'
+            };
+
+            Object.keys(tabs).forEach(tabId => {
+                document.getElementById(`tab-${tabId}`)?.addEventListener('click', function() {
+                    Object.keys(tabs).forEach(id => {
+                        const tabBtn = document.getElementById(`tab-${id}`);
+                        const tabContent = document.getElementById(tabs[id]);
+                        if (id === tabId) {
+                            tabBtn?.classList.add('border-primary', 'text-primary', 'font-medium');
+                            tabBtn?.classList.remove('border-transparent', 'text-gray-500');
+                            tabContent?.classList.remove('hidden');
+                        } else {
+                            tabBtn?.classList.remove('border-primary', 'text-primary', 'font-medium');
+                            tabBtn?.classList.add('border-transparent', 'text-gray-500');
+                            tabContent?.classList.add('hidden');
+                        }
+                    });
+                });
             });
-            
-            // 筛选条件选择器功能
-            const filterSelect = document.getElementById('filter-field-inventory-detail');
-            const filterInput = document.getElementById('filter-value-inventory-detail');
-            
-            filterSelect.addEventListener('change', function() {
-                const selectedValue = this.value;
+
+            const tabNames = ['kingdee', 'business', 'ebs'];
+            tabNames.forEach(tabName => {
+                const exportBtn = document.getElementById(`export-${tabName}`);
+                exportBtn?.addEventListener('click', () => {
+                    alert('导出功能执行中...');
+                });
+
+                const filterSelect = document.getElementById(`filter-field-${tabName}`);
+                const filterInput = document.getElementById(`filter-value-${tabName}`);
                 
-                // 根据选择的筛选条件更新占位符
-                if (selectedValue === 'contract') {
-                    filterInput.placeholder = '按合同号搜索';
-                } else if (selectedValue === 'material') {
-                    filterInput.placeholder = '按物料编码搜索';
-                } else if (selectedValue === 'entity') {
-                    filterInput.placeholder = '按财务主体搜索';
-                } else if (selectedValue === 'doc') {
-                    filterInput.placeholder = '按单据类型搜索';
-                }
+                filterSelect?.addEventListener('change', function() {
+                    const selectedValue = this.value;
+                    const placeholders = {
+                        'entity': '按财务主体搜索',
+                        'contract': '按合同号搜索',
+                        'material': '按物料编码搜索',
+                        'docType': '按单据类型搜索',
+                        'period': '按会计期间搜索',
+                        'stockDate': '按库存截止日期搜索'
+                    };
+                    filterInput.placeholder = placeholders[selectedValue] || '搜索';
+                    filterInput.value = '';
+                });
+
+                const advancedFilterBtn = document.getElementById(`advanced-filter-btn-${tabName}`);
+                const advancedFilter = document.getElementById(`advanced-filter-${tabName}`);
                 
-                // 清空输入框
-                filterInput.value = '';
-            });
-            
-            // 高级筛选功能
-            const advancedFilterBtn = document.getElementById('advanced-filter-btn-inventory-detail');
-            const advancedFilter = document.getElementById('advanced-filter-inventory-detail');
-            
-            advancedFilterBtn.addEventListener('click', function() {
-                advancedFilter.classList.toggle('hidden');
-                
-                // 切换按钮文本和图标
-                if (!advancedFilter.classList.contains('hidden')) {
-                    this.innerHTML = '收起筛选 <i data-lucide="chevron-up" class="w-4 h-4 ml-1"></i>';
-                } else {
-                    this.innerHTML = '高级筛选 <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>';
-                }
-                
-                // 重新初始化图标
-                lucide.createIcons();
+                advancedFilterBtn?.addEventListener('click', function() {
+                    advancedFilter.classList.toggle('hidden');
+                    if (!advancedFilter.classList.contains('hidden')) {
+                        this.innerHTML = '收起筛选 <i data-lucide="chevron-up" class="w-4 h-4 ml-1"></i>';
+                    } else {
+                        this.innerHTML = '高级筛选 <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>';
+                    }
+                    lucide.createIcons();
+                });
             });
         }
         
