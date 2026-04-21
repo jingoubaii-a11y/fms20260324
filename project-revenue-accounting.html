@@ -27,6 +27,128 @@
         }
     </script>
     <link rel="stylesheet" href="common/styles.css">
+    <style>
+        .req-badge {
+            display: inline-block;
+            vertical-align: top;
+            background-color: rgb(250, 173, 20);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 16px;
+            padding: 0px 5px;
+            border-radius: 2px;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            top: -10px;
+            right: -6px;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .req-badge-float {
+            display: inline-block;
+            vertical-align: top;
+            background-color: rgb(250, 173, 20);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 16px;
+            padding: 0px 5px;
+            border-radius: 2px;
+            border: none;
+            cursor: pointer;
+            position: fixed !important;
+            z-index: 9999;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            pointer-events: auto;
+            white-space: nowrap;
+        }
+        .req-badge-float:hover {
+            transform: scale(1.15);
+            box-shadow: 0 3px 12px rgba(250,173,20,0.6);
+            z-index: 10000;
+        }
+        .req-marker {
+            position: relative;
+            display: inline-block;
+            padding-top: 12px;
+        }
+        .req-marker > *:first-child {
+            margin-top: -12px;
+        }
+        .req-tooltip {
+            position: fixed;
+            background-color: #f0efef;
+            border-radius: 4px;
+            width: 450px;
+            max-height: 500px;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 9999;
+            display: none;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .req-tooltip.show { display: block; }
+        .req-tooltip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .req-tooltip-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+        .req-tooltip-close {
+            cursor: pointer;
+            color: #999;
+            font-size: 18px;
+            line-height: 1;
+            padding: 2px 6px;
+        }
+        .req-tooltip-close:hover { color: #333; }
+        .req-tooltip-content {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #444;
+        }
+        .req-tooltip-content p { margin-bottom: 12px; }
+        .req-tooltip-content ul { padding-left: 20px; margin-bottom: 12px; }
+        .req-tooltip-content li { margin-bottom: 6px; }
+        .req-tooltip-content strong { color: #222; }
+        .req-tooltip-content em { color: #666; font-style: italic; }
+        .req-tooltip-content blockquote {
+            border-left: 3px solid #ccc;
+            padding-left: 12px;
+            margin: 8px 0;
+            color: #666;
+            background: #fafafa;
+            padding: 8px 12px;
+        }
+        .req-section-title {
+            font-weight: bold;
+            color: #333;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        .status-green { background-color: #52c41a; }
+        .status-red { background-color: #ff4d4f; }
+        .status-gray { background-color: #999; }
+        .status-blue { background-color: #1890ff; }
+        .status-orange { background-color: #faad14; }
+        .table-wrapper {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+        }
+    </style>
 </head>
 <body class="bg-neutral">
     <div class="flex h-screen">
@@ -39,7 +161,8 @@
 
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <!-- Tab导航 -->
-                    <div class="border-b border-gray-200 mb-6">
+                    <div class="req-marker border-b border-gray-200 mb-6" id="req-marker-1">
+                        <span class="req-badge" data-req="1" data-title="需求描述：Tab导航组件" data-content='<div class="req-section-title">显示样式</div><p>项目收入核算单页面顶部展示三个Tab选项卡：</p><ul><li><span class="status-dot status-blue"></span><strong>完工百分比</strong> - 默认激活状态，显示蓝色下划线</li><li><span class="status-dot status-blue"></span><strong>完成合同法</strong> - 可切换Tab</li><li><span class="status-dot status-gray"></span><strong>设计费</strong> - 当前为待定状态，置灰且不可点击，显示&quot;#待定#&quot;标记</li></ul><div class="req-section-title">交互逻辑</div><ul><li>点击Tab可切换不同核算方法的视图内容</li><li>设计费Tab处于禁用状态，等待后续需求明确后启用</li><li>Tab切换时保持筛选条件和分页状态独立</li></ul>'>1</span>
                         <nav class="-mb-px flex space-x-8">
                             <button class="tab-btn active border-b-2 border-primary text-primary py-3 px-1 text-sm font-medium" data-tab="percentage">
                                 完工百分比
@@ -58,10 +181,13 @@
                         <!-- 筛选条件和按钮栏 -->
                         <div class="flex items-center justify-between mb-6 flex-nowrap">
                             <div class="flex items-center space-x-2 flex-1">
-                                <select id="filter-field-percentage" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    <option value="code">单据编号</option>
-                                    <option value="contract">合同号</option>
-                                </select>
+                                <div class="req-marker relative inline-block" id="req-marker-2">
+                                    <span class="req-badge" data-req="2" data-title="需求描述：完工百分比-筛选条件区域" data-content='<div class="req-section-title">筛选字段清单（13个）</div><ul><li><strong>单据编号</strong>：精准搜索，支持输入框查询</li><li><strong>单据类型</strong>：枚举选择 - 项目核算调整单、标准项目核算单</li><li><strong>会计期间</strong>：选择期间下拉框</li><li><strong>财务主体</strong>：支持多选</li><li><strong>计算状态</strong>：枚举 - 未计算、已计算、计算失败、计算中</li><li><strong>核算确认状态</strong>：枚举 - 未确认、审批中、已确认</li><li><strong>合同号</strong>：取项目基础资料</li><li><strong>签单日期</strong>：取项目基础资料</li><li><strong>需求类型</strong>：取项目基础资料</li><li><strong>产品分类</strong>：取项目基础资料</li><li><strong>实际开工日期</strong>：取项目基础资料</li><li><strong>财务确认竣工日期</strong>：取项目基础资料</li><li><strong>计算批次</strong>：精准搜索</li></ul><div class="req-section-title">交互说明</div><ul><li>支持&quot;高级筛选&quot;展开/收起，展开后显示全部筛选条件</li><li>默认收起状态仅显示主要搜索条件（单据编号/合同号）</li><li>提供&quot;重置&quot;和&quot;查询&quot;按钮</li></ul>'>2</span>
+                                    <select id="filter-field-percentage" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="code">单据编号</option>
+                                        <option value="contract">合同号</option>
+                                    </select>
+                                </div>
                                 <input type="text" id="filter-value-percentage" placeholder="按单据编号搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                                 <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
                                     <i data-lucide="search" class="w-4 h-4"></i>
@@ -71,7 +197,8 @@
                                     <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
                                 </button>
                             </div>
-                            <div class="flex items-center space-x-3">
+                            <div class="req-marker flex items-center space-x-3" id="req-marker-3">
+                                <span class="req-badge" data-req="3" data-title="需求描述：完工百分比-操作按钮" data-content='<div class="req-section-title">按钮功能</div><ul><li><strong>导出</strong>：<ul><li>根据当前筛选条件导出数据</li><li>导出格式支持Excel</li></ul></li><li><strong>确认本期收入</strong>：<ul><li>触发收入确认流程</li><li><em>业务规则：如果项目类型=整装，则需要发起审批流程</em></li><li>审批通过后，确认状态反写为&quot;已确认&quot;</li><li>非整装项目可直接确认</li></ul></li></ul><div class="req-section-title">状态机说明</div><blockquote>核算确认状态机：[新增]→未确认→[确认收入]→已确认</blockquote>'>3</span>
                                 <button id="export-percentage" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 flex items-center">
                                     <i data-lucide="download" class="w-4 h-4 mr-2"></i>
                                     导出
@@ -172,7 +299,8 @@
                         </div>
 
                         <!-- 列表 -->
-                        <div class="overflow-x-auto">
+                        <div class="req-marker table-wrapper" id="req-marker-4">
+                            <span class="req-badge" data-req="4" data-title="需求描述：完工百分比-列表区域" data-content='<div class="req-section-title">列表字段（29个+操作列）</div><ul><li><strong>单据编号</strong>：自动生成，编码规则：WG+yymm+8位流水号</li><li><strong>单据类型</strong>：枚举 - 项目核算调整单、标准项目核算单</li><li><strong>会计期间</strong></li><li><strong>财务主体</strong></li><li><strong>计算状态</strong>：枚举 - 未计算、已计算、计算失败、计算中<ul><li><span class="status-dot status-green"></span>已计算 - 绿色标签</li><li><span class="status-dot status-gray"></span>未计算 - 灰色标签</li><li><span class="status-dot status-red"></span>计算失败 - 红色标签</li><li><span class="status-dot status-orange"></span>计算中 - 橙色标签</li></ul></li><li><strong>核算确认状态</strong>：枚举 - 未确认、审批中、已确认</li><li><strong>项目类型</strong>：取项目基础资料</li><li><strong>合同号/合同名称</strong>：取项目基础资料</li><li><strong>计税方式</strong>：取项目基础资料</li><li><strong>客户名称/客户编号</strong>：取项目基础资料</li><li><strong>需求类型/产品分类</strong>：取项目基础资料</li><li><strong>签单日期/实际开工日期/财务确认竣工日期</strong>：取项目基础资料</li><li><strong>应收总额</strong>：取项目基础资料</li><li><strong>当月毛利率</strong>：自动计算=（本次确认收入-本次确认成本）/本次确认收入，百分比，精度2</li><li><strong>本次确认收入</strong></li><li><strong>本次确认成本</strong>：自动计算=当月合同履约总成本余额+成本调整金额-本月已确认成本</li><li><strong>计算批次/是否重算/本月计算次数</strong></li><li><strong>核算确认时间/计算完成时间/错误信息</strong></li><li><strong>创建时间/创建人</strong></li></ul><div class="req-section-title">操作列</div><ul><li><strong>详情</strong>：点击打开详情弹窗，展示完整核算信息</li></ul>'>4</span>
                             <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                                 <thead class="bg-gray-50">
                                     <tr>
@@ -306,10 +434,13 @@
                         <!-- 筛选条件和按钮栏 -->
                         <div class="flex items-center justify-between mb-6 flex-nowrap">
                             <div class="flex items-center space-x-2 flex-1">
-                                <select id="filter-field-contract" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    <option value="code">单据编号</option>
-                                    <option value="contract">合同号</option>
-                                </select>
+                                <div class="req-marker relative inline-block" id="req-marker-6">
+                                    <span class="req-badge" data-req="6" data-title="需求描述：完成合同法-筛选条件区域" data-content='<div class="req-section-title">筛选字段清单（13个）</div><ul><li><strong>单据编号</strong>：精准搜索</li><li><strong>单据类型</strong>：枚举 - 项目核算调整单、标准项目核算单</li><li><strong>会计期间</strong>：选择期间</li><li><strong>财务主体</strong>：支持多选</li><li><strong>计算状态</strong>：枚举 - 未计算、已计算、计算失败、计算中</li><li><strong>核算确认状态</strong>：枚举 - 未确认、审批中、已确认</li><li><strong>合同号</strong>：取项目基础资料</li><li><strong>签单日期</strong>：取项目基础资料</li><li><strong>需求类型</strong>：取项目基础资料</li><li><strong>产品分类</strong>：取项目基础资料</li><li><strong>实际开工日期</strong>：取项目基础资料</li><li><strong>财务确认竣工日期</strong>：取项目基础资料</li><li><strong>计算批次</strong>：精准搜索</li></ul><div class="req-section-title">与完工百分比的差异</div><blockquote>完成合同法的筛选条件与完工百分比基本一致，但列表展示字段和详情弹窗内容有差异。</blockquote>'>6</span>
+                                    <select id="filter-field-contract" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="code">单据编号</option>
+                                        <option value="contract">合同号</option>
+                                    </select>
+                                </div>
                                 <input type="text" id="filter-value-contract" placeholder="按单据编号搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                                 <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
                                     <i data-lucide="search" class="w-4 h-4"></i>
@@ -319,7 +450,8 @@
                                     <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
                                 </button>
                             </div>
-                            <div class="flex items-center space-x-3">
+                            <div class="req-marker flex items-center space-x-3" id="req-marker-7">
+                                <span class="req-badge" data-req="7" data-title="需求描述：完成合同法-操作按钮" data-content='<div class="req-section-title">按钮功能</div><ul><li><strong>导出</strong>：<ul><li>根据当前筛选条件导出数据</li><li>导出格式支持Excel</li></ul></li><li><strong>确认本期收入</strong>：<ul><li>触发收入确认流程</li><li><em>业务规则：如果项目类型=整装，则需要发起审批流程</em></li><li>审批通过后，确认状态反写为&quot;已确认&quot;</li></ul></li></ul><div class="req-section-title">状态机说明</div><blockquote>核算确认状态机：[新增]→未确认→[确认收入]→已确认</blockquote>'>7</span>
                                 <button id="export-contract" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 flex items-center">
                                     <i data-lucide="download" class="w-4 h-4 mr-2"></i>
                                     导出
@@ -420,7 +552,8 @@
                         </div>
 
                         <!-- 列表 -->
-                        <div class="overflow-x-auto">
+                        <div class="req-marker table-wrapper" id="req-marker-8">
+                            <span class="req-badge" data-req="8" data-title="需求描述：完成合同法-列表区域" data-content='<div class="req-section-title">列表字段（22个+操作列）</div><ul><li><strong>单据编号</strong></li><li><strong>会计期间</strong></li><li><strong>财务主体</strong></li><li><strong>计算状态</strong>：枚举 - 未计算、已计算、计算失败</li><li><strong>核算确认状态</strong>：枚举 - 未确认、审批中、已确认</li><li><strong>合同号/合同名称</strong>：取项目基础资料</li><li><strong>需求类型/产品分类</strong>：取项目基础资料</li><li><strong>签单日期/实际开工日期/实际竣工日期/财务确认竣工日期</strong>：取项目基础资料</li><li><strong>本次确认收入</strong>：自动计算=当月销售收入计算金额+收入调整金额</li><li><strong>本次确认成本</strong>：自动计算=取当月合同履约总成本余额+成本调整金额</li><li><strong>计算批次/是否重算/本月计算次数</strong></li><li><strong>核算确认时间/计算完成时间/错误信息</strong></li><li><strong>创建时间/创建人</strong></li></ul><div class="req-section-title">与完工百分比的区别</div><blockquote>完成合同法不包含：项目类型、计税方式、客户名称/编号、楼盘信息、应收总额、当月毛利率等字段。核心差异在于收入/成本的<strong>计算公式不同</strong>。</blockquote>'>8</span>
                             <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                                 <thead class="bg-gray-50">
                                     <tr>
@@ -981,5 +1114,9 @@
             loadSidebar();
         }
     </script>
+
+    <!-- 需求标注浮窗容器 -->
+    <div id="req-tooltip-container"></div>
+    <script src="js/req-annotation.js"></script>
 </body>
 </html>
