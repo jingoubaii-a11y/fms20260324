@@ -1,0 +1,26 @@
+{
+  "id": 56841,
+  "name": "fms20260324",
+  "abbrName": "FM",
+  "description": "",
+  "devMode": 2,
+  "status": null,
+  "url": null,
+  "databaseHost": null,
+  "databasePort": null,
+  "databaseName": null,
+  "databaseUsername": null,
+  "databasePassword": null,
+  "projectInfo": {
+    "JOYCODE": {
+      "jd_71533fe7506ad": [
+        {
+          "jd_71533fe7506ad": {
+            "projectId": 56841,
+            "appId": "24812"
+          }
+        }
+      ]
+    }
+  }
+}
