@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>业务类型 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sidebar {
+            transition: width 0.3s ease-in-out;
+        }
+
+        .sidebar.collapsed {
+            width: 64px;
+        }
+
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-icon {
+            margin: 0 auto;
+        }
+
+        .sidebar-item {
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 500;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+        }
+
+        .menu-header h2 {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .drawer {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+
+        .drawer.open {
+            transform: translateX(0);
+        }
+
+        .drawer-overlay {
+            display: none;
+        }
+
+        .drawer-overlay.open {
+            display: block;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #003eb3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* 需求标注样式 - 必须严格遵守规范 */
+        .req-badge {
+            display: inline-block;
+            background-color: rgb(250, 173, 20) !important; /* 橙黄色 */
+            color: white;
+            font-size: 11px !important;
+            font-weight: bold;
+            line-height: 16px !important;
+            padding: 0px 5px !important;
+            border-radius: 2px !important;
+            position: absolute;
+            top: -10px;
+            right: -6px;
+            z-index: 9999;
+            opacity: 0; /* 原始badge隐藏 */
+            pointer-events: none;
+        }
+
+        .req-badge-float {
+            position: fixed !important; /* 必须！脱离文档流 */
+            z-index: 9999;
+            background-color: rgb(250, 173, 20) !important; /* 橙黄色 */
+            color: white;
+            font-size: 11px !important;
+            font-weight: bold;
+            line-height: 16px !important;
+            padding: 0px 5px !important;
+            border-radius: 2px !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            pointer-events: auto; /* 必须！允许hover触发 */
+            cursor: pointer;
+        }
+
+        .req-marker {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* 树形结构样式 */
+        .tree-node {
+            padding-left: 16px;
+            border-left: 1px solid #e5e7eb;
+            margin-left: 8px;
+        }
+
+        .tree-node:first-child {
+            margin-top: 4px;
+        }
+
+        .tree-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 2px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tree-item:hover {
+            background-color: #f3f4f6;
+        }
+
+        .tree-item.selected {
+            background-color: #e6f0ff;
+            color: #003eb3;
+            font-weight: 500;
+        }
+
+        .tree-toggle {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* 浮窗样式 */
+        .req-tooltip {
+            position: fixed;
+            max-width: 450px;
+            max-height: 500px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .req-tooltip.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .req-tooltip-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9fafb;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .req-tooltip-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .req-tooltip-close {
+            cursor: pointer;
+            font-size: 20px;
+            color: #6b7280;
+            line-height: 1;
+        }
+
+        .req-tooltip-close:hover {
+            color: #111827;
+        }
+
+        .req-tooltip-content {
+            padding: 16px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        .req-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .status-green { background-color: #10b981; }
+        .status-red { background-color: #ef4444; }
+        .status-gray { background-color: #9ca3af; }
+        .status-blue { background-color: #3b82f6; }
+        .status-orange { background-color: #f97316; }
+
+        code {
+            background-color: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'Monaco', monospace;
+        }
+
+        em {
+            color: #059669;
+            font-style: normal;
+        }
+
+        blockquote {
+            border-left: 3px solid rgb(250, 173, 20);
+            padding-left: 12px;
+            margin: 8px 0;
+            color: #6b7280;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="bg-neutral min-h-screen">
+    <!-- 主容器 -->
+    <div class="flex h-screen">
+        <!-- 侧边栏 -->
+        <div id="sidebar-container"></div>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <!-- 页面标题 [1] -->
+                <div class="req-marker relative block border-b border-gray-200 pb-4 mb-6" id="req-marker-1" style="display: block;">
+                    <span class="req-badge" data-req="1"
+                          data-title="业务类型"
+                          data-content='<div class="req-section-title">业务类型</div><div><strong>说明：</strong>业务类型管理</div><div><em>包含业务类型分组（左侧）和业务类型列表（右侧），占比1:4</em></div>'>1</span>
+                    <h1 class="text-xl font-semibold text-gray-800">业务类型</h1>
+                </div>
+
+                <!-- 筛选条件 [2] -->
+                <div class="mb-6">
+                    <!-- 基础筛选栏 - req-marker精确包裹此区域 -->
+                    <div class="req-marker inline-block relative" id="req-marker-2" style="display: block; width: 100%;">
+                        <span class="req-badge" data-req="2"
+                              data-title="筛选条件"
+                              data-content='<div class="req-section-title">筛选条件</div><div><strong>基础筛选：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li>字段选择器：可选择搜索字段</li><li>输入框：模糊搜索</li><li>搜索/刷新/高级筛选按钮</li></ul><div style="margin-top: 8px;"><strong>高级筛选：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>业务类型名称</code>：模糊搜索</li><li><code>业务编码</code>：模糊搜索</li><li><code>状态</code>：下拉单选（启用、停用）</li><li><code>上级业务分组</code>：下拉单选（已新增业务类型分组）</li></ul>'>2</span>
+
+                        <!-- 筛选条件和按钮栏 -->
+                        <div class="flex items-center justify-between flex-nowrap">
+                            <!-- 左侧：基础筛选 -->
+                            <div class="flex items-center space-x-2 flex-1">
+                                <!-- 字段选择器 -->
+                                <select id="filter-field" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                    <option value="name">业务类型名称</option>
+                                    <option value="code">业务编码</option>
+                                </select>
+                                <!-- 输入框 -->
+                                <input type="text" id="filter-value" placeholder="按名称搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                <!-- 搜索按钮 -->
+                                <button id="search-btn" class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="搜索">
+                                    <i data-lucide="search" class="w-4 h-4"></i>
+                                </button>
+                                <!-- 刷新按钮 -->
+                                <button id="refresh-btn" class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="刷新">
+                                    <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                </button>
+                                <!-- 高级筛选按钮 -->
+                                <button id="advanced-filter-btn" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center text-sm">
+                                    高级筛选
+                                    <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 高级筛选展开区域（不在req-marker内） -->
+                    <div id="advanced-filter" class="hidden bg-gray-50 p-4 rounded-md border border-gray-200 mt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">业务类型名称</label>
+                                <input type="text" id="adv-filter-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="请输入业务类型名称">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">业务编码</label>
+                                <input type="text" id="adv-filter-code" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="请输入业务编码">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">状态</label>
+                                <select id="adv-filter-status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                    <option value="">全部</option>
+                                    <option value="enabled">启用</option>
+                                    <option value="disabled">停用</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">上级业务分组</label>
+                                <select id="adv-filter-group" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                    <option value="">全部</option>
+                                    <option value="income">收入类</option>
+                                    <option value="expense">支出类</option>
+                                    <option value="cost">费用类</option>
+                                    <option value="asset">资产类</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex justify-end space-x-2">
+                            <button id="reset-filter-btn" class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-sm">
+                                重置
+                            </button>
+                            <button id="query-filter-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors text-sm">
+                                查询
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区域：左右分栏 [3][4] -->
+                <div class="grid grid-cols-5 gap-6">
+                    <!-- 左侧：业务类型分组 [3] -->
+                    <div class="col-span-1" id="req-marker-3">
+                        <div class="req-marker relative block border border-gray-200 rounded-lg p-4" style="display: block;">
+                            <span class="req-badge" data-req="3"
+                                  data-title="业务类型分组"
+                                  data-content='<div class="req-section-title">业务类型分组</div><div><strong>页面位置：</strong>位于右侧主内容区的左侧部分，按照层级树状展示</div><div><strong>布局比例：</strong>分组和业务类型页面占比1:4</div><div><strong>按钮功能：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>新增</code>：打开新增业务类型分组抽屉弹窗</li><li><code>编辑</code>：页面参考新增业务类型分组抽屉弹窗</li><li><code>删除</code>：删除校验该业务类型分组下是否有业务类型数据</li></ul>'>3</span>
+
+                            <!-- 分组标题和操作按钮 -->
+                            <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+                                <h3 class="text-sm font-semibold text-gray-700">业务分组</h3>
+                                <div class="flex gap-2">
+                                    <button id="add-group-btn" class="p-1 text-primary hover:bg-secondary rounded" title="新增分组">
+                                        <i data-lucide="plus" class="w-4 h-4"></i>
+                                    </button>
+                                    <button id="edit-group-btn" class="p-1 text-primary hover:bg-secondary rounded" title="编辑分组">
+                                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                    </button>
+                                    <button id="delete-group-btn" class="p-1 text-red-600 hover:bg-red-50 rounded" title="删除分组">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 树形结构 -->
+                            <div class="space-y-1 max-h-[calc(100vh-350px)] overflow-y-auto">
+                                <!-- 一级节点 -->
+                                <div class="tree-item selected" data-id="group-1">
+                                    <div class="tree-toggle" onclick="toggleTreeNode(this)">
+                                        <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                                    </div>
+                                    <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                    <span class="text-sm">收入类</span>
+                                    <span class="ml-auto text-xs text-gray-400">(2)</span>
+                                </div>
+                                <div class="tree-node" id="children-group-1">
+                                    <!-- 二级节点 -->
+                                    <div class="tree-item" data-id="group-1-1">
+                                        <div class="tree-toggle" onclick="toggleTreeNode(this)">
+                                            <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                                        </div>
+                                        <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                        <span class="text-sm">主营业务收入</span>
+                                        <span class="ml-auto text-xs text-gray-400">(1)</span>
+                                    </div>
+                                    <div class="tree-node">
+                                        <!-- 三级节点 -->
+                                        <div class="tree-item" data-id="group-1-1-1">
+                                            <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                            <span class="text-sm">销售收入</span>
+                                        </div>
+                                    </div>
+                                    <div class="tree-item" data-id="group-1-1-2">
+                                        <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                        <span class="text-sm">其他收入</span>
+                                        <span class="ml-auto text-xs text-gray-400">(1)</span>
+                                    </div>
+                                </div>
+
+                                <!-- 另一个一级节点 -->
+                                <div class="tree-item" data-id="group-2">
+                                    <div class="tree-toggle" onclick="toggleTreeNode(this)">
+                                        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                                    </div>
+                                    <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                    <span class="text-sm">支出类</span>
+                                    <span class="ml-auto text-xs text-gray-400">(1)</span>
+                                </div>
+                                <div class="tree-node hidden" id="children-group-2">
+                                    <div class="tree-item" data-id="group-2-1">
+                                        <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                        <span class="text-sm">采购支出</span>
+                                    </div>
+                                </div>
+
+                                <div class="tree-item" data-id="group-3">
+                                    <div class="tree-toggle" onclick="toggleTreeNode(this)">
+                                        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                                    </div>
+                                    <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                    <span class="text-sm">费用类</span>
+                                    <span class="ml-auto text-xs text-gray-400">(1)</span>
+                                </div>
+                                <div class="tree-node hidden" id="children-group-3">
+                                    <div class="tree-item" data-id="group-3-1">
+                                        <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                        <span class="text-sm">费用报销</span>
+                                    </div>
+                                </div>
+
+                                <div class="tree-item" data-id="group-4">
+                                    <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                    <span class="text-sm">资产类</span>
+                                    <span class="ml-auto text-xs text-gray-400">(1)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：业务类型列表 [4] -->
+                    <div class="col-span-4" id="req-marker-4">
+                        <div class="req-marker relative block" style="display: block;">
+                            <span class="req-badge" data-req="4"
+                                  data-title="业务类型列表"
+                                  data-content='<div class="req-section-title">业务类型列表</div><div><strong>页面位置：</strong>位于右侧主内容区的右侧部分，展示新增的业务类型列表</div><div><strong>字段清单：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>业务类型编码</code>：唯一标识</li><li><code>业务类型名称</code>：业务类型名称</li><li><code>上级业务分组</code>：所属分组</li><li><code>说明</code>：补充描述</li><li><code>状态</code>：switch按钮（启用/停用）<br/><em>启用、停用无逻辑判断</em></li><li><code>操作</code>：<br/>- <code>编辑</code>：打开编辑业务类型抽屉弹窗<br/>- <code>删除</code>：删除校验该业务类型是否被单据使用</li></ul>'>4</span>
+
+                            <!-- 列表标题和新增按钮 -->
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-semibold text-gray-700">业务类型列表</h3>
+                                <div class="req-marker inline-block" id="req-marker-5">
+                                    <span class="req-badge" data-req="5"
+                                          data-title="操作按钮"
+                                          data-content='<div class="req-section-title">操作按钮</div><div><strong>功能：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>新增</code>：打开新增业务类型抽屉弹窗</li></ul><div><em>位置：在右侧主内容区展示业务类型列表上方</em></div>'>5</span>
+                                    <button id="add-business-type" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center text-sm">
+                                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                                        新增
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 表格列表 -->
+                            <div class="table-wrapper overflow-x-auto border border-gray-200 rounded-lg">
+                                <table class="min-w-full bg-white">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">业务类型编码</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">业务类型名称</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">上级业务分组</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">说明</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">BT001</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">销售收入</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">收入类 > 主营业务收入</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">主营业务收入</td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">BT002</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">其他业务收入</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">收入类 > 其他收入</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">其他业务收入</td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">BT003</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">采购支出</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">支出类</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">原材料采购</td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">BT004</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">费用报销</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">费用类</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">日常费用报销</td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox">
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">BT005</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">资产购置</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">资产类</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">固定资产购置</td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- 分页 -->
+                            <div class="mt-4 flex items-center justify-between">
+                                <div class="text-sm text-gray-500">
+                                    显示 1 至 5 条，共 5 条
+                                </div>
+                                <div class="flex space-x-1">
+                                    <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                                        上一页
+                                    </button>
+                                    <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                                    <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                                        下一页
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 新增/编辑业务类型抽屉 [6] -->
+    <div id="business-type-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-50 overflow-y-auto">
+        <div class="p-6">
+            <div class="req-marker relative block flex justify-between items-center mb-6" id="req-marker-6" style="display: block;">
+                <span class="req-badge" data-req="6"
+                      data-title="新增/编辑业务类型抽屉"
+                      data-content='<div class="req-section-title">新增/编辑业务类型抽屉弹窗</div><div><strong>字段清单：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>业务类型编码</code>：字符串，32位，<span class="status-dot status-red"></span> 必填</li><li><code>业务类型名称</code>：字符串，64位，<span class="status-dot status-red"></span> 必填</li><li><code>上级业务分组</code>：下拉单选（已新增业务类型分组）</li><li><code>说明</code>：字符串，256位</li></ul><div><strong>操作按钮：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>保存</code>：<br/><em>- 校验编码和名称唯一性<br/>- 校验最多支持三级业务类型</em></li><li><code>关闭</code>：关闭抽屉弹窗</li></ul><blockquote>编辑界面同新增界面</blockquote>'>6</span>
+                <h3 id="drawer-title" class="text-lg font-semibold text-gray-900">新增业务类型</h3>
+                <button id="close-drawer" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="business-type-form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">业务类型编码 <span class="text-red-500">*</span></label>
+                        <input type="text" id="business-type-code" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent" placeholder="请输入业务类型编码（32位以内）" required maxlength="32">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">业务类型名称 <span class="text-red-500">*</span></label>
+                        <input type="text" id="business-type-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent" placeholder="请输入业务类型名称（64位以内）" required maxlength="64">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">上级业务分组</label>
+                        <select id="parent-group" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent">
+                            <option value="">请选择上级业务分组</option>
+                            <option value="income">收入类</option>
+                            <option value="income-main">收入类 > 主营业务收入</option>
+                            <option value="income-other">收入类 > 其他收入</option>
+                            <option value="expense">支出类</option>
+                            <option value="cost">费用类</option>
+                            <option value="asset">资产类</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">说明</label>
+                        <textarea id="business-type-desc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent" rows="3" placeholder="请输入说明（256位以内）" maxlength="256"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end space-x-3">
+                    <button type="button" id="cancel-btn" class="btn btn-outline px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50">关闭</button>
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-md bg-primary text-white hover:bg-blue-700">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新增/编辑业务类型分组抽屉 [7] -->
+    <div id="group-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-50 overflow-y-auto">
+        <div class="p-6">
+            <div class="req-marker relative block flex justify-between items-center mb-6" id="req-marker-7" style="display: block;">
+                <span class="req-badge" data-req="7"
+                      data-title="新增/编辑业务类型分组抽屉"
+                      data-content='<div class="req-section-title">新增/编辑业务类型分组抽屉弹窗</div><div><strong>字段清单：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>业务分组编码</code>：字符串，32位，<span class="status-dot status-red"></span> 必填</li><li><code>业务分组名称</code>：字符串，64位，<span class="status-dot status-red"></span> 必填</li><li><code>上级业务分组</code>：下拉单选（已新增业务类型分组）</li><li><code>说明</code>：字符串，256位</li></ul><div><strong>操作按钮：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>保存</code>：<br/><em>- 校验编码和名称唯一性<br/>- 校验最多支持三级业务类型分组</em></li><li><code>关闭</code>：关闭抽屉弹窗</li></ul><blockquote>编辑界面同新增界面</blockquote>'>7</span>
+                <h3 id="group-drawer-title" class="text-lg font-semibold text-gray-900">新增业务类型分组</h3>
+                <button id="close-group-drawer" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="group-form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">业务分组编码 <span class="text-red-500">*</span></label>
+                        <input type="text" id="group-code" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent" placeholder="请输入业务分组编码（32位以内）" required maxlength="32">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">业务分组名称 <span class="text-red-500">*</span></label>
+                        <input type="text" id="group-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent" placeholder="请输入业务分组名称（64位以内）" required maxlength="64">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">上级业务分组</label>
+                        <select id="parent-group-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent">
+                            <option value="">请选择上级业务分组</option>
+                            <option value="root">根节点（无上级）</option>
+                            <option value="income">收入类</option>
+                            <option value="expense">支出类</option>
+                            <option value="cost">费用类</option>
+                            <option value="asset">资产类</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">说明</label>
+                        <textarea id="group-desc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent" rows="3" placeholder="请输入说明（256位以内）" maxlength="256"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end space-x-3">
+                    <button type="button" id="cancel-group-btn" class="btn btn-outline px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50">关闭</button>
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-md bg-primary text-white hover:bg-blue-700">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 抽屉遮罩 -->
+    <div id="drawer-overlay" class="drawer-overlay fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+
+    <!-- 需求浮窗容器 -->
+    <div id="req-tooltip-container"></div>
+
+    <script src="js/req-annotation.js"></script>
+    <script>
+        // 加载侧边栏
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html');
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+
+                setTimeout(function() {
+                    var script = document.createElement('script');
+                    script.src = 'common/scripts.js';
+                    script.onload = function() {
+                        if (typeof initCommonFunctions === 'function') {
+                            initCommonFunctions();
+                        }
+                    };
+                    document.body.appendChild(script);
+                }, 100);
+            } catch (error) {
+                console.error('加载侧边栏失败:', error);
+            }
+        }
+
+        // 初始化Lucide图标
+        lucide.createIcons();
+
+        // 加载侧边栏
+        loadSidebar();
+
+        // ========== 筛选条件功能（参考单据类型） ==========
+        var filterField = document.getElementById('filter-field');
+        var filterValue = document.getElementById('filter-value');
+        var advancedFilterBtn = document.getElementById('advanced-filter-btn');
+        var advancedFilter = document.getElementById('advanced-filter');
+
+        // 字段选择器切换时更新占位符
+        filterField.addEventListener('change', function() {
+            var selectedValue = this.value;
+            if (selectedValue === 'name') {
+                filterValue.placeholder = '按名称搜索';
+            } else if (selectedValue === 'code') {
+                filterValue.placeholder = '按编码搜索';
+            }
+            filterValue.value = '';
+        });
+
+        // 高级筛选展开/收起
+        advancedFilterBtn.addEventListener('click', function() {
+            advancedFilter.classList.toggle('hidden');
+
+            // 切换按钮文本和图标
+            if (!advancedFilter.classList.contains('hidden')) {
+                this.innerHTML = '收起筛选 <i data-lucide="chevron-up" class="w-4 h-4 ml-1"></i>';
+            } else {
+                this.innerHTML = '高级筛选 <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>';
+            }
+
+            // 重新初始化图标
+            lucide.createIcons();
+        });
+
+        // 搜索按钮点击事件
+        document.getElementById('search-btn').addEventListener('click', function() {
+            var field = filterField.value;
+            var value = filterValue.value.trim();
+            alert('基础筛选：' + (field === 'name' ? '业务类型名称' : '业务编码') + ' = "' + value + '"');
+        });
+
+        // 刷新按钮点击事件
+        document.getElementById('refresh-btn').addEventListener('click', function() {
+            filterValue.value = '';
+            if (!advancedFilter.classList.contains('hidden')) {
+                document.getElementById('adv-filter-name').value = '';
+                document.getElementById('adv-filter-code').value = '';
+                document.getElementById('adv-filter-status').value = '';
+                document.getElementById('adv-filter-group').value = '';
+            }
+            alert('已刷新！');
+        });
+
+        // 高级筛选-重置按钮
+        document.getElementById('reset-filter-btn').addEventListener('click', function() {
+            document.getElementById('adv-filter-name').value = '';
+            document.getElementById('adv-filter-code').value = '';
+            document.getElementById('adv-filter-status').value = '';
+            document.getElementById('adv-filter-group').value = '';
+        });
+
+        // 高级筛选-查询按钮
+        document.getElementById('query-filter-btn').addEventListener('click', function() {
+            var name = document.getElementById('adv-filter-name').value.trim();
+            var code = document.getElementById('adv-filter-code').value.trim();
+            var status = document.getElementById('adv-filter-status').value;
+            var group = document.getElementById('adv-filter-group').value;
+
+            var conditions = [];
+            if (name) conditions.push('名称: ' + name);
+            if (code) conditions.push('编码: ' + code);
+            if (status) conditions.push('状态: ' + (status === 'enabled' ? '启用' : '停用'));
+            if (group) conditions.push('分组: ' + group);
+
+            if (conditions.length === 0) {
+                alert('请至少输入一个筛选条件');
+                return;
+            }
+
+            alert('高级筛选条件：\n' + conditions.join('\n'));
+        });
+
+        // 树节点展开/收起
+        window.toggleTreeNode = function(element) {
+            var icon = element.querySelector('i');
+            var treeItem = element.closest('.tree-item');
+            var nodeId = treeItem.getAttribute('data-id');
+            var childrenNode = document.getElementById('children-' + nodeId);
+
+            if (childrenNode) {
+                if (childrenNode.classList.contains('hidden')) {
+                    childrenNode.classList.remove('hidden');
+                    icon.setAttribute('data-lucide', 'chevron-down');
+                } else {
+                    childrenNode.classList.add('hidden');
+                    icon.setAttribute('data-lucide', 'chevron-right');
+                }
+                lucide.createIcons();
+            }
+        };
+
+        // 业务类型抽屉功能
+        var drawer = document.getElementById('business-type-drawer');
+        var addBtn = document.getElementById('add-business-type');
+        var closeBtn = document.getElementById('close-drawer');
+        var cancelBtn = document.getElementById('cancel-btn');
+
+        addBtn.addEventListener('click', function() {
+            document.getElementById('drawer-title').textContent = '新增业务类型';
+            document.getElementById('business-type-form').reset();
+            openDrawer(drawer);
+        });
+
+        document.querySelectorAll('.edit-business-type').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.getElementById('drawer-title').textContent = '编辑业务类型';
+                document.getElementById('business-type-code').value = 'BT001';
+                document.getElementById('business-type-name').value = '销售收入';
+                document.getElementById('parent-group').value = 'income-main';
+                document.getElementById('business-type-desc').value = '主营业务收入';
+                openDrawer(drawer);
+            });
+        });
+
+        document.querySelectorAll('.delete-business-type').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                if (confirm('确定要删除该业务类型吗？\n\n注意：如果该业务类型已被单据使用，则无法删除。')) {
+                    alert('删除成功！');
+                }
+            });
+        });
+
+        closeBtn.addEventListener('click', function() {
+            closeDrawer(drawer);
+        });
+
+        cancelBtn.addEventListener('click', function() {
+            closeDrawer(drawer);
+        });
+
+        document.getElementById('drawer-overlay').addEventListener('click', function() {
+            closeDrawer(drawer);
+            closeGroupDrawer();
+        });
+
+        document.getElementById('business-type-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var code = document.getElementById('business-type-code').value.trim();
+            var name = document.getElementById('business-type-name').value.trim();
+
+            if (!code || !name) {
+                alert('请填写必填项！');
+                return;
+            }
+
+            if (code === 'BT001' || code === 'BT002') {
+                alert('业务类型编码已存在，请重新输入！');
+                return;
+            }
+
+            if (name === '销售收入' || name === '采购支出') {
+                alert('业务类型名称已存在，请重新输入！');
+                return;
+            }
+
+            var parentGroup = document.getElementById('parent-group').value;
+            if (parentGroup && parentGroup.split('-').length > 3) {
+                alert('最多支持三级业务类型！');
+                return;
+            }
+
+            alert('保存成功！');
+            closeDrawer(drawer);
+        });
+
+        // 业务类型分组抽屉功能
+        var groupDrawer = document.getElementById('group-drawer');
+        var addGroupBtn = document.getElementById('add-group-btn');
+        var editGroupBtn = document.getElementById('edit-group-btn');
+        var deleteGroupBtn = document.getElementById('delete-group-btn');
+        var closeGroupBtn = document.getElementById('close-group-drawer');
+        var cancelGroupBtn = document.getElementById('cancel-group-btn');
+
+        addGroupBtn.addEventListener('click', function() {
+            document.getElementById('group-drawer-title').textContent = '新增业务类型分组';
+            document.getElementById('group-form').reset();
+            openGroupDrawer();
+        });
+
+        editGroupBtn.addEventListener('click', function() {
+            document.getElementById('group-drawer-title').textContent = '编辑业务类型分组';
+            document.getElementById('group-code').value = 'GROUP001';
+            document.getElementById('group-name').value = '收入类';
+            document.getElementById('parent-group-select').value = 'root';
+            document.getElementById('group-desc').value = '收入类业务分组';
+            openGroupDrawer();
+        });
+
+        deleteGroupBtn.addEventListener('click', function() {
+            if (confirm('确定要删除该业务类型分组吗？\n\n注意：如果该分组下有业务类型数据，则无法删除。')) {
+                alert('删除成功！');
+            }
+        });
+
+        closeGroupBtn.addEventListener('click', function() {
+            closeGroupDrawer();
+        });
+
+        cancelGroupBtn.addEventListener('click', function() {
+            closeGroupDrawer();
+        });
+
+        document.getElementById('group-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var code = document.getElementById('group-code').value.trim();
+            var name = document.getElementById('group-name').value.trim();
+
+            if (!code || !name) {
+                alert('请填写必填项！');
+                return;
+            }
+
+            if (code === 'GROUP001') {
+                alert('业务分组编码已存在，请重新输入！');
+                return;
+            }
+
+            if (name === '收入类') {
+                alert('业务分组名称已存在，请重新输入！');
+                return;
+            }
+
+            var parentGroup = document.getElementById('parent-group-select').value;
+            if (parentGroup && parentGroup !== 'root') {
+                var level = parentGroup.split('-').length + 1;
+                if (level > 3) {
+                    alert('最多支持三级业务类型分组！');
+                    return;
+                }
+            }
+
+            alert('保存成功！');
+            closeGroupDrawer();
+        });
+
+        // 打开/关闭抽屉函数
+        function openDrawer(drawerEl) {
+            drawerEl.classList.add('open');
+            var overlay = document.getElementById('drawer-overlay');
+            if (overlay) {
+                overlay.classList.add('open');
+            }
+        }
+
+        function closeDrawer(drawerEl) {
+            drawerEl.classList.remove('open');
+            var overlay = document.getElementById('drawer-overlay');
+            if (overlay) {
+                overlay.classList.remove('open');
+            }
+        }
+
+        function openGroupDrawer() {
+            groupDrawer.classList.add('open');
+            var overlay = document.getElementById('drawer-overlay');
+            if (overlay) {
+                overlay.classList.add('open');
+            }
+        }
+
+        function closeGroupDrawer() {
+            groupDrawer.classList.remove('open');
+            var overlay = document.getElementById('drawer-overlay');
+            if (overlay) {
+                overlay.classList.remove('open');
+            }
+        }
+    </script>
+</body>
+</html>

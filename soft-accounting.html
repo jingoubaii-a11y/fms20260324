@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>软装核算 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="common/styles.css">
+    <style>
+        .req-badge {
+            display: inline-block;
+            vertical-align: top;
+            background-color: rgb(250, 173, 20);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 16px;
+            padding: 0px 5px;
+            border-radius: 2px;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            top: -10px;
+            right: -6px;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .req-badge-float {
+            display: inline-block;
+            vertical-align: top;
+            background-color: rgb(250, 173, 20);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 16px;
+            padding: 0px 5px;
+            border-radius: 2px;
+            border: none;
+            cursor: pointer;
+            position: fixed !important;
+            z-index: 9999;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            pointer-events: auto;
+            white-space: nowrap;
+        }
+        .req-badge-float:hover {
+            transform: scale(1.15);
+            box-shadow: 0 3px 12px rgba(250,173,20,0.6);
+            z-index: 10000;
+        }
+        .req-marker {
+            position: relative;
+            display: inline-block;
+            padding-top: 12px;
+        }
+        .req-marker > *:first-child {
+            margin-top: -12px;
+        }
+        .req-tooltip {
+            position: fixed;
+            background-color: #f0efef;
+            border-radius: 4px;
+            width: 450px;
+            max-height: 500px;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 9999;
+            display: none;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .req-tooltip.show { display: block; }
+        .req-tooltip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .req-tooltip-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+        .req-tooltip-close {
+            cursor: pointer;
+            color: #999;
+            font-size: 18px;
+            line-height: 1;
+            padding: 2px 6px;
+        }
+        .req-tooltip-close:hover { color: #333; }
+        .req-tooltip-content {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #444;
+        }
+        .req-tooltip-content p { margin-bottom: 12px; }
+        .req-tooltip-content ul { padding-left: 20px; margin-bottom: 12px; }
+        .req-tooltip-content li { margin-bottom: 6px; }
+        .req-tooltip-content strong { color: #222; }
+        .req-tooltip-content em { color: #666; font-style: italic; }
+        .req-tooltip-content blockquote {
+            border-left: 3px solid #ccc;
+            padding-left: 12px;
+            margin: 8px 0;
+            color: #666;
+            background: #fafafa;
+            padding: 8px 12px;
+        }
+        .req-section-title {
+            font-weight: bold;
+            color: #333;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        .status-green { background-color: #52c41a; }
+        .status-red { background-color: #ff4d4f; }
+        .status-gray { background-color: #999; }
+        .status-blue { background-color: #1890ff; }
+        .status-orange { background-color: #faad14; }
+        .table-wrapper {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+        }
+        .drawer {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+        .drawer.open {
+            transform: translateX(0);
+        }
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 15;
+            display: none;
+        }
+        .drawer-overlay.open {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-neutral">
+    <div class="flex h-screen">
+        <div id="sidebar-container"></div>
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="space-y-6">
+
+                <!-- 页面标题 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h1 class="text-xl font-semibold text-gray-800">软装核算</h1>
+                </div>
+
+                <!-- Tab导航 [13] -->
+                <div class="bg-white rounded-lg shadow-sm p-6 req-marker relative block" id="req-marker-13">
+                    <span class="req-badge" data-req="13"
+                          data-title="需求描述：Tab导航"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[13] 需求描述：Tab导航</h3><div class="req-section-title">Tab列表（5个Tab）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>软装库存对账tab</strong>：包含三方对账和库存明细两个子tab<br/>- 三方对账：筛选、新增按钮、列表、批量操作<br/>- 库存明细：3个子tab（金蝶/业务系统/EBS）</li><li><strong>软装收入分摊任务tab</strong>：新增按钮、筛选、列表</li><li><strong>软装收入分摊单tab</strong>：采集按钮、筛选、列表、批量操作</li><li><strong>软装项目核算任务tab</strong>：同整装任务结构但默认软装+完成合同法</li><li><strong>软装项目核算单tab</strong>：筛选、导出/确认按钮、列表</li></ol></div>'>13</span>
+
+                    <div class="border-b border-gray-200">
+                        <nav class="-mb-px flex space-x-8 overflow-x-auto">
+                            <button class="soft-tab-btn active border-b-2 border-primary text-primary py-3 px-1 text-sm font-medium whitespace-nowrap" data-tab="reconciliation-tab">软装库存对账</button>
+                            <button class="soft-tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 py-3 px-1 text-sm font-medium whitespace-nowrap" data-tab="revenue-task-tab">软装收入分摊任务</button>
+                            <button class="soft-tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 py-3 px-1 text-sm font-medium whitespace-nowrap" data-tab="revenue-order-tab">软装收入分摊单</button>
+                            <button class="soft-tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 py-3 px-1 text-sm font-medium whitespace-nowrap" data-tab="project-task-tab">软装项目核算任务</button>
+                            <button class="soft-tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 py-3 px-1 text-sm font-medium whitespace-nowrap" data-tab="project-order-tab">软装项目核算单</button>
+                        </nav>
+                    </div>
+
+                    <!-- Tab1: 软装库存对账 -->
+                    <div id="reconciliation-tab" class="soft-tab-content mt-6">
+                        <!-- 子Tab导航 [14] -->
+                        <div class="mb-4 req-marker relative inline-block" id="req-marker-14">
+                            <span class="req-badge" data-req="14"
+                                  data-title="需求描述：库存对量子Tab"
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[14] 需求描述：库存对量子Tab</h3><div class="req-section-title">子Tab列表</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>三方对账tab</strong>：用于对账软装合同的三方系统库存明细</li><li><strong>库存明细tab</strong>：展示金蝶/业务系统/EBS的库存明细数据</li></ol></div>'>14</span>
+                            <div class="border-b border-gray-200">
+                                <nav class="-mb-px flex space-x-6">
+                                    <button class="sub-tab-btn active border-b-2 border-primary text-primary py-2 px-1 text-sm font-medium" data-subtab="three-way-subtab">三方对账</button>
+                                    <button class="sub-tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 py-2 px-1 text-sm font-medium" data-subtab="inventory-detail-subtab">库存明细</button>
+                                </nav>
+                            </div>
+                        </div>
+
+                        <!-- 三方对账内容 -->
+                        <div id="three-way-subtab" class="sub-tab-content">
+                            <!-- 筛选条件和按钮区域 [15] -->
+                            <div class="mb-4">
+                                <!-- 基础筛选栏 -->
+                                <div class="flex items-center justify-between mb-3 flex-nowrap req-marker relative inline-block" id="req-marker-15">
+                                    <span class="req-badge" data-req="15"
+                                          data-title="需求描述：三方对账按钮和筛选"
+                                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[15] 需求描述：三方对账按钮和筛选</h3><div class="req-section-title">按钮</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>新增</strong>：打开新增软装三方对账抽屉</li></ul><div class="req-section-title">筛选条件（5个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>对账结果</strong>：枚举选择</li><li><strong>财务主体</strong>：下拉多选</li><li><strong>合同号</strong>：文本输入</li><li><strong>对账类型</strong>：下拉选择</li><li><strong>收入核算期间</strong>：期间选择</li><li><strong>对账单号</strong>：精准搜索</li></ol><div class="req-section-title">批量操作</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>对账</strong>：支持单个或批量触发对账</li><li><strong>出库</strong>：支持单个或批量生成销售出库单</li></ul></div>'>15</span>
+                                    <div class="flex items-center space-x-2 flex-1">
+                                        <select id="filter-field-three-way" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                            <option value="reconciliation-result">对账结果</option>
+                                            <option value="financial-entity">财务主体</option>
+                                            <option value="contract-no">合同号</option>
+                                            <option value="reconciliation-type">对账类型</option>
+                                            <option value="accounting-period">收入核算期间</option>
+                                            <option value="reconciliation-no">对账单号</option>
+                                        </select>
+                                        <input type="text" id="filter-value-three-way" placeholder="按对账结果搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                        <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors search-btn text-sm">
+                                            <i data-lucide="search" class="w-4 h-4"></i>
+                                        </button>
+                                        <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors refresh-btn text-sm">
+                                            <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                        </button>
+                                        <button id="advanced-filter-btn-three-way" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center advanced-filter-btn text-sm" data-filter="advanced-filter-three-way">
+                                            高级筛选
+                                            <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex flex-col space-y-2">
+                                        <button id="add-reconciliation-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center whitespace-nowrap text-sm">
+                                            <i data-lucide="plus" class="w-4 h-4 mr-1"></i>
+                                            新增
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 高级筛选展开区域 -->
+                                <div id="advanced-filter-three-way" class="hidden bg-gray-50 p-4 rounded-md border border-gray-200 mb-3">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">对账结果</label>
+                                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                                <option value="">全部</option>
+                                                <option value="待对账">待对账</option>
+                                                <option value="对账成功">对账成功</option>
+                                                <option value="对账失败">对账失败</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                                <option value="">全部</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
+                                            <input type="text" placeholder="合同号" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">对账类型</label>
+                                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                                <option value="">全部</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">收入核算期间</label>
+                                            <input type="text" placeholder="收入核算期间" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">对账单号</label>
+                                            <input type="text" placeholder="对账单号" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 批量操作栏 -->
+                                <div class="flex space-x-2 mb-3">
+                                    <button class="px-4 py-2 bg-yellow-50 text-yellow-700 border border-yellow-300 rounded-md hover:bg-yellow-100 text-sm">批量对账</button>
+                                    <button class="px-4 py-2 bg-green-50 text-green-700 border border-green-300 rounded-md hover:bg-green-100 text-sm">批量出库</button>
+                                </div>
+                            </div>
+
+                            <!-- 三方对账列表 [16] -->
+                            <div class="overflow-x-auto req-marker relative inline-block" id="req-marker-16">
+                                <span class="req-badge" data-req="16"
+                                      data-title="需求描述：三方对账列表"
+                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[16] 需求描述：三方对账列表</h3><div class="req-section-title">字段清单（12个字段+操作）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>对账单号</strong>：自动生成</li><li><strong>合同号</strong>：取项目基础资料</li><li><strong>财务主体</strong></li><li><strong>单据类型</strong>：竣工出库对账</li><li><strong>收入核算期间</strong></li><li><strong>财务确认竣工时间</strong></li><li><strong>是否出库</strong>：布尔值</li><li><strong>出库单号</strong>：出库后反写</li><li><strong>生成出库异常信息</strong></li><li><strong>对账状态</strong>：枚举：待对账/对账中/对账成功/对账失败<br/><em>状态机：开始→[触发对账]→待对账→[获取三方系统库存明细]→[开始对账]→对账中→对账成功→结束[自动出库]</em></li><li><strong>对账时间</strong></li></ol><div class="req-section-title">操作</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>详情</strong>：展示业务与金蝶对账详情、金蝶与EBS对账详情</li><li><strong>对账</strong>：手动触发对账流程</li><li><strong>出库</strong>：生成销售出库单</li><li><strong>库存明细</strong>：跳转至库存明细页面</li></ol></div>'>16</span>
+                                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase"><input type="checkbox" class="w-4 h-4"></th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">对账单号</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">收入核算期间</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">是否出库</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">对账状态</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">对账时间</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <tr>
+                                            <td class="px-3 py-2"><input type="checkbox" class="w-4 h-4"></td>
+                                            <td class="px-3 py-2 text-sm text-gray-900 font-medium">DZ202604150001</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">RZ901000001</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">成都分公司</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">2026-04</td>
+                                            <td class="px-3 py-2 text-sm">
+                                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">是</span>
+                                            </td>
+                                            <td class="px-3 py-2 text-sm">
+                                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">对账成功</span>
+                                            </td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">2026-04-15 10:30:00</td>
+                                            <td class="px-3 py-2 text-sm space-x-1">
+                                                <button class="text-primary hover:text-blue-700">详情</button>
+                                                <button class="text-green-600 hover:text-green-800">库存明细</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2"><input type="checkbox" class="w-4 h-4"></td>
+                                            <td class="px-3 py-2 text-sm text-gray-900 font-medium">DZ202604140002</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">RZ901000002</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">成都分公司</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">2026-04</td>
+                                            <td class="px-3 py-2 text-sm">
+                                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">否</span>
+                                            </td>
+                                            <td class="px-3 py-2 text-sm">
+                                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">对账中</span>
+                                            </td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">-</td>
+                                            <td class="px-3 py-2 text-sm space-x-1">
+                                                <button class="text-primary hover:text-blue-700">详情</button>
+                                                <button class="text-blue-600 hover:text-blue-800">重新对账</button>
+                                                <button class="text-orange-600 hover:text-orange-800">出库</button>
+                                                <button class="text-green-600 hover:text-green-800">库存明细</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 库存明细内容 -->
+                        <div id="inventory-detail-subtab" class="sub-tab-content hidden">
+                            <!-- 库存明细子Tab [17] -->
+                            <div class="mb-4 req-marker relative inline-block" id="req-marker-17">
+                                <span class="req-badge" data-req="17"
+                                      data-title="需求描述：库存明细子Tab"
+                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[17] 需求描述：库存明细子Tab</h3><div class="req-section-title">子Tab列表（3个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>金蝶tab</strong>：展示金蝶系统的库存明细数据（19个字段）<br/>筛选条件：财务主体、合同号、物料编码、单据类型、会计期间<br/>按钮：导出</li><li><strong>业务系统tab</strong>：展示SVI/积木云装系统的库存明细数据（9个字段）<br/>筛选条件：财务主体、合同号、物料编码、单据类型、库存截止日期<br/>按钮：导出</li><li><strong>EBS tab</strong>：展示EBS系统的库存明细数据（11个字段）<br/>筛选条件：财务主体、合同号、物料编码、单据类型、会计期间<br/>按钮：导出</li></ol></div>'>17</span>
+                                <div class="border-b border-gray-200">
+                                    <nav class="-mb-px flex space-x-6">
+                                        <button class="inventory-sub-tab-btn active border-b-2 border-primary text-primary py-2 px-1 text-sm font-medium" data-inventorytab="kingdee-inventory-tab">金蝶</button>
+                                        <button class="inventory-sub-tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 py-2 px-1 text-sm font-medium" data-inventorytab="business-inventory-tab">业务系统</button>
+                                        <button class="inventory-sub-tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 py-2 px-1 text-sm font-medium" data-inventorytab="ebs-inventory-tab">EBS</button>
+                                    </nav>
+                                </div>
+                            </div>
+
+                            <!-- 金蝶库存明细 -->
+                            <div id="kingdee-inventory-tab" class="inventory-sub-tab-content">
+                                <div class="mb-4">
+                                    <div class="flex items-center justify-between mb-3 flex-nowrap">
+                                        <div class="flex items-center space-x-2 flex-1">
+                                            <input type="text" placeholder="财务主体" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm w-32">
+                                            <input type="text" placeholder="合同号" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm w-32">
+                                            <input type="text" placeholder="物料编码" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm w-32">
+                                            <select class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm w-32">
+                                                <option value="">单据类型</option>
+                                                <option value="采购入库单">采购入库单</option>
+                                                <option value="采购退货单">采购退货单</option>
+                                                <option value="直接调拨单">直接调拨单</option>
+                                            </select>
+                                            <input type="text" placeholder="会计期间" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm w-28">
+                                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors search-btn">
+                                                <i data-lucide="search" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                        <div class="flex flex-col space-y-2">
+                                            <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center whitespace-nowrap text-sm">
+                                                <i data-lucide="download" class="w-4 h-4 mr-1"></i>
+                                                导出
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
+                                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">会计期间</th>
+                                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据编号</th>
+                                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据类型</th>
+                                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">物料编码</th>
+                                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">数量</th>
+                                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">客户价</th>
+                                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">来源系统</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-200">
+                                            <tr>
+                                                <td class="px-2 py-2 text-gray-700">成都分公司</td>
+                                                <td class="px-2 py-2 text-gray-700">2026-04</td>
+                                                <td class="px-2 py-2 text-gray-700">RZ901000001</td>
+                                                <td class="px-2 py-2 text-gray-700">CGRKD00001</td>
+                                                <td class="px-2 py-2 text-gray-700">采购入库单</td>
+                                                <td class="px-2 py-2 text-gray-700">WL001</td>
+                                                <td class="px-2 py-2 text-gray-700">100</td>
+                                                <td class="px-2 py-2 text-gray-700">50.00</td>
+                                                <td class="px-2 py-2"><span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">金蝶</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- 业务系统库存明细 -->
+                            <div id="business-inventory-tab" class="inventory-sub-tab-content hidden">
+                                <p class="text-gray-500 text-center py-8">业务系统库存明细数据展示区域</p>
+                            </div>
+
+                            <!-- EBS库存明细 -->
+                            <div id="ebs-inventory-tab" class="inventory-sub-tab-content hidden">
+                                <p class="text-gray-500 text-center py-8">EBS库存明细数据展示区域</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab2: 软装收入分摊任务 -->
+                    <div id="revenue-task-tab" class="soft-tab-content mt-6 hidden">
+                        <!-- 筛选条件和按钮栏 [18] -->
+                        <div class="mb-4 req-marker relative inline-block" id="req-marker-18">
+                            <span class="req-badge" data-req="18"
+                                  data-title="需求描述：软装收入分摊任务"
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[18] 需求描述：软装收入分摊任务</h3><div class="req-section-title">按钮</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>新增</strong>：打开新增软装收入计算任务抽屉弹窗</li></ul><div class="req-section-title">筛选条件（5个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>计算批次号</strong>：精准搜索</li><li><strong>核算期间</strong>：期间选择</li><li><strong>项目类型</strong>：下拉选择</li><li><strong>合同号</strong>：文本输入</li><li><strong>计算状态</strong>：下拉选择</li></ol><div class="req-section-title">列表字段（9个字段+报告查询操作）</div><ol style="margin-left: 20px; line-height: 1.8;"><li>计算批次号、核算期间、项目类型、计算状态、是否重算已计算的合同、是否重算已确认的合同、创建人、创建时间</li><li><strong>报告查询</strong>：查看计算结果报告</li></ol></div>'>18</span>
+                            <div class="flex items-center justify-between mb-3 flex-nowrap">
+                                <div class="flex items-center space-x-2 flex-1">
+                                    <select id="filter-field-revenue-task" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                        <option value="batch-no">计算批次号</option>
+                                        <option value="accounting-period">核算期间</option>
+                                        <option value="project-type">项目类型</option>
+                                        <option value="contract-no">合同号</option>
+                                        <option value="calculation-status">计算状态</option>
+                                    </select>
+                                    <input type="text" id="filter-value-revenue-task" placeholder="按计算批次号搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors search-btn text-sm">
+                                        <i data-lucide="search" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors refresh-btn text-sm">
+                                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <button id="add-revenue-task-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center whitespace-nowrap text-sm">
+                                        <i data-lucide="plus" class="w-4 h-4 mr-1"></i>
+                                        新增
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">计算批次号</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">核算期间</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">项目类型</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">计算状态</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建人</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <tr>
+                                            <td class="px-3 py-2 text-gray-900 font-medium">JSFP2604150001</td>
+                                            <td class="px-3 py-2 text-gray-700">2026-04</td>
+                                            <td class="px-3 py-2 text-gray-700">软装</td>
+                                            <td class="px-3 py-2"><span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">计算完成</span></td>
+                                            <td class="px-3 py-2 text-gray-700">张三</td>
+                                            <td class="px-3 py-2 text-gray-700">2026-04-15 10:30</td>
+                                            <td class="px-3 py-2"><button class="text-primary hover:text-blue-700">报告查询</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab3: 软装收入分摊单 -->
+                    <div id="revenue-order-tab" class="soft-tab-content mt-6 hidden">
+                        <!-- 筛选条件和按钮栏 [19] -->
+                        <div class="mb-4 req-marker relative inline-block" id="req-marker-19">
+                            <span class="req-badge" data-req="19"
+                                  data-title="需求描述：软装收入分摊单"
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[19] 需求描述：软装收入分摊单</h3><div class="req-section-title">按钮</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>采集</strong>：执行数据采集操作</li></ul><div class="req-section-title">筛选条件（4个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>单据编号</strong>：精准搜索</li><li><strong>会计期间</strong>：期间选择</li><li><strong>财务主体</strong>：多选</li><li><strong>合同号</strong>：文本输入</li></ol><div class="req-section-title">列表字段（22个字段+操作）</div><ol style="margin-left: 20px; line-height: 1.8;"><li>单据编号、单据类型、会计期间、财务主体、合同号、财务确认竣工日期、对账单号、出库单号、出库日期、待分摊金额、税率、计算批号等...</li></ol><div class="req-section-title">操作</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>分摊明细</strong>：查看分摊明细信息</li><li><strong>计算</strong>：执行分摊计算</li><li><strong>删除</strong>：删除当前记录</li></ul><div class="req-section-title">批量操作</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>计算</strong>：批量执行计算</li><li><strong>重算</strong>：批量重新计算</li><li><strong>删除</strong>：批量删除</li></ul></div>'>19</span>
+                            <div class="flex items-center justify-between mb-3 flex-nowrap">
+                                <div class="flex items-center space-x-2 flex-1">
+                                    <select id="filter-field-revenue-order" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                        <option value="doc-no">单据编号</option>
+                                        <option value="accounting-period">会计期间</option>
+                                        <option value="financial-entity">财务主体</option>
+                                        <option value="contract-no">合同号</option>
+                                    </select>
+                                    <input type="text" id="filter-value-revenue-order" placeholder="按单据编号搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors search-btn text-sm">
+                                        <i data-lucide="search" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors refresh-btn text-sm">
+                                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center whitespace-nowrap text-sm">
+                                        <i data-lucide="refresh-cw" class="w-4 h-4 mr-1"></i>
+                                        采集
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- 批量操作栏 -->
+                            <div class="flex space-x-2 mb-3">
+                                <button class="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-300 rounded-md hover:bg-blue-100 text-sm">批量计算</button>
+                                <button class="px-4 py-2 bg-yellow-50 text-yellow-700 border border-yellow-300 rounded-md hover:bg-yellow-100 text-sm">批量重算</button>
+                                <button class="px-4 py-2 bg-red-50 text-red-700 border border-red-300 rounded-md hover:bg-red-100 text-sm">批量删除</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase"><input type="checkbox" class="w-4 h-4"></th>
+                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据编号</th>
+                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据类型</th>
+                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">会计期间</th>
+                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
+                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">待分摊金额</th>
+                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">计算状态</th>
+                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <tr>
+                                            <td class="px-2 py-2"><input type="checkbox" class="w-4 h-4"></td>
+                                            <td class="px-2 py-2 text-gray-900 font-medium">JSD26041500000001</td>
+                                            <td class="px-2 py-2 text-gray-700">竣工收入分摊</td>
+                                            <td class="px-2 py-2 text-gray-700">2026-04</td>
+                                            <td class="px-2 py-2 text-gray-700">成都分公司</td>
+                                            <td class="px-2 py-2 text-gray-700">RZ901000001</td>
+                                            <td class="px-2 py-2 text-gray-700">120,000.00</td>
+                                            <td class="px-2 py-2"><span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已计算</span></td>
+                                            <td class="px-2 py-2 space-x-1">
+                                                <button class="text-primary hover:text-blue-700">分摊明细</button>
+                                                <button class="text-blue-600 hover:text-blue-800">计算</button>
+                                                <button class="text-red-600 hover:text-red-800">删除</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab4: 软装项目核算任务 -->
+                    <div id="project-task-tab" class="soft-tab-content mt-6 hidden">
+                        <!-- 筛选条件和按钮栏 [20] -->
+                        <div class="mb-4 req-marker relative inline-block" id="req-marker-20">
+                            <span class="req-badge" data-req="20"
+                                  data-title="需求描述：软装项目核算任务"
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[20] 需求描述：软装项目核算任务</h3><div class="req-section-title">说明</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">同整装项目收入核算任务结构，但默认：<br/>- 项目类型锁定=软装<br/>- 核算方法锁定=完成合同法</blockquote><div class="req-section-title">功能模块</div><ul style="margin-left: 20px; line-height: 1.8;"><li>新增按钮 → 弹窗</li><li>筛选条件（6个）：合同号、项目类型、核算期间、核算方法、计算批次号、计算状态</li><li>列表（9个字段+报告查询操作）</li></ul></div>'>20</span>
+                            <div class="flex items-center justify-between mb-3 flex-nowrap">
+                                <div class="flex items-center space-x-2 flex-1">
+                                    <select id="filter-field-project-task" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                        <option value="contract-no">合同号</option>
+                                        <option value="project-type">项目类型</option>
+                                        <option value="accounting-period">核算期间</option>
+                                        <option value="accounting-method">核算方法</option>
+                                        <option value="batch-no">计算批次号</option>
+                                        <option value="calculation-status">计算状态</option>
+                                    </select>
+                                    <input type="text" id="filter-value-project-task" placeholder="按合同号搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors search-btn text-sm">
+                                        <i data-lucide="search" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors refresh-btn text-sm">
+                                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center whitespace-nowrap text-sm">
+                                        <i data-lucide="plus" class="w-4 h-4 mr-1"></i>
+                                        新增
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">计算批次号</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">项目类型</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">核算期间</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">核算方法</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">计算状态</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建人</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <tr>
+                                            <td class="px-3 py-2 text-gray-900 font-medium">RZPC2604150001</td>
+                                            <td class="px-3 py-2 text-gray-700">软装</td>
+                                            <td class="px-3 py-2 text-gray-700">2026-04</td>
+                                            <td class="px-3 py-2 text-gray-700">完成合同法</td>
+                                            <td class="px-3 py-2"><span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">计算完成</span></td>
+                                            <td class="px-3 py-2 text-gray-700">张三</td>
+                                            <td class="px-3 py-2 text-gray-700">2026-04-15 11:00</td>
+                                            <td class="px-3 py-2"><button class="text-primary hover:text-blue-700">报告查询</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab5: 软装项目核算单 -->
+                    <div id="project-order-tab" class="soft-tab-content mt-6 hidden">
+                        <!-- 按钮栏 [21] -->
+                        <div class="mb-4 req-marker relative inline-block" id="req-marker-21">
+                            <span class="req-badge" data-req="21"
+                                  data-title="需求描述：软装项目核算单"
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[21] 需求描述：软装项目核算单</h3><div class="req-section-title">按钮</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>导出</strong>：根据筛选条件导出数据</li><li><strong>确认本期收入</strong>：发起审批流程，审批通过后更新确认状态</li></ul><div class="req-section-title">筛选条件（13个）</div><p style="line-height: 1.8;">同整装项目核算单筛选条件</p><div class="req-section-title">列表字段（22个字段+详情操作）</div><ol style="margin-left: 20px; line-height: 1.8;"><li>单据编号、单据类型、会计期间、财务主体、计算状态、核算确认状态、项目类型、合同号、合同名称、计税方式、客户名称、应收总额、当月毛利率、本次确认收入、本次确认成本、计算批次、是否重算、本月计算次数等...</li></ol><div class="req-section-title">操作</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>详情</strong>：点击后弹窗展示完整字段信息</li></ul></div>'>21</span>
+                            <div class="flex items-center justify-between mb-3 flex-nowrap">
+                                <div class="flex items-center space-x-2 flex-1">
+                                    <select id="filter-field-project-order" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                        <option value="doc-no">单据编号</option>
+                                        <option value="doc-type">单据类型</option>
+                                        <option value="accounting-period">会计期间</option>
+                                        <option value="financial-entity">财务主体</option>
+                                        <option value="contract-no">合同号</option>
+                                    </select>
+                                    <input type="text" id="filter-value-project-order" placeholder="按单据编号搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors search-btn text-sm">
+                                        <i data-lucide="search" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors refresh-btn text-sm">
+                                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center whitespace-nowrap text-sm">
+                                        <i data-lucide="download" class="w-4 h-4 mr-1"></i>
+                                        导出
+                                    </button>
+                                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center whitespace-nowrap text-sm">
+                                        <i data-lucide="check-circle" class="w-4 h-4 mr-1"></i>
+                                        确认本期收入
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据编号</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据类型</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">会计期间</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">计算状态</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">确认状态</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">应收总额</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">本次确认收入</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <tr>
+                                            <td class="px-3 py-2 text-gray-900 font-medium">RG26041500000001</td>
+                                            <td class="px-3 py-2 text-gray-700">标准项目核算单</td>
+                                            <td class="px-3 py-2 text-gray-700">2026-04</td>
+                                            <td class="px-3 py-2 text-gray-700">成都分公司</td>
+                                            <td class="px-3 py-2"><span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已计算</span></td>
+                                            <td class="px-3 py-2"><span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已确认</span></td>
+                                            <td class="px-3 py-2 text-gray-700">RZ901000001</td>
+                                            <td class="px-3 py-2 text-gray-700">180,000.00</td>
+                                            <td class="px-3 py-2 text-gray-700">60,000.00</td>
+                                            <td class="px-3 py-2"><button class="text-primary hover:text-blue-700">详情</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="req-tooltip-container"></div>
+    <script src="js/req-annotation.js"></script>
+
+    <!-- ========== ① 新增对账单抽屉 (Tab1: 三方对账) ========== -->
+    <div class="drawer-overlay" id="reconciliation-drawer-overlay"></div>
+    <div id="reconciliation-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-20 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">新增软装三方对账</h3>
+            <button id="close-reconciliation-drawer-btn" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">财务主体 <span class="text-red-500">*</span></label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md" id="recon-financial-entity">
+                    <option value="">请选择</option>
+                    <option value="cdgf">成都分公司</option>
+                    <option value="shgf">上海分公司</option>
+                    <option value="bjgf">北京分公司</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">合同号 <span class="text-red-500">*</span></label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="请输入合同号" id="recon-contract-no">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">对账类型 <span class="text-red-500">*</span></label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md" id="recon-type">
+                    <option value="">请选择</option>
+                    <option value="monthly">月度对账</option>
+                    <option value="project">项目对账</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">收入核算期间 <span class="text-red-500">*</span></label>
+                <input type="month" class="w-full px-3 py-2 border border-gray-300 rounded-md" id="recon-period">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">备注</label>
+                <textarea class="w-full px-3 py-2 border border-gray-300 rounded-md" rows="3" placeholder="请输入备注信息" id="recon-remark"></textarea>
+            </div>
+        </div>
+        <div class="mt-6 flex space-x-3">
+            <button type="button" id="save-reconciliation-btn" class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">保存</button>
+            <button type="button" id="cancel-reconciliation-btn" class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">关闭</button>
+        </div>
+    </div>
+
+    <!-- ========== ② 对账详情弹窗 (Tab1: 三方对账) ========== -->
+    <div id="reconciliation-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800">对账详情</h3>
+                <button id="close-reconciliation-detail-btn" class="p-2 rounded-md hover:bg-gray-100">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div><label class="text-sm text-gray-500">对账单号：</label><span class="font-medium">DZ202604150001</span></div>
+                    <div><label class="text-sm text-gray-500">合同号：</label><span class="font-medium">RZ901000001</span></div>
+                    <div><label class="text-sm text-gray-500">财务主体：</label><span class="font-medium">成都分公司</span></div>
+                    <div><label class="text-sm text-gray-500">收入核算期间：</label><span class="font-medium">2026-04</span></div>
+                    <div><label class="text-sm text-gray-500">对账结果：</label><span class="px-2 py-1 bg-green-100 text-green-800 rounded">对账成功</span></div>
+                    <div><label class="text-sm text-gray-500">是否出库：</label><span class="font-medium">是</span></div>
+                    <div><label class="text-sm text-gray-500">对账时间：</label><span class="font-medium">2026-04-15 10:30:00</span></div>
+                </div>
+                <h4 class="font-semibold mb-3">对账明细</h4>
+                <table class="min-w-full border border-gray-200 rounded">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">物料编码</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">物料名称</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500">业务数量</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500">金蝶数量</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500">EBS数量</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">差异</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-4 py-2 text-sm">WL001</td>
+                            <td class="px-4 py-2 text-sm">沙发A款</td>
+                            <td class="px-4 py-2 text-sm text-right">10</td>
+                            <td class="px-4 py-2 text-sm text-right">10</td>
+                            <td class="px-4 py-2 text-sm text-right">10</td>
+                            <td class="px-4 py-2 text-sm"><span class="text-green-600">一致</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-2 text-sm">WL002</td>
+                            <td class="px-4 py-2 text-sm">餐桌B款</td>
+                            <td class="px-4 py-2 text-sm text-right">5</td>
+                            <td class="px-4 py-2 text-sm text-right">5</td>
+                            <td class="px-4 py-2 text-sm text-right">5</td>
+                            <td class="px-4 py-2 text-sm"><span class="text-green-600">一致</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-2 text-sm">WL003</td>
+                            <td class="px-4 py-2 text-sm">床C款</td>
+                            <td class="px-4 py-2 text-sm text-right">8</td>
+                            <td class="px-4 py-2 text-sm text-right">7</td>
+                            <td class="px-4 py-2 text-sm text-right">8</td>
+                            <td class="px-4 py-2 text-sm"><span class="text-red-600">不一致</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ③ 新增分摊任务抽屉 (Tab2: 软装收入分摊任务) ========== -->
+    <div class="drawer-overlay" id="allocation-drawer-overlay"></div>
+    <div id="allocation-drawer" class="drawer fixed top-0 right-0 h-full w-[520px] bg-white shadow-lg z-20 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">新增软装收入计算任务</h3>
+            <button id="close-allocation-drawer-btn" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">项目类型 <span class="text-red-500">*</span></label>
+                <input type="text" value="软装" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">核算方法 <span class="text-red-500">*</span></label>
+                <input type="text" value="完成合同法" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">财务组织 <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <div id="allocation-entity-tags" class="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md min-h-[40px] cursor-pointer"></div>
+                    <div id="allocation-entity-dropdown" class="hidden absolute z-10 top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        <div class="p-2">
+                            <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="all">
+                                <input type="checkbox" class="mr-2" id="alloc-entity-all"><label for="alloc-entity-all">全选</label>
+                            </div>
+                            <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="org1">
+                                <input type="checkbox" class="mr-2" id="alloc-entity-org1"><label for="alloc-entity-org1">成都分公司</label>
+                            </div>
+                            <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="org2">
+                                <input type="checkbox" class="mr-2" id="alloc-entity-org2"><label for="alloc-entity-org2">北京分公司</label>
+                            </div>
+                            <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="org3">
+                                <input type="checkbox" class="mr-2" id="alloc-entity-org3"><label for="alloc-entity-org3">上海分公司</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">核算期间 <span class="text-red-500">*</span></label>
+                <input type="text" value="2026年04月" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">合同号 <span class="text-red-500">*</span></label>
+                <input type="text" placeholder="请输入或选择合同号" class="w-full px-3 py-2 border border-gray-300 rounded-md" id="alloc-contract-no">
+            </div>
+            <div class="space-y-2">
+                <label class="flex items-center">
+                    <input type="checkbox" id="recalc-calculated" class="mr-2 w-4 h-4">
+                    <span class="text-sm text-gray-700">是否重算已计算未确认</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="checkbox" id="recalc-confirmed" class="mr-2 w-4 h-4">
+                    <span class="text-sm text-gray-700">是否重算已确认</span>
+                </label>
+            </div>
+        </div>
+        <div class="mt-6 flex space-x-3">
+            <button type="button" id="save-allocation-btn" class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">确认提交计算</button>
+            <button type="button" id="cancel-allocation-btn" class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">关闭</button>
+        </div>
+    </div>
+
+    <!-- ========== ④ 分摊明细弹窗 (Tab3: 软装收入分摊单) ========== -->
+    <div id="allocation-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800">收入分摊明细</h3>
+                <button id="close-allocation-detail-btn" class="p-2 rounded-md hover:bg-gray-100">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div><label class="text-sm text-gray-500">分摊单号：</label><span class="font-medium">FT202604200001</span></div>
+                    <div><label class="text-sm text-gray-500">合同号：</label><span class="font-medium">RZ901000003</span></div>
+                    <div><label class="text-sm text-gray-500">财务主体：</label><span class="font-medium">成都分公司</span></div>
+                    <div><label class="text-sm text-gray-500">收入核算期间：</label><span class="font-medium">2026-04</span></div>
+                    <div><label class="text-sm text-gray-500">分摊总额：</label><span class="font-medium text-blue-600">¥125,600.00</span></div>
+                    <div><label class="text-sm text-gray-500">已分摊金额：</label><span class="font-medium">¥98,400.00</span></div>
+                </div>
+                <h4 class="font-semibold mb-3">分摊明细列表</h4>
+                <table class="min-w-full border border-gray-200 rounded">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">物料编码</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">物料名称</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500">销售出库数量</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500">单价</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500">销售出库金额</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500">分摊比例</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500">分摊金额</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-4 py-2 text-sm">WL001</td>
+                            <td class="px-4 py-2 text-sm">沙发A款</td>
+                            <td class="px-4 py-2 text-sm text-right">5</td>
+                            <td class="px-4 py-2 text-sm text-right">¥8,000.00</td>
+                            <td class="px-4 py-2 text-sm text-right">¥40,000.00</td>
+                            <td class="px-4 py-2 text-sm text-right">31.85%</td>
+                            <td class="px-4 py-2 text-sm text-right font-medium">¥40,000.00</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-2 text-sm">WL002</td>
+                            <td class="px-4 py-2 text-sm">餐桌B款</td>
+                            <td class="px-4 py-2 text-sm text-right">3</td>
+                            <td class="px-4 py-2 text-sm text-right">¥12,000.00</td>
+                            <td class="px-4 py-2 text-sm text-right">¥36,000.00</td>
+                            <td class="px-4 py-2 text-sm text-right">28.66%</td>
+                            <td class="px-4 py-2 text-sm text-right font-medium">¥36,000.00</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-2 text-sm">WL003</td>
+                            <td class="px-4 py-2 text-sm">床C款</td>
+                            <td class="px-4 py-2 text-sm text-right">6</td>
+                            <td class="px-4 py-2 text-sm text-right">¥8,266.67</td>
+                            <td class="px-4 py-2 text-sm text-right">¥49,600.00</td>
+                            <td class="px-4 py-2 text-sm text-right">39.49%</td>
+                            <td class="px-4 py-2 text-sm text-right font-medium">¥49,600.00</td>
+                        </tr>
+                    </tbody>
+                    <tfoot class="bg-gray-50 font-semibold">
+                        <tr>
+                            <td colspan="5" class="px-4 py-2 text-right">合计：</td>
+                            <td class="px-4 py-2 text-right">100%</td>
+                            <td class="px-4 py-2 text-right text-blue-600">¥125,600.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ⑤ 新增项目核算任务弹窗 (Tab4: 软装项目核算任务) ========== -->
+    <div id="soft-project-task-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-900">新增软装项目核算任务</h3>
+                <button id="close-soft-task-modal" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">项目类型 <span class="text-red-500">*</span></label>
+                            <input type="text" value="软装" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">核算方法 <span class="text-red-500">*</span></label>
+                            <input type="text" value="完成合同法" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">财务组织 <span class="text-red-500">*</span></label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md" id="soft-task-entity">
+                            <option value="">请选择</option>
+                            <option value="成都分公司">成都分公司</option>
+                            <option value="北京分公司">北京分公司</option>
+                            <option value="上海分公司">上海分公司</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">核算期间 <span class="text-red-500">*</span></label>
+                            <input type="text" value="2026-04" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
+                            <input type="text" placeholder="请输入或选择合同号" class="w-full px-3 py-2 border border-gray-300 rounded-md" id="soft-task-contract">
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="w-4 h-4 text-primary focus:ring-primary" id="soft-recalc-calculated">
+                            <span class="ml-2 text-sm text-gray-700">是否重算已计算未确认的合同</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="w-4 h-4 text-primary focus:ring-primary" id="soft-recalc-confirmed">
+                            <span class="ml-2 text-sm text-gray-700">是否重算已确认的合同</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
+                <button id="cancel-soft-task-btn" class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">取消</button>
+                <button id="confirm-soft-task-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700">确认提交计算</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ⑥ 核算单详情弹窗 (Tab5: 软装项目核算单) ========== -->
+    <div id="soft-accounting-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-6xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-lg font-semibold text-gray-900">软装项目核算单详情</h3>
+                <button id="close-soft-accounting-detail-btn" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-3 gap-4">
+                    <div><label class="text-xs text-gray-500">单据编号</label><p class="text-sm font-medium mt-1">RG26041500000001</p></div>
+                    <div><label class="text-xs text-gray-500">单据类型</label><p class="text-sm font-medium mt-1">标准项目核算单</p></div>
+                    <div><label class="text-xs text-gray-500">会计期间</label><p class="text-sm font-medium mt-1">2026-04</p></div>
+                    <div><label class="text-xs text-gray-500">财务主体</label><p class="text-sm font-medium mt-1">成都分公司</p></div>
+                    <div><label class="text-xs text-gray-500">计算状态</label><p class="text-sm font-medium mt-1 text-green-600">已计算</p></div>
+                    <div><label class="text-xs text-gray-500">核算确认状态</label><p class="text-sm font-medium mt-1 text-green-600">已确认</p></div>
+                    <div><label class="text-xs text-gray-500">项目类型</label><p class="text-sm font-medium mt-1">软装</p></div>
+                    <div><label class="text-xs text-gray-500">合同号</label><p class="text-sm font-medium mt-1">RZ901000001</p></div>
+                    <div><label class="text-xs text-gray-500">合同名称</label><p class="text-sm font-medium mt-1">测试软装项目A</p></div>
+                    <div><label class="text-xs text-gray-500">计税方式</label><p class="text-sm font-medium mt-1">一般计税</p></div>
+                    <div><label class="text-xs text-gray-500">客户名称</label><p class="text-sm font-medium mt-1">测试客户B</p></div>
+                    <div><label class="text-xs text-gray-500">应收总额</label><p class="text-sm font-medium mt-1">180,000.00</p></div>
+                    <div><label class="text-xs text-gray-500">预计总成本</label><p class="text-sm font-medium mt-1">135,000.00</p></div>
+                    <div><label class="text-xs text-gray-500">预计总收入</label><p class="text-sm font-medium mt-1">185,000.00</p></div>
+                    <div><label class="text-xs text-gray-500">当月毛利率</label><p class="text-sm font-medium mt-1">33.33%</p></div>
+                    <div><label class="text-xs text-gray-500">累计毛利率</label><p class="text-sm font-medium mt-1">35.20%</p></div>
+                    <div><label class="text-xs text-gray-500">本次确认收入</label><p class="text-sm font-medium mt-1">60,000.00</p></div>
+                    <div><label class="text-xs text-gray-500">本次确认成本</label><p class="text-sm font-medium mt-1">40,000.00</p></div>
+                    <div><label class="text-xs text-gray-500">截止本月累计确认收入</label><p class="text-sm font-medium mt-1">150,000.00</p></div>
+                    <div><label class="text-xs text-gray-500">截止本月累计确认成本</label><p class="text-sm font-medium mt-1">97,800.00</p></div>
+                    <div><label class="text-xs text-gray-500">计算批次</label><p class="text-sm font-medium mt-1">RZPC2604150001</p></div>
+                    <div><label class="text-xs text-gray-500">是否重算</label><p class="text-sm font-medium mt-1">否</p></div>
+                    <div><label class="text-xs text-gray-500">本月计算次数</label><p class="text-sm font-medium mt-1">1</p></div>
+                    <div><label class="text-xs text-gray-500">错误信息</label><p class="text-sm font-medium mt-1">-</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function loadSidebar() {
+            try {
+                var response = await fetch('common/sidebar.html');
+                var sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+
+                setTimeout(function() {
+                    var script = document.createElement('script');
+                    script.src = 'common/scripts.js';
+                    script.onload = function() {
+                        if (typeof initCommonFunctions === 'function') {
+                            initCommonFunctions();
+                        }
+                        initPageFunctions();
+                        lucide.createIcons();
+                    };
+                    document.body.appendChild(script);
+                }, 100);
+            } catch (error) {
+                console.error('加载侧边栏失败:', error);
+            }
+        }
+
+        function initPageFunctions() {
+            // 高级筛选展开/收起
+            document.querySelectorAll('.advanced-filter-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var filterId = this.getAttribute('data-filter');
+                    var filterEl = document.getElementById(filterId);
+                    if (filterEl) {
+                        filterEl.classList.toggle('hidden');
+                        var icon = this.querySelector('i');
+                        if (icon) {
+                            if (filterEl.classList.contains('hidden')) {
+                                icon.setAttribute('data-lucide', 'chevron-down');
+                            } else {
+                                icon.setAttribute('data-lucide', 'chevron-up');
+                            }
+                            lucide.createIcons();
+                        }
+                    }
+                });
+            });
+
+            // 搜索按钮功能
+            document.querySelectorAll('.search-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    alert('执行查询操作');
+                });
+            });
+
+            // 刷新按钮功能
+            document.querySelectorAll('.refresh-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    location.reload();
+                });
+            });
+
+            // 筛选字段选择变化时更新输入框placeholder
+            // 三方对账筛选
+            var filterFieldThreeWay = document.getElementById('filter-field-three-way');
+            var filterValueThreeWay = document.getElementById('filter-value-three-way');
+            if (filterFieldThreeWay && filterValueThreeWay) {
+                filterFieldThreeWay.addEventListener('change', function() {
+                    var selectedValue = this.value;
+                    var placeholders = {
+                        'reconciliation-result': '按对账结果搜索',
+                        'financial-entity': '按财务主体搜索',
+                        'contract-no': '按合同号搜索',
+                        'reconciliation-type': '按对账类型搜索',
+                        'accounting-period': '按收入核算期间搜索',
+                        'reconciliation-no': '按对账单号搜索'
+                    };
+                    filterValueThreeWay.placeholder = placeholders[selectedValue] || '请输入搜索内容';
+                    filterValueThreeWay.value = '';
+                });
+            }
+
+            // 软装收入分摊任务筛选
+            var filterFieldRevenueTask = document.getElementById('filter-field-revenue-task');
+            var filterValueRevenueTask = document.getElementById('filter-value-revenue-task');
+            if (filterFieldRevenueTask && filterValueRevenueTask) {
+                filterFieldRevenueTask.addEventListener('change', function() {
+                    var selectedValue = this.value;
+                    var placeholders = {
+                        'batch-no': '按计算批次号搜索',
+                        'accounting-period': '按核算期间搜索',
+                        'project-type': '按项目类型搜索',
+                        'contract-no': '按合同号搜索',
+                        'calculation-status': '按计算状态搜索'
+                    };
+                    filterValueRevenueTask.placeholder = placeholders[selectedValue] || '请输入搜索内容';
+                    filterValueRevenueTask.value = '';
+                });
+            }
+
+            // 软装收入分摊单筛选
+            var filterFieldRevenueOrder = document.getElementById('filter-field-revenue-order');
+            var filterValueRevenueOrder = document.getElementById('filter-value-revenue-order');
+            if (filterFieldRevenueOrder && filterValueRevenueOrder) {
+                filterFieldRevenueOrder.addEventListener('change', function() {
+                    var selectedValue = this.value;
+                    var placeholders = {
+                        'doc-no': '按单据编号搜索',
+                        'accounting-period': '按会计期间搜索',
+                        'financial-entity': '按财务主体搜索',
+                        'contract-no': '按合同号搜索'
+                    };
+                    filterValueRevenueOrder.placeholder = placeholders[selectedValue] || '请输入搜索内容';
+                    filterValueRevenueOrder.value = '';
+                });
+            }
+
+            // 软装项目核算任务筛选
+            var filterFieldProjectTask = document.getElementById('filter-field-project-task');
+            var filterValueProjectTask = document.getElementById('filter-value-project-task');
+            if (filterFieldProjectTask && filterValueProjectTask) {
+                filterFieldProjectTask.addEventListener('change', function() {
+                    var selectedValue = this.value;
+                    var placeholders = {
+                        'contract-no': '按合同号搜索',
+                        'project-type': '按项目类型搜索',
+                        'accounting-period': '按核算期间搜索',
+                        'accounting-method': '按核算方法搜索',
+                        'batch-no': '按计算批次号搜索',
+                        'calculation-status': '按计算状态搜索'
+                    };
+                    filterValueProjectTask.placeholder = placeholders[selectedValue] || '请输入搜索内容';
+                    filterValueProjectTask.value = '';
+                });
+            }
+
+            // 软装项目核算单筛选
+            var filterFieldProjectOrder = document.getElementById('filter-field-project-order');
+            var filterValueProjectOrder = document.getElementById('filter-value-project-order');
+            if (filterFieldProjectOrder && filterValueProjectOrder) {
+                filterFieldProjectOrder.addEventListener('change', function() {
+                    var selectedValue = this.value;
+                    var placeholders = {
+                        'doc-no': '按单据编号搜索',
+                        'doc-type': '按单据类型搜索',
+                        'accounting-period': '按会计期间搜索',
+                        'financial-entity': '按财务主体搜索',
+                        'contract-no': '按合同号搜索'
+                    };
+                    filterValueProjectOrder.placeholder = placeholders[selectedValue] || '请输入搜索内容';
+                    filterValueProjectOrder.value = '';
+                });
+            }
+
+            // 主Tab切换
+            document.querySelectorAll('.soft-tab-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.soft-tab-btn').forEach(function(b) {
+                        b.classList.remove('active', 'border-primary', 'text-primary');
+                        b.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    this.classList.add('active', 'border-primary', 'text-primary');
+                    this.classList.remove('border-transparent', 'text-gray-500');
+
+                    document.querySelectorAll('.soft-tab-content').forEach(function(content) {
+                        content.classList.add('hidden');
+                    });
+                    var tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.remove('hidden');
+
+                    lucide.createIcons();
+                });
+            });
+
+            // 子Tab切换（三方对账/库存明细）
+            document.querySelectorAll('.sub-tab-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.sub-tab-btn').forEach(function(b) {
+                        b.classList.remove('active', 'border-primary', 'text-primary');
+                        b.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    this.classList.add('active', 'border-primary', 'text-primary');
+                    this.classList.remove('border-transparent', 'text-gray-500');
+
+                    document.querySelectorAll('.sub-tab-content').forEach(function(content) {
+                        content.classList.add('hidden');
+                    });
+                    var subTabId = this.getAttribute('data-subtab');
+                    document.getElementById(subTabId).classList.remove('hidden');
+
+                    lucide.createIcons();
+                });
+            });
+
+            // 库存明细子Tab切换（金蝶/业务系统/EBS）
+            document.querySelectorAll('.inventory-sub-tab-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.inventory-sub-tab-btn').forEach(function(b) {
+                        b.classList.remove('active', 'border-primary', 'text-primary');
+                        b.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    this.classList.add('active', 'border-primary', 'text-primary');
+                    this.classList.remove('border-transparent', 'text-gray-500');
+
+                    document.querySelectorAll('.inventory-sub-tab-content').forEach(function(content) {
+                        content.classList.add('hidden');
+                    });
+                    var inventoryTabId = this.getAttribute('data-inventorytab');
+                    document.getElementById(inventoryTabId).classList.remove('hidden');
+
+                    lucide.createIcons();
+                });
+            });
+
+            // ========== Tab1: 软装库存对账 - 三方对账功能 ==========
+
+            // ① 新增对账单按钮 → 打开抽屉
+            var addReconciliationBtn = document.getElementById('add-reconciliation-btn');
+            var reconciliationDrawer = document.getElementById('reconciliation-drawer');
+            var reconciliationOverlay = document.getElementById('reconciliation-drawer-overlay');
+
+            if (addReconciliationBtn) {
+                addReconciliationBtn.addEventListener('click', function() {
+                    reconciliationDrawer.classList.add('open');
+                    reconciliationOverlay.classList.add('open');
+                    lucide.createIcons();
+                });
+            }
+
+            // 关闭对账单抽屉
+            var closeReconDrawerBtn = document.getElementById('close-reconciliation-drawer-btn');
+            var cancelReconBtn = document.getElementById('cancel-reconciliation-btn');
+            if (closeReconDrawerBtn) {
+                closeReconDrawerBtn.addEventListener('click', function() {
+                    reconciliationDrawer.classList.remove('open');
+                    reconciliationOverlay.classList.remove('open');
+                });
+            }
+            if (cancelReconBtn) {
+                cancelReconBtn.addEventListener('click', function() {
+                    reconciliationDrawer.classList.remove('open');
+                    reconciliationOverlay.classList.remove('open');
+                });
+            }
+            if (reconciliationOverlay) {
+                reconciliationOverlay.addEventListener('click', function() {
+                    reconciliationDrawer.classList.remove('open');
+                    reconciliationOverlay.classList.remove('open');
+                });
+            }
+
+            // 保存对账单
+            var saveReconBtn = document.getElementById('save-reconciliation-btn');
+            if (saveReconBtn) {
+                saveReconBtn.addEventListener('click', function() {
+                    alert('保存成功！');
+                    reconciliationDrawer.classList.remove('open');
+                    reconciliationOverlay.classList.remove('open');
+                });
+            }
+
+            // ② 详情按钮（三方对账列表）→ 打开详情弹窗
+            var reconDetailModal = document.getElementById('reconciliation-detail-modal');
+            var closeReconDetailBtn = document.getElementById('close-reconciliation-detail-btn');
+
+            document.querySelectorAll('#three-way-subtab button').forEach(function(btn) {
+                if (btn.textContent.trim() === '详情') {
+                    btn.addEventListener('click', function() {
+                        if (reconDetailModal) {
+                            reconDetailModal.style.display = 'flex';
+                            lucide.createIcons();
+                        }
+                    });
+                }
+            });
+
+            if (closeReconDetailBtn && reconDetailModal) {
+                closeReconDetailBtn.addEventListener('click', function() {
+                    reconDetailModal.style.display = 'none';
+                });
+                reconDetailModal.addEventListener('click', function(e) {
+                    if (e.target === reconDetailModal) {
+                        reconDetailModal.style.display = 'none';
+                    }
+                });
+            }
+
+            // 对账按钮
+            document.querySelectorAll('#three-way-subtab button').forEach(function(btn) {
+                if (btn.textContent.trim() === '重新对账') {
+                    btn.addEventListener('click', function() {
+                        alert('开始对账操作');
+                    });
+                }
+            });
+
+            // 出库按钮
+            document.querySelectorAll('#three-way-subtab button').forEach(function(btn) {
+                if (btn.textContent.trim() === '出库') {
+                    btn.addEventListener('click', function() {
+                        alert('生成出库单');
+                    });
+                }
+            });
+
+            // 库存明细按钮（切换到库存明细子Tab）
+            document.querySelectorAll('#three-way-subtab button').forEach(function(btn) {
+                if (btn.textContent.trim() === '库存明细') {
+                    btn.addEventListener('click', function() {
+                        // 切换到库存明细子Tab
+                        document.querySelectorAll('.sub-tab-btn').forEach(function(b) {
+                            b.classList.remove('active', 'border-primary', 'text-primary');
+                            b.classList.add('border-transparent', 'text-gray-500');
+                        });
+                        var inventoryDetailBtn = document.querySelector('[data-subtab="inventory-detail-subtab"]');
+                        if (inventoryDetailBtn) {
+                            inventoryDetailBtn.classList.add('active', 'border-primary', 'text-primary');
+                            inventoryDetailBtn.classList.remove('border-transparent', 'text-gray-500');
+                        }
+
+                        document.querySelectorAll('.sub-tab-content').forEach(function(content) {
+                            content.classList.add('hidden');
+                        });
+                        var inventoryDetailTab = document.getElementById('inventory-detail-subtab');
+                        if (inventoryDetailTab) {
+                            inventoryDetailTab.classList.remove('hidden');
+                        }
+
+                        lucide.createIcons();
+                    });
+                }
+            });
+
+            // 批量操作按钮（批量对账、批量出库、批量删除）
+            document.querySelectorAll('#three-way-subtab').parentElement.querySelectorAll('button').forEach(function(btn) {
+                if (btn.textContent.trim() === '批量对账') {
+                    btn.addEventListener('click', function() {
+                        alert('批量对账操作');
+                    });
+                }
+                if (btn.textContent.trim() === '批量出库') {
+                    btn.addEventListener('click', function() {
+                        alert('批量生成出库单');
+                    });
+                }
+            });
+
+            // 导出按钮（金蝶库存明细区域）
+            var kingdeeExportBtn = document.querySelector('#kingdee-inventory-tab .flex.items-center.justify-between button');
+            if (kingdeeExportBtn && kingdeeExportBtn.textContent.trim() === '导出') {
+                kingdeeExportBtn.addEventListener('click', function() {
+                    alert('导出金蝶库存明细');
+                });
+            }
+
+            // ========== Tab2: 软装收入分摊任务 ==========
+
+            // ③ 新增分摊任务按钮 → 打开抽屉
+            var addRevenueTaskBtn = document.getElementById('add-revenue-task-btn');
+            var allocationDrawer = document.getElementById('allocation-drawer');
+            var allocationOverlay = document.getElementById('allocation-drawer-overlay');
+
+            if (addRevenueTaskBtn) {
+                addRevenueTaskBtn.addEventListener('click', function() {
+                    allocationDrawer.classList.add('open');
+                    allocationOverlay.classList.add('open');
+                    lucide.createIcons();
+                });
+            }
+
+            // 关闭分摊任务抽屉
+            var closeAllocDrawerBtn = document.getElementById('close-allocation-drawer-btn');
+            var cancelAllocBtn = document.getElementById('cancel-allocation-btn');
+            if (closeAllocDrawerBtn) {
+                closeAllocDrawerBtn.addEventListener('click', function() {
+                    allocationDrawer.classList.remove('open');
+                    allocationOverlay.classList.remove('open');
+                });
+            }
+            if (cancelAllocBtn) {
+                cancelAllocBtn.addEventListener('click', function() {
+                    allocationDrawer.classList.remove('open');
+                    allocationOverlay.classList.remove('open');
+                });
+            }
+            if (allocationOverlay) {
+                allocationOverlay.addEventListener('click', function() {
+                    allocationDrawer.classList.remove('open');
+                    allocationOverlay.classList.remove('open');
+                });
+            }
+
+            // 保存/确认提交分摊任务
+            var saveAllocBtn = document.getElementById('save-allocation-btn');
+            if (saveAllocBtn) {
+                saveAllocBtn.addEventListener('click', function() {
+                    alert('确认提交计算成功！');
+                    allocationDrawer.classList.remove('open');
+                    allocationOverlay.classList.remove('open');
+                });
+            }
+
+            // 财务组织选择器功能（分摊任务抽屉）
+            var allocEntityTags = document.getElementById('allocation-entity-tags');
+            var allocEntityDropdown = document.getElementById('allocation-entity-dropdown');
+            var allocEntityCheckboxes = document.querySelectorAll('#allocation-entity-dropdown input[type="checkbox"]');
+
+            if (allocEntityTags && allocEntityDropdown) {
+                allocEntityTags.addEventListener('click', function() {
+                    allocEntityDropdown.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!allocEntityTags.contains(e.target) && !allocEntityDropdown.contains(e.target)) {
+                        allocEntityDropdown.classList.add('hidden');
+                    }
+                });
+
+                allocEntityCheckboxes.forEach(function(checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        var value = this.closest('div[data-value]').getAttribute('data-value');
+                        var label = this.nextElementSibling.textContent;
+
+                        if (value === 'all') {
+                            if (this.checked) {
+                                allocEntityCheckboxes.forEach(function(cb) { cb.checked = true; });
+                                allocEntityTags.innerHTML = '';
+                                allocEntityCheckboxes.forEach(function(cb) {
+                                    var cbValue = cb.closest('div[data-value]').getAttribute('data-value');
+                                    if (cbValue !== 'all') {
+                                        var cbLabel = cb.nextElementSibling.textContent;
+                                        addAllocEntityTag(cbValue, cbLabel);
+                                    }
+                                });
+                            } else {
+                                allocEntityCheckboxes.forEach(function(cb) { cb.checked = false; });
+                                allocEntityTags.innerHTML = '';
+                            }
+                        } else {
+                            if (this.checked) {
+                                addAllocEntityTag(value, label);
+                            } else {
+                                removeAllocEntityTag(value);
+                            }
+
+                            var allSelected = Array.from(allocEntityCheckboxes).every(function(cb) {
+                                return cb.checked;
+                            });
+                            allocEntityCheckboxes[0].checked = allSelected;
+                        }
+                    });
+                });
+
+                function addAllocEntityTag(value, label) {
+                    if (!allocEntityTags.querySelector('[data-value="' + value + '"]')) {
+                        var tag = document.createElement('div');
+                        tag.className = 'flex items-center bg-secondary text-primary px-2 py-1 rounded-full text-sm';
+                        tag.setAttribute('data-value', value);
+                        tag.innerHTML = '<span>' + label + '</span><button type="button" class="ml-1 text-primary hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button>';
+                        tag.querySelector('button').addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            removeAllocEntityTag(value);
+                            var entityCheckbox = document.getElementById('alloc-entity-' + value);
+                            if (entityCheckbox) { entityCheckbox.checked = false; }
+                            var allSel = Array.from(allocEntityCheckboxes).every(function(cb) { return cb.checked; });
+                            allocEntityCheckboxes[0].checked = allSel;
+                        });
+                        allocEntityTags.appendChild(tag);
+                        lucide.createIcons();
+                    }
+                }
+
+                function removeAllocEntityTag(value) {
+                    var tag = allocEntityTags.querySelector('[data-value="' + value + '"]');
+                    if (tag) { tag.remove(); }
+                }
+            }
+
+            // 报告查询按钮
+            document.querySelectorAll('#revenue-task-tab button').forEach(function(btn) {
+                if (btn.textContent.trim() === '报告查询') {
+                    btn.addEventListener('click', function() {
+                        alert('查看计算报告');
+                    });
+                }
+            });
+
+            // ========== Tab3: 软装收入分摊单 ==========
+
+            // 采集按钮
+            var collectBtn = document.querySelector('#revenue-order-tab button');
+            if (collectBtn && collectBtn.textContent.trim() === '采集') {
+                collectBtn.addEventListener('click', function() {
+                    alert('数据采集中...');
+                });
+            }
+
+            // ④ 分摊明细弹窗 → 打开详情弹窗
+            var allocationDetailModal = document.getElementById('allocation-detail-modal');
+            var closeAllocDetailBtn = document.getElementById('close-allocation-detail-btn');
+
+            document.querySelectorAll('#revenue-order-tab table button').forEach(function(btn) {
+                if (btn.textContent.trim() === '分摊明细') {
+                    btn.addEventListener('click', function() {
+                        if (allocationDetailModal) {
+                            allocationDetailModal.style.display = 'flex';
+                            lucide.createIcons();
+                        }
+                    });
+                }
+                if (btn.textContent.trim() === '计算') {
+                    btn.addEventListener('click', function() {
+                        alert('开始计算');
+                    });
+                }
+                if (btn.textContent.trim() === '删除') {
+                    btn.addEventListener('click', function() {
+                        if (confirm('确定要删除这条记录吗？')) {
+                            this.closest('tr').remove();
+                        }
+                    });
+                }
+            });
+
+            if (closeAllocDetailBtn && allocationDetailModal) {
+                closeAllocDetailBtn.addEventListener('click', function() {
+                    allocationDetailModal.style.display = 'none';
+                });
+                allocationDetailModal.addEventListener('click', function(e) {
+                    if (e.target === allocationDetailModal) {
+                        allocationDetailModal.style.display = 'none';
+                    }
+                });
+            }
+
+            // 批量操作按钮（批量计算、批量重算、批量删除）
+            document.querySelectorAll('#revenue-order-tab .flex.space-x-2 button').forEach(function(btn) {
+                if (btn.textContent.trim() === '批量计算') {
+                    btn.addEventListener('click', function() {
+                        alert('批量计算操作');
+                    });
+                }
+                if (btn.textContent.trim() === '批量重算') {
+                    btn.addEventListener('click', function() {
+                        alert('批量重新计算');
+                    });
+                }
+                if (btn.textContent.trim() === '批量删除') {
+                    btn.addEventListener('click', function() {
+                        if (confirm('确定要批量删除选中的记录吗？')) {
+                            alert('批量删除操作');
+                        }
+                    });
+                }
+            });
+
+            // ========== Tab4: 软装项目核算任务 ==========
+
+            // ⑤ 新增按钮 → 打开弹窗
+            var projectTaskAddBtn = document.querySelector('#project-task-tab button:first-of-type');
+            var softProjectTaskModal = document.getElementById('soft-project-task-modal');
+            var closeSoftTaskModalBtn = document.getElementById('close-soft-task-modal');
+            var cancelSoftTaskBtn = document.getElementById('cancel-soft-task-btn');
+
+            if (projectTaskAddBtn && projectTaskAddBtn.textContent.trim() === '新增') {
+                projectTaskAddBtn.addEventListener('click', function() {
+                    if (softProjectTaskModal) {
+                        softProjectTaskModal.style.display = 'flex';
+                        lucide.createIcons();
+                    }
+                });
+            }
+
+            if (closeSoftTaskModalBtn && softProjectTaskModal) {
+                closeSoftTaskModalBtn.addEventListener('click', function() {
+                    softProjectTaskModal.style.display = 'none';
+                });
+            }
+            if (cancelSoftTaskBtn && softProjectTaskModal) {
+                cancelSoftTaskBtn.addEventListener('click', function() {
+                    softProjectTaskModal.style.display = 'none';
+                });
+            }
+            if (softProjectTaskModal) {
+                softProjectTaskModal.addEventListener('click', function(e) {
+                    if (e.target === softProjectTaskModal) {
+                        softProjectTaskModal.style.display = 'none';
+                    }
+                });
+            }
+
+            // 确认提交按钮
+            var confirmSoftTaskBtn = document.getElementById('confirm-soft-task-btn');
+            if (confirmSoftTaskBtn) {
+                confirmSoftTaskBtn.addEventListener('click', function() {
+                    alert('确认提交计算成功！');
+                    if (softProjectTaskModal) {
+                        softProjectTaskModal.style.display = 'none';
+                    }
+                });
+            }
+
+            // 报告查询按钮
+            document.querySelectorAll('#project-task-tab button').forEach(function(btn) {
+                if (btn.textContent.trim() === '报告查询') {
+                    btn.addEventListener('click', function() {
+                        alert('查看计算报告');
+                    });
+                }
+            });
+
+            // ========== Tab5: 软装项目核算单 ==========
+
+            // 导出按钮
+            var projectOrderExportBtn = document.querySelector('#project-order-tab button:first-of-type');
+            if (projectOrderExportBtn && projectOrderExportBtn.textContent.trim() === '导出') {
+                projectOrderExportBtn.addEventListener('click', function() {
+                    alert('导出核算单列表');
+                });
+            }
+
+            // 确认本期收入按钮
+            var confirmProjectOrderBtn = document.querySelector('#project-order-tab button:nth-of-type(2)');
+            if (confirmProjectOrderBtn && confirmProjectOrderBtn.textContent.trim().indexOf('确认本期收入') !== -1) {
+                confirmProjectOrderBtn.addEventListener('click', function() {
+                    alert('确认本期收入');
+                });
+            }
+
+            // ⑥ 详情按钮 → 打开详情弹窗
+            var softAccountingDetailModal = document.getElementById('soft-accounting-detail-modal');
+            var closeSoftAccountingDetailBtn = document.getElementById('close-soft-accounting-detail-btn');
+
+            document.querySelectorAll('#project-order-tab table button').forEach(function(btn) {
+                if (btn.textContent.trim() === '详情') {
+                    btn.addEventListener('click', function() {
+                        if (softAccountingDetailModal) {
+                            softAccountingDetailModal.style.display = 'flex';
+                            lucide.createIcons();
+                        }
+                    });
+                }
+            });
+
+            if (closeSoftAccountingDetailBtn && softAccountingDetailModal) {
+                closeSoftAccountingDetailBtn.addEventListener('click', function() {
+                    softAccountingDetailModal.style.display = 'none';
+                });
+                softAccountingDetailModal.addEventListener('click', function(e) {
+                    if (e.target === softAccountingDetailModal) {
+                        softAccountingDetailModal.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadSidebar);
+        } else {
+            loadSidebar();
+        }
+    </script>
+</body>
+</html>
