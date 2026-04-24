@@ -1008,7 +1008,7 @@
                                                 <td class="px-3 py-3 text-gray-600 whitespace-nowrap">2026-04-15 10:00:00</td>
                                                 <td class="px-3 py-3 text-gray-700 whitespace-nowrap">系统管理员</td>
                                                 <td class="px-3 py-3 text-center whitespace-nowrap">
-                                                    <button class="text-primary hover:text-blue-700 font-medium">详情</button>
+                                                    <button class="text-primary hover:text-blue-700 font-medium view-detail-btn">详情</button>
                                                 </td>
                                             </tr>
                                             <tr class="hover:bg-gray-50">
@@ -1037,7 +1037,13 @@
                                                 <td class="px-3 py-3 text-gray-600 whitespace-nowrap">2026-04-16 11:00:00</td>
                                                 <td class="px-3 py-3 text-gray-700 whitespace-nowrap">财务专员A</td>
                                                 <td class="px-3 py-3 text-center whitespace-nowrap">
-                                                    <button class="text-primary hover:text-blue-700 font-medium">详情</button>
+                                                    <div class="req-marker inline-block" id="req-marker-24-actions">
+                                                        <span class="req-badge" data-req="24"
+                                                              data-title="需求描述：操作按钮"
+                                                              data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[24] 需求描述：操作按钮</h3><div class="req-section-title">按钮清单</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>详情</strong>：点击后弹窗展示完整字段信息（67个字段）</li><li><strong>流程查看</strong>：<em>仅当单据存在审批流时才显示</em><br/>点击后弹框查看流程详情，包括：流程状态、流程节点、流程操作人、流程操作时间等</li></ul><div class="req-section-title">显示条件</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">当核算确认状态=审批中时，显示"流程查看"按钮；其他状态（未确认/已确认）时隐藏该按钮</blockquote></div>'>24</span>
+                                                        <button class="text-primary hover:text-blue-700 font-medium view-detail-btn">详情</button>
+                                                        <button class="text-primary hover:text-blue-700 font-medium ml-3 view-process-btn">流程查看</button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -1051,6 +1057,128 @@
 
             </div>
         </main>
+    </div>
+
+    <!-- ========== ⑦ 流程查看弹窗 (Tab5: 软装项目核算单) [24] ========== -->
+    <div id="process-view-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 max-h-[85vh] overflow-y-auto req-marker relative block" id="req-marker-24-process">
+            <span class="req-badge" data-req="24"
+                  data-title="需求描述：流程查看弹窗"
+                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[24] 需求描述：流程查看弹窗</h3><div class="req-section-title">打开方式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击列表中的<strong>"流程查看"</strong>按钮打开此弹窗</li></ul><div class="req-section-title">显示条件</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">仅当单据存在审批流时才显示该按钮（即核算确认状态=审批中时）</blockquote><div class="req-section-title">模块清单</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>[24-process-info] 流程基本信息</strong>：2个字段<ul style="margin-left: 20px; margin-top: 4px;"><li>单据编号</li><li>流程状态（枚举：审批中/已通过/已驳回）</li></ul></li><li><strong>[24-process-nodes] 流程节点列表</strong>：<br/>展示完整的审批流程节点，包括节点名称、操作人、操作时间、操作意见等</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>每个节点按时间顺序纵向排列</em></li><li><em>当前节点高亮显示</em></li><li><em>支持查看每个节点的详细操作信息</em></li></ul></div>'>24</span>
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-lg font-semibold text-gray-900">流程查看</h3>
+                <button id="close-process-modal-btn" class="p-2 rounded-md hover:bg-gray-100">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <!-- 流程基本信息 [24-process-info] -->
+                <div class="mb-6 req-marker relative block" id="req-marker-24-process-info">
+                    <span class="req-badge" data-req="24"
+                          data-title="需求描述：流程基本信息"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[24-process-info] 需求描述：流程基本信息</h3><div class="req-section-title">字段清单（2个字段）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>单据编号</strong>：当前查看的单据编号</li><li><strong>流程状态</strong>：枚举值<blockquote style="border-left: 3px solid #ccc; padding-left: 12px; margin: 4px 0; color: #666; background: #fafafa; padding: 6px 10px; font-size: 12px;"><span class="status-dot status-blue"></span>审批中<br/><span class="status-dot status-green"></span>已通过<br/><span class="status-dot status-red"></span>已驳回</blockquote></li></ol></div>'>24</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">流程基本信息</h4>
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-3 bg-gray-50 p-4 rounded-lg">
+                        <div><label class="text-xs text-gray-500">单据编号</label><p class="text-sm font-medium mt-1">RG26041600000002</p></div>
+                        <div><label class="text-xs text-gray-500">流程状态</label><p class="text-sm font-medium mt-1"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"><span class="status-dot status-blue"></span>审批中</span></p></div>
+                    </div>
+                </div>
+
+                <!-- 流程节点时间线 [24-process-nodes] -->
+                <div class="mb-6 req-marker relative block" id="req-marker-24-process-nodes">
+                    <span class="req-badge" data-req="24"
+                          data-title="需求描述：流程节点时间线"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[24-process-nodes] 需求描述：流程节点时间线</h3><div class="req-section-title">展示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>采用垂直时间线布局</li><li>每个节点包含：节点名称、操作人、操作时间、操作意见</li><li>当前节点高亮显示（蓝色边框+背景）</li><li>已完成节点显示为绿色</li></ul><div class="req-section-title">典型节点示例</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>提交申请</strong>：申请人提交确认收入申请</li><li><strong>部门经理审批</strong>：部门经理审核确认</li><li><strong>财务审核</strong>：财务人员最终审核</li></ol><div class="req-section-title">业务规则</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">节点按时间顺序从上到下排列；当前节点可进行操作；历史节点只读展示</blockquote></div>'>24</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">流程节点</h4>
+                    
+                    <div class="relative pl-8 space-y-6">
+                        <!-- 时间线 -->
+                        <div class="absolute left-[11px] top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                        
+                        <!-- 节点1: 提交申请 - 已完成 -->
+                        <div class="relative">
+                            <div class="absolute left-[-23px] w-11 h-11 rounded-full bg-green-100 border-4 border-white flex items-center justify-center shadow-sm">
+                                <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4 ml-4">
+                                <div class="flex items-start justify-between mb-2">
+                                    <h5 class="font-semibold text-gray-800">提交申请</h5>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">已完成</span>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-500 w-20">操作人：</span>
+                                        <span class="text-gray-700 font-medium">财务专员A</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-500 w-20">操作时间：</span>
+                                        <span class="text-gray-700">2026-04-16 10:15:30</span>
+                                    </div>
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-gray-500 w-20">操作意见：</span>
+                                        <span class="text-gray-700">提交软装项目核算收入确认申请</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 节点2: 部门经理审批 - 已完成 -->
+                        <div class="relative">
+                            <div class="absolute left-[-23px] w-11 h-11 rounded-full bg-green-100 border-4 border-white flex items-center justify-center shadow-sm">
+                                <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4 ml-4">
+                                <div class="flex items-start justify-between mb-2">
+                                    <h5 class="font-semibold text-gray-800">部门经理审批</h5>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">已完成</span>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-500 w-20">操作人：</span>
+                                        <span class="text-gray-700 font-medium">张经理</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-500 w-20">操作时间：</span>
+                                        <span class="text-gray-700">2026-04-16 14:22:18</span>
+                                    </div>
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-gray-500 w-20">操作意见：</span>
+                                        <span class="text-gray-700">同意，数据核对无误</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 节点3: 财务审核 - 当前节点 -->
+                        <div class="relative">
+                            <div class="absolute left-[-23px] w-11 h-11 rounded-full bg-blue-100 border-4 border-blue-400 flex items-center justify-center shadow-md animate-pulse">
+                                <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                            </div>
+                            <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 ml-4 shadow-sm">
+                                <div class="flex items-start justify-between mb-2">
+                                    <h5 class="font-semibold text-blue-800">财务审核</h5>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 animate-pulse">审批中</span>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-500 w-20">当前审批人：</span>
+                                        <span class="text-blue-700 font-medium">财务主管B</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-500 w-20">提交时间：</span>
+                                        <span class="text-gray-700">2026-04-16 14:25:00</span>
+                                    </div>
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-gray-500 w-20">备注：</span>
+                                        <span class="text-gray-600 italic">等待财务主管审核确认...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="req-tooltip-container"></div>
@@ -1834,9 +1962,9 @@
             <div class="p-6">
                 <!-- 核算结果 -->
                 <div class="mb-6 req-marker relative block" id="req-marker-project-report-result">
-                    <span class="req-badge" data-req="22"
+                    <span class="req-badge" data-req="20"
                           data-title="需求描述：核算结果"
-                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[22] 需求描述：核算结果</h3><div class="req-section-title">字段清单（4个汇总字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>计算批次号</strong>：与任务列表中的批次号一致</li><li><strong>本次核算项目总数量</strong>= 成功数 + 失败数</li><li><strong>核算成功数量</strong>：通过所有校验的合同数</li><li><strong>核算失败数量</strong>：校验未通过的合同数（详见下方失败列表）</li></ol></div>'>22</span>
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[20] 需求描述：核算结果</h3><div class="req-section-title">字段清单（4个汇总字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>计算批次号</strong>：与任务列表中的批次号一致</li><li><strong>本次核算项目总数量</strong>= 成功数 + 失败数</li><li><strong>核算成功数量</strong>：通过所有校验的合同数</li><li><strong>核算失败数量</strong>：校验未通过的合同数（详见下方失败列表）</li></ol></div>'>20</span>
                     <h4 class="font-semibold mb-3 text-gray-800">核算结果</h4>
                     <div class="grid grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg">
                         <div class="text-center">
@@ -1860,9 +1988,9 @@
 
                 <!-- 失败详情列表 -->
                 <div class="req-marker relative block" id="req-marker-project-report-failures">
-                    <span class="req-badge" data-req="23"
+                    <span class="req-badge" data-req="20-fail"
                           data-title="需求描述：失败详情列表"
-                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[23] 需求描述：失败详情列表</h3><div class="req-section-title">字段清单（2个字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>合同号</strong>：取项目基础资料</li><li><strong>计算失败原因</strong>：枚举值<blockquote style="border-left: 3px solid #ccc; padding-left: 12px; margin: 4px 0; color: #666; background: #fafafa; padding: 6px 10px; font-size: 12px;">① 软装销售收入计算分摊未完成<br/>② 工费成本未获取</blockquote></li></ol><div class="req-section-title">示例数据（5条）</div><table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px;"><thead><tr style="background: #f5f5f5;"><th style="border: 1px solid #ddd; padding: 6px; text-align: left;">财务主体</th><th style="border: 1px solid #ddd; padding: 6px; text-align: left;">合同号</th><th style="border: 1px solid #ddd; padding: 6px; text-align: left;">失败原因</th></tr></thead><tbody><tr><td style="border: 1px solid #ddd; padding: 6px;">财务主体1</td><td style="border: 1px solid #ddd; padding: 6px;">HT202603001</td><td style="border: 1px solid #ddd; padding: 6px; color: #d32f2f;">软装销售收入计算分摊未完成</td></tr><tr><td style="border: 1px solid #ddd; padding: 6px;">财务主体2</td><td style="border: 1px solid #ddd; padding: 6px;">HT202603005</td><td style="border: 1px solid #ddd; padding: 6px; color: #d32f2f;">工费成本未获取</td></tr><tr><td style="border: 1px solid #ddd; padding: 6px;">财务主体3</td><td style="border: 1px solid #ddd; padding: 6px;">HT202603008</td><td style="border: 1px solid #ddd; padding: 6px; color: #d32f2f;">软装销售收入计算分摊未完成</td></tr><tr><td style="border: 1px solid #ddd; padding: 6px;">财务主体4</td><td style="border: 1px solid #ddd; padding: 6px;">HT202603012</td><td style="border: 1px solid #ddd; padding: 6px; color: #d32f2f;">软装销售收入计算分摊未完成</td></tr><tr><td style="border: 1px solid #ddd; padding: 6px;">财务主体5</td><td style="border: 1px solid #ddd; padding: 6px;">HT202603015</td><td style="border: 1px solid #ddd; padding: 6px; color: #d32f2f;">软装销售收入计算分摊未完成</td></tr></tbody></table><div class="req-section-title" style="margin-top: 10px;">注意事项</div><blockquote style="border-left: 3px solid #faad14; padding-left: 12px; color: #666; background: #fffbe6; padding: 8px 12px;">仅展示核算失败的合同明细，成功的合同不在此列表显示</blockquote></div>'>23</span>
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[20-fail] 需求描述：失败详情列表</h3><div class="req-section-title">字段清单（2个字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>合同号</strong>：取项目基础资料</li><li><strong>计算失败原因</strong>：枚举值<blockquote style="border-left: 3px solid #ccc; padding-left: 12px; margin: 4px 0; color: #666; background: #fafafa; padding: 6px 10px; font-size: 12px;">① 被分摊的物料数量均等于0（无可分摊的物料）<br/>② 应收总额&lt;0<br/>③ 对账状态不等于对账成功<br/>④ 所有物料客户价全部=0<br/>⑤ 该合同未生成竣工销售出库单</blockquote></li></ol><div class="req-section-title">示例数据（5条）</div><table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px;"><thead><tr style="background: #f5f5f5;"><th style="border: 1px solid #ddd; padding: 6px; text-align: left;">财务主体</th><th style="border: 1px solid #ddd; padding: 6px; text-align: left;">合同号</th><th style="border: 1px solid #ddd; padding: 6px; text-align: left;">失败原因</th></tr></thead><tbody><tr><td style="border: 1px solid #ddd; padding: 6px;">财务主体1</td><td style="border: 1px solid #ddd; padding: 6px;">HT202603001</td><td style="border: 1px solid #ddd; padding: 6px; color: #d32f2f;">被分摊的物料数量均等于0（无可分摊的物料）</td></tr><tr><td style="border: 1px solid #ddd; padding: 6px;">财务主体2</td><td style="border: 1px solid #ddd; padding: 6px;">HT202603005</td><td style="border: 1px solid #ddd; padding: 6px; color: #d32f2f;">应收总额&lt;0</td></tr><tr><td style="border: 1px solid #ddd; padding: 6px;">财务主体3</td><td style="border: 1px solid #ddd; padding: 6px;">HT202603008</td><td style="border: 1px solid #ddd; padding: 6px; color: #d32f2f;">对账状态不等于对账成功</td></tr><tr><td style="border: 1px solid #ddd; padding: 6px;">财务主体4</td><td style="border: 1px solid #ddd; padding: 6px;">HT202603012</td><td style="border: 1px solid #ddd; padding: 6px; color: #d32f2f;">所有物料客户价全部=0</td></tr><tr><td style="border: 1px solid #ddd; padding: 6px;">财务主体5</td><td style="border: 1px solid #ddd; padding: 6px;">HT202603015</td><td style="border: 1px solid #ddd; padding: 6px; color: #d32f2f;">该合同未生成竣工销售出库单</td></tr></tbody></table></div>'>20-fail</span>
                     <h4 class="font-semibold mb-3 text-gray-800">失败详情列表</h4>
                     <div class="table-wrapper">
                         <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
@@ -1877,27 +2005,27 @@
                                 <tr>
                                     <td class="px-4 py-2 text-gray-700">财务主体1</td>
                                     <td class="px-4 py-2 text-gray-900 font-medium">HT202603001</td>
-                                    <td class="px-4 py-2 text-red-600">软装销售收入计算分摊未完成</td>
+                                    <td class="px-4 py-2 text-red-600">被分摊的物料数量均等于0（无可分摊的物料）</td>
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-2 text-gray-700">财务主体2</td>
                                     <td class="px-4 py-2 text-gray-900 font-medium">HT202603005</td>
-                                    <td class="px-4 py-2 text-red-600">工费成本未获取</td>
+                                    <td class="px-4 py-2 text-red-600">应收总额&lt;0</td>
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-2 text-gray-700">财务主体3</td>
                                     <td class="px-4 py-2 text-gray-900 font-medium">HT202603008</td>
-                                    <td class="px-4 py-2 text-red-600">软装销售收入计算分摊未完成</td>
+                                    <td class="px-4 py-2 text-red-600">对账状态不等于对账成功</td>
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-2 text-gray-700">财务主体4</td>
                                     <td class="px-4 py-2 text-gray-900 font-medium">HT202603012</td>
-                                    <td class="px-4 py-2 text-red-600">软装销售收入计算分摊未完成</td>
+                                    <td class="px-4 py-2 text-red-600">所有物料客户价全部=0</td>
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-2 text-gray-700">财务主体5</td>
                                     <td class="px-4 py-2 text-gray-900 font-medium">HT202603015</td>
-                                    <td class="px-4 py-2 text-red-600">软装销售收入计算分摊未完成</td>
+                                    <td class="px-4 py-2 text-red-600">该合同未生成竣工销售出库单</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -2691,6 +2819,30 @@
                 softAccountingDetailModal.addEventListener('click', function(e) {
                     if (e.target === softAccountingDetailModal) {
                         softAccountingDetailModal.style.display = 'none';
+                    }
+                });
+            }
+
+            // ⑦ 流程查看按钮 → 打开流程查看弹窗
+            var processViewModal = document.getElementById('process-view-modal');
+            var closeProcessModalBtn = document.getElementById('close-process-modal-btn');
+
+            document.querySelectorAll('.view-process-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (processViewModal) {
+                        processViewModal.style.display = 'flex';
+                        lucide.createIcons();
+                    }
+                });
+            });
+
+            if (closeProcessModalBtn && processViewModal) {
+                closeProcessModalBtn.addEventListener('click', function() {
+                    processViewModal.style.display = 'none';
+                });
+                processViewModal.addEventListener('click', function(e) {
+                    if (e.target === processViewModal) {
+                        processViewModal.style.display = 'none';
                     }
                 });
             }

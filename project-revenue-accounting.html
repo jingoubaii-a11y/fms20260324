@@ -616,7 +616,15 @@
                                         <td class="px-3 py-2 text-sm text-gray-700">2026-04-16 10:00</td>
                                         <td class="px-3 py-2 text-sm text-gray-700">admin</td>
                                         <td class="px-3 py-2 text-sm">
-                                            <button class="text-primary hover:text-blue-700 view-detail-contract">详情</button>
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:text-blue-700 view-detail-contract">详情</button>
+                                                <div class="req-marker inline-block" id="req-marker-26">
+                                                    <span class="req-badge" data-req="26"
+                                                          data-title="流程查看按钮"
+                                                          data-content='<div class="req-section-title">流程查看按钮</div><div><strong>显示样式：</strong>文字链接按钮，与"详情"按钮并列</div><div><strong>功能说明：</strong>点击后弹框展示审批流程详情</div><div><strong>弹框内容：</strong></div><div>&nbsp;&nbsp;• 流程状态（进行中/已完成/已驳回等）</div><div>&nbsp;&nbsp;• 流程节点列表（当前节点、历史节点）</div><div>&nbsp;&nbsp;• 各节点操作人信息</div><div>&nbsp;&nbsp;• 各节点操作时间</div><div><em>业务规则：仅当单据存在审批流时才显示此按钮，无审批流时隐藏</em></div><div><strong>交互逻辑：</strong></div><div>&nbsp;&nbsp;1. 点击按钮打开弹框</div><div>&nbsp;&nbsp;2. 弹框以模态方式展示，支持关闭</div><div>&nbsp;&nbsp;3. 数据从工作流引擎实时获取</div><blockquote>注意事项：需对接工作流API获取流程实例数据</blockquote>'>26</span>
+                                                    <button class="text-primary hover:text-blue-700">流程查看</button>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
