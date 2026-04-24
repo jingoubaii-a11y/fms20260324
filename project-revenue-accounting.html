@@ -162,13 +162,16 @@
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <!-- Tab导航 -->
                     <div class="req-marker border-b border-gray-200 mb-6" id="req-marker-1">
-                        <span class="req-badge" data-req="1" data-title="需求描述：Tab导航组件" data-content='<div class="req-section-title">显示样式</div><p>项目收入核算单页面顶部展示三个Tab选项卡：</p><ul><li><span class="status-dot status-blue"></span><strong>完工百分比</strong> - 默认激活状态，显示蓝色下划线</li><li><span class="status-dot status-blue"></span><strong>完成合同法</strong> - 可切换Tab</li><li><span class="status-dot status-gray"></span><strong>设计费</strong> - 当前为待定状态，置灰且不可点击，显示&quot;#待定#&quot;标记</li></ul><div class="req-section-title">交互逻辑</div><ul><li>点击Tab可切换不同核算方法的视图内容</li><li>设计费Tab处于禁用状态，等待后续需求明确后启用</li><li>Tab切换时保持筛选条件和分页状态独立</li></ul>'>1</span>
+                        <span class="req-badge" data-req="1" data-title="需求描述：Tab导航组件" data-content='<div class="req-section-title">显示样式</div><p>项目收入核算单页面顶部展示四个Tab选项卡：</p><ul><li><span class="status-dot status-blue"></span><strong>完工百分比</strong> - 默认激活状态，显示蓝色下划线</li><li><span class="status-dot status-blue"></span><strong>完成合同法</strong> - 可切换Tab</li><li><span class="status-dot status-blue"></span><strong>整装项目收入核算任务</strong> - 用于管理整装项目的核算任务创建和执行</li><li><span class="status-dot status-gray"></span><strong>设计费</strong> - 当前为待定状态，置灰且不可点击，显示&quot;#待定#&quot;标记</li></ul><div class="req-section-title">交互逻辑</div><ul><li>点击Tab可切换不同核算方法的视图内容</li><li>设计费Tab处于禁用状态，等待后续需求明确后启用</li><li>Tab切换时保持筛选条件和分页状态独立</li></ul>'>1</span>
                         <nav class="-mb-px flex space-x-8">
                             <button class="tab-btn active border-b-2 border-primary text-primary py-3 px-1 text-sm font-medium" data-tab="percentage">
                                 完工百分比
                             </button>
                             <button class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 py-3 px-1 text-sm font-medium" data-tab="contract">
                                 完成合同法
+                            </button>
+                            <button class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 py-3 px-1 text-sm font-medium" data-tab="task">
+                                整装项目收入核算任务
                             </button>
                             <button class="tab-btn border-b-2 border-transparent text-gray-400 cursor-not-allowed py-3 px-1 text-sm font-medium" data-tab="design" disabled>
                                 设计费 #待定#
@@ -632,6 +635,137 @@
                         </div>
                     </div>
 
+                    <!-- 整装项目收入核算任务Tab内容 -->
+                    <div class="req-marker" id="req-marker-5">
+                        <span class="req-badge" data-req="5" data-title="需求描述：整装项目收入核算任务Tab容器" data-content='<div class="req-section-title">模块概述</div><p>整装项目收入核算任务管理页面，用于创建和监控整装项目的批量收入核算任务。</p><div class="req-section-title">包含子模块</div><ul><li><strong>按钮区域 [6]</strong>：新增核算任务</li><li><strong>筛选条件 [7]</strong>：合同号、核算期间、计算批次号、计算状态</li><li><strong>列表区域 [8]</strong>：13个字段+操作列（报告查询）</li></ul><div class="req-section-title">业务流程</div><blockquote>1. 点击[新增]→打开弹窗配置参数→确认创建任务<br>2. 后台自动执行计算→更新计算状态<br>3. 计算完成后可点击[报告查询]查看详情</blockquote><div class="req-section-title">状态机</div><ul><li><span class="status-dot status-gray"></span>未计算 → <span class="status-dot status-orange"></span>计算中 → <span class="status-dot status-green"></span>计算完成/<span class="status-dot status-red"></span>计算失败</li></ul>'>5</span>
+                        <div id="tab-task" class="tab-content hidden">
+                        <!-- 筛选条件和按钮栏 -->
+                        <div class="flex items-center justify-between mb-6 flex-nowrap">
+                            <div class="flex items-center space-x-2 flex-1">
+                                <div class="req-marker relative inline-block" id="req-marker-7">
+                                    <span class="req-badge" data-req="7" data-title="需求描述：整装核算任务-筛选条件区域" data-content='<div class="req-section-title">筛选字段清单（4个）</div><ul><li><strong>合同号</strong>：精准匹配，输入框查询</li><li><strong>核算期间</strong>：默认当前会计期间，选择器</li><li><strong>计算批次号</strong>：精准匹配，输入框查询</li><li><strong>计算状态</strong>：枚举选择<ul><li>未计算</li><li>计算中</li><li>计算完成</li><li>计算失败</li></ul></li></ul><div class="req-section-title">交互说明</div><ul><li>支持实时筛选</li><li>核算期间默认值：系统自动带出当前会计期间</li></ul>'>7</span>
+                                    <div class="flex items-center space-x-2">
+                                        <input type="text" placeholder="合同号" class="w-40 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <select class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <option value="">核算期间（默认当前）</option>
+                                            <option value="2026-04" selected>2026-04</option>
+                                            <option value="2026-03">2026-03</option>
+                                        </select>
+                                        <input type="text" placeholder="计算批次号" class="w-40 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <select class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <option value="">计算状态</option>
+                                            <option value="pending">未计算</option>
+                                            <option value="calculating">计算中</option>
+                                            <option value="completed">计算完成</option>
+                                            <option value="failed">计算失败</option>
+                                        </select>
+                                        <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                            <i data-lucide="search" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="req-marker flex items-center space-x-3" id="req-marker-6">
+                                <span class="req-badge" data-req="6" data-title="需求描述：整装核算任务-操作按钮" data-content='<div class="req-section-title">按钮功能</div><ul><li><strong>新增</strong>：<ul><li>打开&quot;新增整装项目收入核算任务（弹窗）&quot;</li><li>用于创建新的整装项目核算任务</li></ul></li></ul><div class="req-section-title">业务规则</div><blockquote>点击新增后可配置：财务组织、合同号、是否重算等参数，确认后创建核算任务并执行后台计算。</blockquote>'>6</span>
+                                <button id="add-task-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
+                                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                                    新增
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 列表 -->
+                        <div class="req-marker table-wrapper" id="req-marker-8">
+                            <span class="req-badge" data-req="8" data-title="需求描述：整装核算任务-列表区域" data-content='<div class="req-section-title">列表字段（13个+操作列）</div><ul><li><strong>计算批次号</strong>：自动生成</li><li><strong>项目类型</strong>：枚举 - 整装、软装、设计费</li><li><strong>核算期间</strong></li><li><strong>核算方法</strong>：枚举 - 完成合同法、完工百分比、收款确收</li><li><strong>计算状态</strong>：枚举<ul><li><span class="status-dot status-gray"></span>未计算 - 灰色标签</li><li><span class="status-dot status-orange"></span>计算中 - 橙色标签</li><li><span class="status-dot status-green"></span>计算完成 - 绿色标签</li><li><span class="status-dot status-red"></span>计算失败 - 红色标签</li></ul></li><li><strong>本次核算合同数量</strong>：<em>符合核算条件的合同总数</em></li><li><strong>本次核算成功数量</strong>：<em>成功完成计算的合同数量（蓝色加粗）</em></li><li><strong>本次核算失败数量</strong>：<em>计算失败的合同数量（红色加粗）</em></li><li><strong>是否重算已计算未确认的合同</strong>：布尔</li><li><strong>是否重算已确认的合同</strong>：布尔</li><li><strong>创建人</strong></li><li><strong>创建时间</strong></li></ul><div class="req-section-title">业务规则</div><blockquote><em>本次核算合同数量 = 本次核算成功数量 + 本次核算失败数量</em></blockquote><div class="req-section-title">操作列</div><ul><li><strong>报告查询</strong>：<ul><li>仅当计算状态=计算完成时可见</li><li>点击后弹窗显示核算报告详情</li></ul></li></ul>'>8</span>
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">计算批次号</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">项目类型</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">核算期间</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">核算方法</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">计算状态</th>
+                                        <th class="px-3 py-2 text-center text-xs font-medium text-gray-700 uppercase font-semibold">本次核算<br/>合同数量</th>
+                                        <th class="px-3 py-2 text-center text-xs font-medium text-blue-600 uppercase font-semibold">本次核算<br/>成功数量</th>
+                                        <th class="px-3 py-2 text-center text-xs font-medium text-red-600 uppercase font-semibold">本次核算<br/>失败数量</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">是否重算已计算未确认的合同</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">是否重算已确认的合同</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建人</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-700">TASK202604001</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">整装</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">2026-04</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">完工百分比</td>
+                                        <td class="px-3 py-2 text-sm">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">计算完成</span>
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-900 text-center font-semibold">15</td>
+                                        <td class="px-3 py-2 text-sm text-blue-600 text-center font-bold">14</td>
+                                        <td class="px-3 py-2 text-sm text-red-600 text-center font-bold">1</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 text-center">否</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 text-center">否</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">admin</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">2026-04-20 10:30</td>
+                                        <td class="px-3 py-2 text-sm">
+                                            <button class="text-primary hover:text-blue-700 view-report-btn">报告查询</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-700">TASK202604002</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">整装</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">2026-04</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">完工百分比</td>
+                                        <td class="px-3 py-2 text-sm">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">计算中</span>
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-900 text-center font-semibold">20</td>
+                                        <td class="px-3 py-2 text-sm text-gray-400 text-center">-</td>
+                                        <td class="px-3 py-2 text-sm text-gray-400 text-center">-</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 text-center">是</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 text-center">否</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">admin</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">2026-04-21 14:20</td>
+                                        <td class="px-3 py-2 text-sm text-gray-400">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-700">TASK202603005</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">整装</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">2026-03</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">完工百分比</td>
+                                        <td class="px-3 py-2 text-sm">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">计算失败</span>
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-900 text-center font-semibold">18</td>
+                                        <td class="px-3 py-2 text-sm text-blue-600 text-center font-bold">16</td>
+                                        <td class="px-3 py-2 text-sm text-red-600 text-center font-bold">2</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 text-center">否</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 text-center">否</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">zhangsan</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">2026-03-28 09:15</td>
+                                        <td class="px-3 py-2 text-sm text-gray-400">-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-6 flex items-center justify-between">
+                            <div class="text-sm text-gray-500">
+                                显示 1-3 条，共 3 条
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
                     <!-- 设计费Tab内容（待定） -->
                     <div id="tab-design" class="tab-content hidden">
                         <div class="text-center py-20">
@@ -643,141 +777,156 @@
         </main>
     </div>
 
-    <!-- 完工百分比详情弹窗 -->
+    <!-- 整装项目核算单详情弹窗 [12] -->
     <div id="detail-modal-percentage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-7xl mx-4 max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
-                <h3 class="text-lg font-semibold text-gray-900">完工百分比 - 详情</h3>
+                <h3 class="text-lg font-semibold text-gray-900">整装项目核算单 - 详情</h3>
                 <button class="close-detail-modal-percentage text-gray-400 hover:text-gray-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            <div class="p-6">
-                <div class="space-y-6">
-                    <!-- 基本信息 -->
-                    <div class="border-b pb-4">
-                        <h4 class="text-md font-medium text-gray-800 mb-3">基本信息</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">单据编号</label><p class="text-sm text-gray-900">WG2604150001</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">单据类型</label><p class="text-sm text-gray-900">标准项目核算单</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">会计期间</label><p class="text-sm text-gray-900">2026-04</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">财务主体</label><p class="text-sm text-gray-900">财务主体1</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">计算状态</label><p class="text-sm"><span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已计算</span></p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">核算确认状态</label><p class="text-sm"><span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">未确认</span></p></div>
-                        </div>
+            <div class="p-6 space-y-6">
+                <!-- ① 基本信息 [12-basic] -->
+                <div class="req-marker border-b pb-4" id="req-marker-12-basic">
+                    <span class="req-badge" data-req="12-basic"
+                          data-title="需求描述：基本信息 [12]"
+                          data-content='<div class="req-section-title">字段清单（29个）</div><ul><li><strong>单据编号</strong>：自动生成</li><li><strong>单据类型</strong>：枚举 - 项目核算调整单、标准项目核算单</li><li><strong>会计期间</strong></li><li><strong>财务主体</strong></li><li><strong>计算状态</strong>：枚举<ul><li>未计算/已计算/计算失败</li></ul></li><li><strong>核算确认状态</strong>：枚举<ul><li>未确认/审批中/已确认</li></ul></li><li><strong>合同号/合同名称</strong></li><li><strong>计税方式/税率</strong></li><li><strong>客户名称/客户编号</strong></li><li><strong>楼盘名称/楼盘地址</strong></li><li><strong>需求类型/产品名称/产品分类</strong></li><li><strong>业务线/到店门店</strong></li><li><strong>签单设计师/签单设计部</strong></li><li><strong>签单日期/实际开工日期/实际竣工日期/财务确认竣工日期</strong></li><li><strong>应收总额/预计总成本/预计总收入/预计毛利率</strong></li></ul>'>12-basic</span>
+                    <h4 class="text-md font-medium text-gray-800 mb-3">基本信息</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">单据编号</label><p class="text-sm text-gray-900 font-medium">WG2604150001</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">单据类型</label><p class="text-sm text-gray-900">标准项目核算单</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">会计期间</label><p class="text-sm text-gray-900">2026-04</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">财务主体</label><p class="text-sm text-gray-900">财务主体1</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">计算状态</label><p class="text-sm"><span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已计算</span></p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">核算确认状态</label><p class="text-sm"><span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">未确认</span></p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">合同号</label><p class="text-sm text-primary font-medium">HT202603001</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">合同名称</label><p class="text-sm text-gray-900">家装项目1</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">计税方式</label><p class="text-sm text-gray-900">一般纳税人</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">税率</label><p class="text-sm text-gray-900">13%</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">客户名称</label><p class="text-sm text-gray-900">张三</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">客户编号</label><p class="text-sm text-gray-900">KH001</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">楼盘名称</label><p class="text-sm text-gray-900">某某花园</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">楼盘地址</label><p class="text-sm text-gray-900">北京市朝阳区XX路XX号</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">需求类型</label><p class="text-sm text-gray-900">整装</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">产品名称</label><p class="text-sm text-gray-900">标准整装套餐</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">产品分类</label><p class="text-sm text-gray-900">标准整装</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">业务线</label><p class="text-sm text-gray-900">家装业务线</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">到店门店</label><p class="text-sm text-gray-900">北京朝阳店</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">签单设计师</label><p class="text-sm text-gray-900">王设计师</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">签单设计部</label><p class="text-sm text-gray-900">设计一部</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">签单日期</label><p class="text-sm text-gray-900">2026-03-15</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">实际开工日期</label><p class="text-sm text-gray-900">2026-03-20</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">实际竣工日期</label><p class="text-sm text-gray-900">-</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">财务确认竣工日期</label><p class="text-sm text-gray-900">-</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">应收总额</label><p class="text-sm text-gray-900 font-bold">¥100,000.00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">预计总成本</label><p class="text-sm text-gray-900 font-medium">¥80,000.00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">预计总收入</label><p class="text-sm text-blue-600 font-medium">¥88,495.58</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">预计毛利率</label><p class="text-sm text-green-600 font-bold">9.62%</p></div>
                     </div>
+                </div>
 
-                    <!-- 项目信息 -->
-                    <div class="border-b pb-4">
-                        <h4 class="text-md font-medium text-gray-800 mb-3">项目信息</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">合同号</label><p class="text-sm text-gray-900">HT202603001</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">合同名称</label><p class="text-sm text-gray-900">家装项目1</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">计税方式</label><p class="text-sm text-gray-900">一般纳税人</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">税率</label><p class="text-sm text-gray-900">13%</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">客户名称</label><p class="text-sm text-gray-900">张三</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">客户编号</label><p class="text-sm text-gray-900">KH001</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">楼盘名称</label><p class="text-sm text-gray-900">某某花园</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">楼盘地址</label><p class="text-sm text-gray-900">北京市朝阳区XX路XX号</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">需求类型</label><p class="text-sm text-gray-900">整装</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">产品名称</label><p class="text-sm text-gray-900">标准整装套餐</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">产品分类</label><p class="text-sm text-gray-900">标准整装</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">业务线</label><p class="text-sm text-gray-900">家装业务线</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">到店门店</label><p class="text-sm text-gray-900">北京朝阳店</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">签单设计师</label><p class="text-sm text-gray-900">王设计师</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">签单设计部</label><p class="text-sm text-gray-900">设计一部</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">签单日期</label><p class="text-sm text-gray-900">2026-03-15</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">实际开工日期</label><p class="text-sm text-gray-900">2026-03-20</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">实际竣工日期</label><p class="text-sm text-gray-900">-</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">财务确认竣工日期</label><p class="text-sm text-gray-900">-</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">应收总额</label><p class="text-sm text-gray-900 font-medium">100,000.00</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">预计总成本</label><p class="text-sm text-gray-900">80,000.00</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">预计总收入</label><p class="text-sm text-gray-900">88,495.58</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">预计毛利率</label><p class="text-sm text-gray-900">9.62%</p></div>
-                        </div>
+                <!-- ② 核算信息 [12-calc] -->
+                <div class="req-marker border-b pb-4" id="req-marker-12-calc">
+                    <span class="req-badge" data-req="12-calc"
+                          data-title="需求描述：核算信息 [12]"
+                          data-content='<div class="req-section-title">字段清单（13个）</div><ul><li><strong>当月毛利率</strong>：<em>自动计算=（本次确认收入-本次确认成本）/本次确认收入</em></li><li><strong>累计当月毛利率</strong></li><li><strong>截止当月累计完工百分比</strong></li><li><strong>本次完工百分比</strong></li><li><strong>本次确认收入</strong>：<em>蓝色加粗</em></li><li><strong>本次确认成本</strong>：<em>红色加粗</em></li><li><strong>本月已确认成本</strong></li><li><strong>收入调整金额</strong></li><li><strong>成本调整金额</strong></li><li><strong>调整单号</strong></li><li><strong>已竣工未交款计税</strong></li><li><strong>截至竣工计税收款金额</strong></li><li><strong>截至竣工计税退款金额</strong></li></ul><div class="req-section-title">显示样式</div><ul><li>毛利率字段：<span style="color:green">绿色</span></li><li>收入字段：<span style="color:blue">蓝色加粗</span></li><li>成本字段：<span style="color:red">红色加粗</span></li></ul>'>12-calc</span>
+                    <h4 class="text-md font-medium text-gray-800 mb-3">核算信息</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">当月毛利率</label><p class="text-sm text-green-600 font-bold">25.00%</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">累计当月毛利率</label><p class="text-sm text-green-600 font-medium">28.57%</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">截止当月累计完工百分比</label><p class="text-sm text-gray-900 font-medium">56.25%</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">本次完工百分比</label><p class="text-sm text-gray-900 font-medium">18.75%</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">本次确认收入</label><p class="text-sm text-blue-600 font-bold">¥50,000.00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">本次确认成本</label><p class="text-sm text-red-600 font-bold">¥37,500.00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">本月已确认成本</label><p class="text-sm text-gray-900">¥0.00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">收入调整金额</label><p class="text-sm text-gray-900">¥0.00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">成本调整金额</label><p class="text-sm text-gray-900">¥0.00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">调整单号</label><p class="text-sm text-gray-900">-</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">已竣工未交款计税</label><p class="text-sm text-gray-900">-</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">截至竣工计税收款金额</label><p class="text-sm text-gray-900">-</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">截至竣工计税退款金额</label><p class="text-sm text-gray-900">-</p></div>
                     </div>
+                </div>
 
-                    <!-- 核算信息 -->
-                    <div class="border-b pb-4">
-                        <h4 class="text-md font-medium text-gray-800 mb-3">核算信息</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">当月毛利率</label><p class="text-sm text-gray-900 font-medium text-green-600">25.00%</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">累计当月毛利率</label><p class="text-sm text-gray-900 font-medium">28.57%</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">截止当月累计完工百分比</label><p class="text-sm text-gray-900 font-medium">56.25%</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">本次完工百分比</label><p class="text-sm text-gray-900 font-medium">18.75%</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">本次确认收入</label><p class="text-sm text-gray-900 font-medium text-blue-600">50,000.00</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">本次确认成本</label><p class="text-sm text-gray-900 font-medium text-red-600">37,500.00</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">本月已确认成本</label><p class="text-sm text-gray-900">0.00</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">收入调整金额</label><p class="text-sm text-gray-900">0.00</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">成本调整金额</label><p class="text-sm text-gray-900">0.00</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">调整单号</label><p class="text-sm text-gray-900">-</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">已竣工未交款计税</label><p class="text-sm text-gray-900">-</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">截至竣工计税收款金额</label><p class="text-sm text-gray-900">-</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">截至竣工计税退款金额</label><p class="text-sm text-gray-900">-</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">截止上次累计已竣工未交款计税</label><p class="text-sm text-gray-900">-</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">截止本月累计确认收入</label><p class="text-sm text-gray-900 font-medium">50,000.00</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">截止本月累计确认成本</label><p class="text-sm text-gray-900 font-medium">37,500.00</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">截止上次累计确认收入</label><p class="text-sm text-gray-900">0.00</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">截止上次累计确认成本</label><p class="text-sm text-gray-900">0.00</p></div>
-                        </div>
+                <!-- ③ 累计确认信息 [12-accum] -->
+                <div class="req-marker border-b pb-4" id="req-marker-12-accum">
+                    <span class="req-badge" data-req="12-accum"
+                          data-title="需求描述：累计确认信息 [12]"
+                          data-content='<div class="req-section-title">字段清单（5个）</div><ul><li><strong>截止上次累计已竣工未交款计税</strong></li><li><strong>截止本月累计确认收入</strong>：<em>蓝色加粗</em></li><li><strong>截止本月累计确认成本</strong>：<em>红色加粗</em></li><li><strong>截止上次累计确认收入</strong></li><li><strong>截止上次累计确认成本</strong></li></ul><div class="req-section-title">业务规则</div><blockquote>用于追踪历史累计数据，与当月数据形成对比</blockquote>'>12-accum</span>
+                    <h4 class="text-md font-medium text-gray-800 mb-3">累计确认信息</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">截止上次累计已竣工未交款计税</label><p class="text-sm text-gray-900">-</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">截止本月累计确认收入</label><p class="text-sm text-blue-600 font-bold">¥50,000.00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">截止本月累计确认成本</label><p class="text-sm text-red-600 font-bold">¥37,500.00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">截止上次累计确认收入</label><p class="text-sm text-gray-900">¥0.00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">截止上次累计确认成本</label><p class="text-sm text-gray-900">¥0.00</p></div>
                     </div>
+                </div>
 
-                    <!-- 成本明细 -->
-                    <div class="border-b pb-4">
-                        <h4 class="text-md font-medium text-gray-800 mb-3">成本明细</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <h5 class="text-sm font-medium text-gray-700 mb-2">截止本月累计合同履约成本</h5>
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex justify-between"><span class="text-gray-600">材料成本-其中：材料</span><span class="text-gray-900">20,000.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">材料成本-其中：材料进项税额转出</span><span class="text-gray-900">2,600.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">人工成本（工人及员工）</span><span class="text-gray-900">10,000.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">劳务分包差额抵税</span><span class="text-gray-900">3,000.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">运输成本</span><span class="text-gray-900">1,500.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">其他成本</span><span class="text-gray-900">400.00</span></div>
-                                    <div class="flex justify-between font-medium pt-2 border-t"><span class="text-gray-900">合计</span><span class="text-gray-900">37,500.00</span></div>
-                                </div>
-                            </div>
-                            <div>
-                                <h5 class="text-sm font-medium text-gray-700 mb-2">当月合同履约总成本余额</h5>
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex justify-between"><span class="text-gray-600">当月材料成本-其中材料</span><span class="text-gray-900">20,000.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">当月材料成本-其中：材料进项税额转出</span><span class="text-gray-900">2,600.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">当月人工成本（工人及员工）</span><span class="text-gray-900">10,000.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">当月劳务分包差额抵税</span><span class="text-gray-900">3,000.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">当月运输成本</span><span class="text-gray-900">1,500.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">当月其他成本</span><span class="text-gray-900">400.00</span></div>
-                                    <div class="flex justify-between font-medium pt-2 border-t"><span class="text-gray-900">合计</span><span class="text-gray-900">37,500.00</span></div>
-                                </div>
-                            </div>
-                            <div>
-                                <h5 class="text-sm font-medium text-gray-700 mb-2">截止上次累计合同履约成本</h5>
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex justify-between"><span class="text-gray-600">截止上次累计材料成本-其中：材料</span><span class="text-gray-900">0.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">截止上次累计材料成本-其中：材料进项税额转出</span><span class="text-gray-900">0.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">截止上次累计人工成本（工人及员工）</span><span class="text-gray-900">0.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">截止上次累计劳务分包成本差额抵税</span><span class="text-gray-900">0.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">截止上次累计运输成本</span><span class="text-gray-900">0.00</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">截止上次累计其他成本</span><span class="text-gray-900">0.00</span></div>
-                                    <div class="flex justify-between font-medium pt-2 border-t"><span class="text-gray-900">合计</span><span class="text-gray-900">0.00</span></div>
-                                </div>
+                <!-- ④ 合同履约成本 [12-cost] -->
+                <div class="req-marker border-b pb-4" id="req-marker-12-cost">
+                    <span class="req-badge" data-req="12-cost"
+                          data-title="需求描述：合同履约成本明细 [12]"
+                          data-content='<div class="req-section-title">子模块（3个，共18个字段）</div><ul><li><strong>截止本月累计合同履约成本</strong>（6项）<ul><li>材料成本-其中：材料</li><li>材料成本-其中：材料进项税额转出</li><li>人工成本（工人及员工）</li><li>劳务分包差额抵税</li><li>运输成本</li><li>其他成本</li></ul></li><li><strong>当月合同履约总成本余额</strong>（6项）</li><li><strong>截止上次累计合同履约成本</strong>（6项）</li></ul><div class="req-section-title">显示样式</div><blockquote>三栏对比布局，每栏含合计行</blockquote>'>12-cost</span>
+                    <h4 class="text-md font-medium text-gray-800 mb-3">合同履约成本明细</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h5 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b">截止本月累计合同履约成本</h5>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between"><span class="text-gray-600">材料成本-其中：材料</span><span class="text-gray-900 font-medium">20,000.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">材料进项税额转出</span><span class="text-gray-900 font-medium">2,600.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">人工成本（工人及员工）</span><span class="text-gray-900 font-medium">10,000.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">劳务分包差额抵税</span><span class="text-gray-900 font-medium">3,000.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">运输成本</span><span class="text-gray-900 font-medium">1,500.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">其他成本</span><span class="text-gray-900 font-medium">400.00</span></div>
+                                <div class="flex justify-between font-bold pt-2 mt-2 border-t border-gray-300"><span class="text-gray-900">合计</span><span class="text-blue-600">37,500.00</span></div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- 系统信息 -->
-                    <div>
-                        <h4 class="text-md font-medium text-gray-800 mb-3">系统信息</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">计算批次</label><p class="text-sm text-gray-900">1</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">是否重算</label><p class="text-sm text-gray-900">否</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">本月计算次数</label><p class="text-sm text-gray-900">1</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">核算确认时间</label><p class="text-sm text-gray-900">-</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">计算完成时间</label><p class="text-sm text-gray-900">2026-04-15 10:30:00</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">错误信息</label><p class="text-sm text-gray-900">-</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">创建时间</label><p class="text-sm text-gray-900">2026-04-15 09:00:00</p></div>
-                            <div><label class="block text-xs font-medium text-gray-500 mb-1">创建人</label><p class="text-sm text-gray-900">admin</p></div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h5 class="text-sm font-semibold text-blue-700 mb-3 pb-2 border-b border-blue-200">当月合同履约总成本余额</h5>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between"><span class="text-gray-600">当月材料成本-其中材料</span><span class="text-gray-900 font-medium">20,000.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">当月材料进项税额转出</span><span class="text-gray-900 font-medium">2,600.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">当月人工成本（工人及员工）</span><span class="text-gray-900 font-medium">10,000.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">当月劳务分包差额抵税</span><span class="text-gray-900 font-medium">3,000.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">当月运输成本</span><span class="text-gray-900 font-medium">1,500.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">当月其他成本</span><span class="text-gray-900 font-medium">400.00</span></div>
+                                <div class="flex justify-between font-bold pt-2 mt-2 border-t border-blue-200"><span class="text-gray-900">合计</span><span class="text-blue-600">37,500.00</span></div>
+                            </div>
                         </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h5 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b">截止上次累计合同履约成本</h5>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between"><span class="text-gray-600">截止上次累计材料成本</span><span class="text-gray-900 font-medium">0.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">截止上次累计材料进项税额转出</span><span class="text-gray-900 font-medium">0.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">截止上次累计人工成本</span><span class="text-gray-900 font-medium">0.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">截止上次累计劳务分包差额抵税</span><span class="text-gray-900 font-medium">0.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">截止上次累计运输成本</span><span class="text-gray-900 font-medium">0.00</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">截止上次累计其他成本</span><span class="text-gray-900 font-medium">0.00</span></div>
+                                <div class="flex justify-between font-bold pt-2 mt-2 border-t border-gray-300"><span class="text-gray-900">合计</span><span class="text-gray-900">0.00</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ⑤ 系统信息 [12-sys] -->
+                <div class="req-marker" id="req-marker-12-sys">
+                    <span class="req-badge" data-req="12-sys"
+                          data-title="需求描述：系统信息 [12]"
+                          data-content='<div class="req-section-title">字段清单（10个）</div><ul><li><strong>计算批次</strong></li><li><strong>是否重算</strong>：布尔</li><li><strong>本月计算次数</strong></li><li><strong>核算确认时间</strong></li><li><strong>计算完成时间</strong></li><li><strong>错误信息</strong>：<em>失败时显示具体错误原因</em></li><li><strong>创建时间/创建人</strong></li><li><strong>修改时间/修改人</strong></li></ul><div class="req-section-title">业务规则</div><blockquote>系统自动记录的计算元数据和审计日志</blockquote>'>12-sys</span>
+                    <h4 class="text-md font-medium text-gray-800 mb-3">系统信息</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">计算批次</label><p class="text-sm text-gray-900">1</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">是否重算</label><p class="text-sm text-gray-900">否</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">本月计算次数</label><p class="text-sm text-gray-900">1</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">核算确认时间</label><p class="text-sm text-gray-900">-</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">计算完成时间</label><p class="text-sm text-gray-900">2026-04-15 10:30:00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">错误信息</label><p class="text-sm text-gray-900">-</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">创建时间</label><p class="text-sm text-gray-900">2026-04-15 09:00:00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">创建人</label><p class="text-sm text-gray-900">admin</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">修改时间</label><p class="text-sm text-gray-900">2026-04-15 09:00:00</p></div>
+                        <div><label class="block text-xs font-medium text-gray-500 mb-1">修改人</label><p class="text-sm text-gray-900">admin</p></div>
                     </div>
                 </div>
             </div>
@@ -980,6 +1129,9 @@
 
             // 完成合同法Tab功能
             initContractTab();
+
+            // 整装项目收入核算任务Tab功能
+            initTaskTab();
         }
 
         function initPercentageTab() {
@@ -1043,6 +1195,76 @@
                     detailModal.classList.add('hidden');
                 }
             });
+        }
+
+        function initTaskTab() {
+            const addTaskBtn = document.getElementById('add-task-btn');
+            const addTaskModal = document.getElementById('add-task-modal');
+
+            if (addTaskBtn && addTaskModal) {
+                addTaskBtn.addEventListener('click', () => {
+                    addTaskModal.classList.remove('hidden');
+                    lucide.createIcons();
+                });
+
+                document.querySelectorAll('.close-add-task-modal').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        addTaskModal.classList.add('hidden');
+                    });
+                });
+
+                addTaskModal.addEventListener('click', (e) => {
+                    if (e.target === addTaskModal) {
+                        addTaskModal.classList.add('hidden');
+                    }
+                });
+            }
+
+            const confirmTaskBtn = document.getElementById('confirm-task-btn');
+            if (confirmTaskBtn) {
+                confirmTaskBtn.addEventListener('click', () => {
+                    const recalcConfirmed = document.getElementById('recalc-confirmed').checked;
+
+                    if (recalcConfirmed) {
+                        if (confirm('您勾选了"重算已确认的合同"，确定要继续吗？此操作将重新计算已确认的合同数据。')) {
+                            alert('正在创建整装项目核算任务...\n\n1. 确认计算范围中...\n2. 创建项目核算单据（增量/存量）...\n3. 更新计算批次号...\n4. 执行后台计算逻辑...\n\n计算完成后将弹框提示！');
+                            document.getElementById('add-task-modal').classList.add('hidden');
+                        }
+                    } else {
+                        alert('正在创建整装项目核算任务...\n\n1. 确认计算范围中...\n2. 创建项目核算单据（增量/存量）...\n3. 更新计算批次号...\n4. 执行后台计算逻辑...\n\n计算完成后将弹框提示！');
+                        document.getElementById('add-task-modal').classList.add('hidden');
+                    }
+                });
+            }
+
+            document.querySelectorAll('.view-report-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    var row = this.closest('tr');
+                    var batchId = row.cells[0].textContent;
+
+                    var reportModal = document.getElementById('report-modal');
+                    if (reportModal) {
+                        document.getElementById('report-batch-id').textContent = batchId;
+                        reportModal.classList.remove('hidden');
+                        lucide.createIcons();
+                    }
+                });
+            });
+
+            var reportModal = document.getElementById('report-modal');
+            if (reportModal) {
+                document.querySelectorAll('.close-report-modal').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        reportModal.classList.add('hidden');
+                    });
+                });
+
+                reportModal.addEventListener('click', (e) => {
+                    if (e.target === reportModal) {
+                        reportModal.classList.add('hidden');
+                    }
+                });
+            }
         }
 
         function initContractTab() {
@@ -1114,6 +1336,176 @@
             loadSidebar();
         }
     </script>
+
+    <!-- 新增整装项目收入核算任务弹窗 -->
+    <div id="add-task-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-lg font-semibold text-gray-900">新增整装项目收入核算任务</h3>
+                <button class="close-add-task-modal text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="space-y-6">
+                    <!-- 基本信息区域 -->
+                    <div class="req-marker border-b pb-4" id="req-marker-6-form">
+                        <span class="req-badge" data-req="6" data-title="需求描述：新增整装核算任务表单" data-content='<div class="req-section-title">字段清单（7个）</div><ul><li><strong>项目类型</strong>：<ul><li><em>锁定字段</em></li><li>默认值：整装</li><li>枚举：整装、软装、设计费</li><li>必填</li></ul></li><li><strong>核算方法</strong>：<ul><li><em>锁定字段</em></li><li>默认值：完工百分比</li><li>枚举：完成合同法、完工百分比、收款确收</li></ul></li><li><strong>财务组织</strong>：<ul><li>下拉多选，支持全选</li><li>必填</li></ul></li><li><strong>核算期间</strong>：<ul><li><em>锁定字段</em></li><li>自动带出当前会计期间</li><li>必填</li></ul></li><li><strong>合同号</strong>：<ul><li>输入后下拉多选</li><li>非必填（不填则没有合同过滤条件）</li></ul></li><li><strong>是否重算已计算未确认的合同</strong>：<ul><li>布尔类型，默认不勾选</li><li><em>勾选条件：</em>计算状态=未计算/计算失败/已计算 且 确认状态=未确认 且 没有审批中的项目收入确认审批流程</li><li><em>未勾选条件：</em>计算状态=计算失败或还未创建当期核算单据</li></ul></li><li><strong>是否重算已确认的合同</strong>：<ul><li>布尔类型，默认不勾选</li><li><em>勾选条件：</em>确认状态=已确认</li></ul></li></ul><div class="req-section-title">操作按钮</div><ul><li><strong>确认</strong>：<ul><li>若勾选了&quot;重算已确认的合同&quot;需要进行二次确认</li><li>确认计算范围：在本期应核算项目条件基础上加上根据任务选择的项</li><li>排除正在计算中的任务</li><li>创建增量/存量单据并更新批次号</li><li>执行后台计算逻辑</li><li>计算完成后弹框提示并支持跳转查看报告</li></ul></li><li><strong>取消</strong>：关闭弹窗</li></ul>'>6</span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    项目类型 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" value="整装" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    核算方法
+                                </label>
+                                <input type="text" value="完工百分比" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    财务组织 <span class="text-red-500">*</span>
+                                </label>
+                                <select multiple class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent h-24">
+                                    <option value="org1">财务主体1</option>
+                                    <option value="org2">财务主体2</option>
+                                    <option value="org3">财务主体3</option>
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">按住Ctrl键可多选</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    核算期间 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" value="2026-04" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    合同号
+                                </label>
+                                <select multiple class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent h-24">
+                                    <option value="HT001">HT202603001 - 家装项目1</option>
+                                    <option value="HT002">HT202603002 - 软装项目2</option>
+                                    <option value="HT005">HT202603005 - 竣工项目A</option>
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">非必填，不填则没有合同过滤条件；按住Ctrl键可多选</p>
+                            </div>
+                        </div>
+
+                        <!-- 重算选项 -->
+                        <div class="mt-6 space-y-3">
+                            <div class="flex items-start">
+                                <input type="checkbox" id="recalc-unconfirmed" class="mt-1 mr-2">
+                                <div>
+                                    <label for="recalc-unconfirmed" class="text-sm font-medium text-gray-700 cursor-pointer">
+                                        是否重算已计算未确认的合同
+                                    </label>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        默认不勾选。勾选后将对满足条件的合同进行重算（计算状态=未计算/计算失败/已计算，且确认状态=未确认）
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <input type="checkbox" id="recalc-confirmed" class="mt-1 mr-2">
+                                <div>
+                                    <label for="recalc-confirmed" class="text-sm font-medium text-gray-700 cursor-pointer">
+                                        是否重算已确认的合同
+                                    </label>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        默认不勾选。勾选后将需要二次确认，且仅对确认状态=已确认的合同进行重算
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end space-x-3 sticky bottom-0 bg-white">
+                <button class="close-add-task-modal px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    取消
+                </button>
+                <button id="confirm-task-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                    确认
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 报告查询弹窗 -->
+    <div id="report-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-lg font-semibold text-gray-900">整装项目收入核算任务 - 报告详情</h3>
+                <button class="close-report-modal text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="space-y-6">
+                    <!-- 核算结果区域 -->
+                    <div class="req-marker border-b pb-4" id="req-marker-report-1">
+                        <span class="req-badge" data-req="report-1" data-title="需求描述：核算结果汇总" data-content='<div class="req-section-title">显示字段（4个）</div><ul><li><strong>计算批次号</strong>：自动生成，唯一标识本次核算任务</li><li><strong>本次核算项目总数量</strong>：符合核算条件的合同总数</li><li><strong>核算成功数量</strong>：成功完成计算的合同数量</li><li><strong>核算失败数量</strong>：计算失败的合同数量</li></ul><div class="req-section-title">业务规则</div><blockquote><em>核算结果 = 本次核算项目总数量 = 核算成功数量 + 核算失败数量</em></blockquote><div class="req-section-title">显示样式</div><ul><li>计算批次号：普通文本显示</li><li>项目总数量：<span style="color:blue">蓝色加粗大字体</span></li><li>成功数量：<span style="color:green">绿色加粗大字体</span></li><li>失败数量：<span style="color:red">红色加粗大字体</span></li></ul>'>report-1</span>
+                        <h4 class="text-md font-medium text-gray-800 mb-3">核算结果</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg">
+                            <div class="text-center">
+                                <p class="text-xs text-gray-500 mb-1">计算批次号</p>
+                                <p class="text-sm font-bold text-gray-900" id="report-batch-id">TASK202604001</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-gray-500 mb-1">本次核算项目总数量</p>
+                                <p class="text-2xl font-bold text-blue-600" id="report-total-count">15</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-gray-500 mb-1">核算成功数量</p>
+                                <p class="text-2xl font-bold text-green-600" id="report-success-count">14</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-gray-500 mb-1">核算失败数量</p>
+                                <p class="text-2xl font-bold text-red-600" id="report-fail-count">1</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 失败详情列表区域 -->
+                    <div class="req-marker" id="req-marker-report-2">
+                        <span class="req-badge" data-req="report-2" data-title="需求描述：失败详情列表 [21]" data-content='<div class="req-section-title">列表字段（3个）</div><ul><li><strong>财务主体</strong>：合同所属的财务组织</li><li><strong>合同号</strong>：计算失败的合同编号</li><li><strong>失败原因</strong>：具体的错误信息<em>（见下方示例）</em></li></ul><div class="req-section-title">业务规则</div><blockquote>仅当<strong>核算失败数量&gt;0</strong>时显示此区域</blockquote><div class="req-section-title">示例数据（来自PRD）</div><table class="w-full text-xs border border-gray-300"><thead class="bg-gray-100"><tr><th class="border px-2 py-1">财务主体</th><th class="border px-2 py-1">合同号</th><th class="border px-2 py-1">失败原因</th></tr></thead><tbody><tr><td class="border px-2 py-1">财务主体1</td><td class="border px-2 py-1">HT202603001</td><td class="border px-2 py-1 text-red-600">预计总收入为&gt;0、预计总成本&gt;0</td></tr><tr><td class="border px-2 py-1">财务主体2</td><td class="border px-2 py-1">HT202603005</td><td class="border px-2 py-1 text-red-600">应收总额≦0</td></tr></tbody></table>'>report-2</span>
+                        <h4 class="text-md font-medium text-gray-800 mb-3">失败详情列表</h4>
+                        <div class="table-wrapper">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-red-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">财务主体</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">合同号</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">失败原因</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200" id="report-fail-list">
+                                    <tr class="hover:bg-red-50">
+                                        <td class="px-4 py-3 text-sm text-gray-700">财务主体1</td>
+                                        <td class="px-4 py-3 text-sm text-primary font-medium">HT202603001</td>
+                                        <td class="px-4 py-3 text-sm text-red-600">预计总收入为>0、预计总成本>0</td>
+                                    </tr>
+                                    <tr class="hover:bg-red-50">
+                                        <td class="px-4 py-3 text-sm text-gray-700">财务主体2</td>
+                                        <td class="px-4 py-3 text-sm text-primary font-medium">HT202603005</td>
+                                        <td class="px-4 py-3 text-sm text-red-600">应收总额≤0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 text-right">共 2 条失败记录</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end sticky bottom-0 bg-white">
+                <button class="close-report-modal px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    关闭
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- 需求标注浮窗容器 -->
     <div id="req-tooltip-container"></div>

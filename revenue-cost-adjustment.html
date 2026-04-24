@@ -151,6 +151,7 @@
         .drawer {
             transition: transform 0.3s ease-in-out;
             transform: translateX(100%);
+            left: auto;
         }
         .drawer.open {
             transform: translateX(0);
@@ -214,8 +215,8 @@
                                     <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
                                 </button>
                             </div>
-                            <div class="flex flex-col space-y-2">
-                                <div class="req-marker inline-block" id="req-marker-23">
+                            <div class="flex flex-row space-x-2">
+                                <div class="req-marker inline-flex" id="req-marker-23">
                                     <span class="req-badge" data-req="23"
                                           data-title="需求描述：操作按钮"
                                           data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[23] 需求描述：操作按钮</h3><div class="req-section-title">按钮清单（3个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>新增</strong>：打开新增调整单抽屉<br/>抽屉字段：财务主体、单据编号（自动生成TZD+8位）、会计期间、合同号、收入调整金额、成本调整金额、调整原因、单据状态、是否参与核算、核算单号</li><li><strong>导入</strong>：弹框，可下载导入模板，批量导入调整单数据</li><li><strong>导出</strong>：根据筛选条件返回数据导出为Excel格式</li></ol></div>'>23</span>
@@ -369,7 +370,7 @@
     <!-- 新增/编辑调整单抽屉 [26] -->
     <div id="adjustment-drawer" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50" id="drawer-overlay"></div>
-        <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl overflow-y-auto req-marker relative inline-block" id="req-marker-26">
+        <div class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl overflow-y-auto req-marker drawer transform translate-x-full transition-transform duration-300 ease-in-out z-50" id="req-marker-26" style="left: auto;">
             <span class="req-badge" data-req="26"
                   data-title="需求描述：新增/编辑调整单抽屉"
                   data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[26] 需求描述：新增/编辑调整单抽屉</h3><div class="req-section-title">打开方式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击"新增"按钮打开此抽屉（新增模式）</li><li>点击列表的"编辑"按钮打开此抽屉（编辑模式）</li></ul><div class="req-section-title">表单字段清单（10个字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>财务主体</strong>：下拉选择财务主体</li><li><strong>单据编号</strong>：<em>锁定</em>，自动生成规则：TZD+8位流水号</li><li><strong>会计期间</strong>：选择会计期间</li><li><strong>合同号</strong>：过滤财务主体对应的合同，下拉选择</li><li><strong>收入调整金额</strong>：数字输入，可正负数</li><li><strong>成本调整金额</strong>：数字输入，可正负数</li><li><strong>调整原因</strong>：文本输入，必填</li><li><strong>单据状态</strong>：枚举：草稿、生效</li><li><strong>是否参与核算</strong>：枚举：是、否<br/><em>业务规则：核算单据采集保存后反写为是，核算单据删除后反写为否</em></li><li><strong>核算单号</strong>：<em>锁定</em>，核算单据采集保存后反写核算单号，项目收入核算单据删除后清空核算单号</li></ol><div class="req-section-title">操作按钮</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>保存</strong>：保存当前表单数据</li><li><strong>生效</strong>：将单据状态更新为"生效"</li></ol></div>'>26</span>
@@ -529,6 +530,7 @@
             // 新增按钮
             var addBtn = document.getElementById('add-adjustment-btn');
             var drawer = document.getElementById('adjustment-drawer');
+            var drawerPanel = document.getElementById('req-marker-26');
             var closeDrawer = document.getElementById('close-drawer');
             var cancelBtn = document.getElementById('cancel-adjustment-btn');
             var overlay = document.getElementById('drawer-overlay');
@@ -536,11 +538,19 @@
             addBtn.addEventListener('click', function() {
                 document.getElementById('drawer-title').textContent = '新增调整单';
                 drawer.classList.remove('hidden');
+                setTimeout(function() {
+                    drawerPanel.classList.remove('translate-x-full');
+                    drawerPanel.classList.add('translate-x-0');
+                }, 10);
                 lucide.createIcons();
             });
 
             function closeDrawerFunc() {
-                drawer.classList.add('hidden');
+                drawerPanel.classList.remove('translate-x-0');
+                drawerPanel.classList.add('translate-x-full');
+                setTimeout(function() {
+                    drawer.classList.add('hidden');
+                }, 300);
             }
 
             closeDrawer.addEventListener('click', closeDrawerFunc);
@@ -552,6 +562,10 @@
                 btn.addEventListener('click', function() {
                     document.getElementById('drawer-title').textContent = '编辑调整单';
                     drawer.classList.remove('hidden');
+                    setTimeout(function() {
+                        drawerPanel.classList.remove('translate-x-full');
+                        drawerPanel.classList.add('translate-x-0');
+                    }, 10);
                     lucide.createIcons();
                 });
             });

@@ -285,6 +285,95 @@
         </div>
     </div>
 
+    <div id="report-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-900">软装收入计算任务报告</h3>
+                <button id="close-report-modal" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="req-marker relative block" id="req-marker-report-result">
+                    <span class="req-badge" data-req="20"
+                          data-title="核算结果"
+                          data-content='<div class="req-section-title">核算结果模块</div><div><strong>显示样式：</strong>信息卡片式布局，4个指标并排展示</div><div><strong>字段清单：</strong></div><ul><li><strong>计算批次号：</strong>系统自动生成的唯一标识</li><li><strong>本次核算项目总数量：</strong>参与本次计算的合同总数</li><li><strong>核算成功数量：</strong>计算成功的合同数</li><li><strong>核算失败数量：</strong>计算失败的合同数</li></ul><div><em>业务规则：仅当计算状态=计算完成时才显示此弹窗</em></div>'>20</span>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">核算结果</h4>
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="bg-white p-3 rounded-md shadow-sm">
+                                <div class="text-xs text-gray-500 mb-1">计算批次号</div>
+                                <div class="text-sm font-semibold text-gray-900">PC20260415001</div>
+                            </div>
+                            <div class="bg-white p-3 rounded-md shadow-sm">
+                                <div class="text-xs text-gray-500 mb-1">本次核算项目总数量</div>
+                                <div class="text-sm font-semibold text-gray-900">10</div>
+                            </div>
+                            <div class="bg-white p-3 rounded-md shadow-sm">
+                                <div class="text-xs text-gray-500 mb-1">核算成功数量</div>
+                                <div class="text-sm font-semibold text-green-600">5</div>
+                            </div>
+                            <div class="bg-white p-3 rounded-md shadow-sm">
+                                <div class="text-xs text-gray-500 mb-1">核算失败数量</div>
+                                <div class="text-sm font-semibold text-red-600">5</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="req-marker relative block" id="req-marker-failure-list">
+                    <span class="req-badge" data-req="21"
+                          data-title="失败详情列表"
+                          data-content='<div class="req-section-title">失败详情列表</div><div><strong>显示样式：</strong>表格形式，支持横向滚动</div><div><strong>字段清单：</strong></div><ul><li><strong>财务主体：</strong>归属的财务组织</li><li><strong>合同号：</strong>唯一标识</li><li><strong>失败原因：</strong>详细错误描述</li></ul><div><em>常见失败场景：</em></div><blockquote>• 被分摊的物料数量均等于0（无可分摊的物料）<br>• 应收总额&lt;0<br>• 对账状态不等于对账成功<br>• 所有物料客户价全部=0<br>• 该合同已生成竣工销售出库单</blockquote>'>21</span>
+                    <div class="table-wrapper">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">失败详情列表</h4>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">失败原因</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-700">财务主体1</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">HT202603001</td>
+                                        <td class="px-3 py-2 text-sm text-red-600">被分摊的物料数量均等于0（无可分摊的物料）</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-700">财务主体2</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">HT202603005</td>
+                                        <td class="px-3 py-2 text-sm text-red-600">应收总额&lt;0</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-700">财务主体3</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">HT202603008</td>
+                                        <td class="px-3 py-2 text-sm text-red-600">对账状态不等于对账成功</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-700">财务主体4</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">HT202603012</td>
+                                        <td class="px-3 py-2 text-sm text-red-600">所有物料客户价全部=0</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-700">财务主体5</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">HT202603015</td>
+                                        <td class="px-3 py-2 text-sm text-red-600">该合同已生成竣工销售出库单</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end">
+                <button id="close-report-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700">关闭</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         async function loadSidebar() {
             try {
@@ -400,6 +489,22 @@
                     detailModal.classList.add('hidden');
                 }
             });
+
+            const reportModal = document.getElementById('report-modal');
+
+            document.getElementById('close-report-modal').addEventListener('click', () => {
+                reportModal.classList.add('hidden');
+            });
+
+            document.getElementById('close-report-btn').addEventListener('click', () => {
+                reportModal.classList.add('hidden');
+            });
+
+            reportModal.addEventListener('click', (e) => {
+                if (e.target === reportModal) {
+                    reportModal.classList.add('hidden');
+                }
+            });
         }
         
         if (document.readyState === 'loading') {
@@ -408,5 +513,7 @@
             loadSidebar();
         }
     </script>
+    <div id="req-tooltip-container"></div>
+    <script src="js/req-annotation.js"></script>
 </body>
 </html>
