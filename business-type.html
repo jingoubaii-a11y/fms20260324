@@ -415,7 +415,7 @@
                         <div class="req-marker relative block border border-gray-200 rounded-lg p-4" style="display: block;">
                             <span class="req-badge" data-req="3"
                                   data-title="业务类型分组"
-                                  data-content='<div class="req-section-title">业务类型分组</div><div><strong>页面位置：</strong>位于右侧主内容区的左侧部分，按照层级树状展示</div><div><strong>布局比例：</strong>分组和业务类型页面占比1:4</div><div><strong>按钮功能：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>新增</code>：打开新增业务类型分组抽屉弹窗</li><li><code>编辑</code>：页面参考新增业务类型分组抽屉弹窗</li><li><code>删除</code>：删除校验该业务类型分组下是否有业务类型数据</li></ul>'>3</span>
+                                  data-content='<div class="req-section-title">业务类型分组</div><div><strong>页面位置：</strong>位于右侧主内容区的左侧部分，按照层级树状展示</div><div><strong>布局比例：</strong>分组和业务类型页面占比1:4</div><div><strong>按钮功能：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>新增</code>：打开新增业务类型分组抽屉弹窗</li><li><code>编辑</code>：页面参考新增业务类型分组抽屉弹窗</li><li><code>删除</code>：<em>删除校验（双重条件）</em>：<br/>1. 该分组下<strong>无业务类型数据</strong><br/>2. 且该分组为<strong>末级分组</strong>（无子分组）<br/><blockquote>任一条件不满足则不可删除</blockquote></li></ul>'>3</span>
 
                             <!-- 分组标题和操作按钮 -->
                             <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">

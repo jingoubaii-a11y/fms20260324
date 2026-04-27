@@ -6,6 +6,124 @@
     <title>软装销售收入计算 - 财务中台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <div id="add-task-drawer" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-xl transform transition-transform duration-300">
+            <div class="flex flex-col h-full">
+                <div class="req-marker relative block border-b border-gray-200 p-6" id="req-marker-18-title">
+                    <span class="req-badge" data-req="18"
+                          data-title="需求描述：新增软装项目收入核算任务（抽屉）"
+                          data-content='<div class="req-section-title">需求描述：新增软装项目收入核算任务（抽屉） [18]</div><div><strong>功能说明：</strong>创建软装项目收入核算的计算任务</div><div><strong>触发方式：</strong>点击页面上的"新增计算任务"按钮打开此抽屉</div><div><em>业务规则：此功能用于批量创建软装项目收入核算任务，支持增量首算和存量反复</em></div>'>18</span>
+                    <h3 class="text-lg font-semibold text-gray-900">新增软装项目收入核算任务</h3>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                    <div class="req-marker relative block" id="req-marker-18-fields">
+                        <span class="req-badge" data-req="18"
+                              data-title="需求描述：字段清单"
+                              data-content='<div class="req-section-title">需求描述：字段清单 [18]</div><div><strong>显示样式：</strong>表单布局，包含5个字段</div><div><strong>字段清单：</strong></div><ul><li><strong>项目类型：</strong>锁定字段，默认值<em>软装</em>，枚举值：整装、软装、设计费</li><li><strong>核算方法：</strong>锁定字段，默认值<em>完成合同法</em>，枚举值：完成合同法、完工百分比、收款确收</li><li><strong>财务组织：</strong>下拉多选，支持全选，<span style="color:red;">必填</span></li><li><strong>核算期间：</strong>锁定，自动带出当前会计期间，<span style="color:red;">必填</span></li><li><strong>合同号：</strong>输入后下拉多选，不填默认没有合同过滤条件，非必填</li></ul><div><strong>默认筛选条件（未勾选重算选项时）：</strong></div><blockquote>以下两个选项均未勾选，则项目需要满足以下条件，若不满足则提示错误信息：<br>1. 计算状态=未计算 or 计算失败<br>2. 确认状态=未确认 且 没有审批中的项目收入确认审批流程<br>3. 未创建当期核算单据</blockquote><div><em>业务规则：若勾选以下布尔选项，就在以上三个条件上取对应勾选条件的并集</em></div>'>18</span>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">项目类型</label>
+                                <input type="text" value="软装" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed">
+                                <p class="mt-1 text-xs text-gray-500">锁定，默认值：软装（枚举：整装、软装、设计费）</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">核算方法</label>
+                                <input type="text" value="完成合同法" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed">
+                                <p class="mt-1 text-xs text-gray-500">锁定，默认值：完成合同法（枚举：完成合同法、完工百分比、收款确收）</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">财务组织 <span class="text-red-500">*</span></label>
+                                <select multiple class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent h-24">
+                                    <option value="org1">财务主体1</option>
+                                    <option value="org2">财务主体2</option>
+                                    <option value="org3">财务主体3</option>
+                                </select>
+                                <div class="mt-1 flex items-center space-x-4">
+                                    <label class="flex items-center text-sm text-gray-600">
+                                        <input type="checkbox" class="mr-1"> 全选
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">核算期间 <span class="text-red-500">*</span></label>
+                                <input type="text" value="2026-04" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed">
+                                <p class="mt-1 text-xs text-gray-500">只能核算当前会计期间，自动带出</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">合同号</label>
+                                <select multiple class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent h-24">
+                                    <option value="HT202603001">HT202603001</option>
+                                    <option value="HT202603002">HT202603002</option>
+                                    <option value="HT202603003">HT202603003</option>
+                                </select>
+                                <p class="mt-1 text-xs text-gray-500">非必填，不填则没有合同过滤条件</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="req-marker relative block bg-gray-50 p-4 rounded-lg" id="req-marker-18-recalculate">
+                        <span class="req-badge" data-req="18"
+                              data-title="需求描述：重算选项"
+                              data-content='<div class="req-section-title">需求描述：重算选项 [18]</div><div><strong>功能说明：</strong>控制是否包含已计算的合同到核算范围</div><div><strong>选项清单（2个布尔选项）：</strong></div><ul><li><strong>是否重算项目收入已计算且未确认的合同：</strong>默认不勾选<br><blockquote>勾选后，合同需要满足条件：<br>1. 计算状态=未计算 or 计算失败 or <em>已计算</em><br>2. 确认状态=未确认 且 没有审批中的项目收入确认审批流程</blockquote></li><li><strong>是否重算项目收入已计算且已确认的合同：</strong>默认不勾选<br><blockquote>勾选后，则需要满足条件：<br>1. 计算状态=未计算 or 计算失败 or <em>已计算</em><br>2. 确认状态=<em>已确认</em></blockquote></li></ul><div><em>业务规则：若勾选以下布尔选项，就在基础条件上取对应勾选条件的并集。原则：增量首算和存量反复</em></div>'>18</span>
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-semibold text-gray-700 mb-3">重算选项</h4>
+
+                            <label class="flex items-start space-x-3 p-3 bg-white rounded-md hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" class="mt-1">
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-gray-900">是否重算项目收入已计算且未确认的合同</div>
+                                    <div class="text-xs text-gray-500 mt-1">勾选后，将项目核算状态为已计算但未确认的合同纳入范围</div>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start space-x-3 p-3 bg-white rounded-md hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" class="mt-1">
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-gray-900">是否重算项目收入已计算且已确认的合同</div>
+                                    <div class="text-xs text-gray-500 mt-1">勾选后，将已确认的合同重新计算（需谨慎操作）</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="req-marker relative block bg-blue-50 p-4 rounded-lg" id="req-marker-18-rules">
+                        <span class="req-badge" data-req="18"
+                              data-title="本期应计算的项目条件"
+                              data-content='<div class="req-section-title">本期应计算的项目条件</div><div><strong>适用场景：</strong>核算方法=完成合同法</div><div><strong>满足条件：</strong></div><blockquote>• 财务确认竣工日期不为空且&lt;=当期会计期结束日期<br>• 合同状态=打开<br>• 项目类型=软装<br>• 排除：合同有计算批次且对应批次计算任务正在计算中</blockquote><div><em>业务规则：在此基础条件上加上用户选择的项目类型、核算方法、合同号、是否重算等条件</em></div>'>18</span>
+                        <div>
+                            <h4 class="text-sm font-semibold text-blue-800 mb-2">📋 本期应计算的项目条件</h4>
+                            <ul class="text-xs text-blue-700 space-y-1 list-disc list-inside">
+                                <li>财务确认竣工日期不为空且 ≤ 当期会计期结束日期</li>
+                                <li>合同状态 = 打开</li>
+                                <li>项目类型 = 软装</li>
+                                <li>排除：合同有计算批次且对应批次计算任务正在计算中</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="req-marker relative block border-t border-gray-200 p-6" id="req-marker-18-actions">
+                    <span class="req-badge" data-req="18"
+                          data-title="需求描述：操作按钮"
+                          data-content='<div class="req-section-title">需求描述：操作按钮 [18]</div><div><strong>确认按钮交互逻辑（5个步骤）：</strong></div><ol><li><strong>步骤1 - 二次确认：</strong>点击确认后，若勾选了重算已确认的合同需要进行二次确认，否则直接创建一个软装销售收入计算任务<br><blockquote>确认计算范围：在本期应核算项目条件基础上加上根据新增任务选择的项合同号、是否重算（计算状态、确认状态），但需排除掉合同有计算批次且对应批次计算任务正在计算中</blockquote></li><li><strong>步骤2 - 创建核算单据：</strong>确认了项目核算范围后，创建项目核算单据：<br><blockquote>- 增量单据：<br>  &nbsp;* 未创建核算单据的合同，则创建项目核算单据，是否重算=否，并更新当前计算批次号<br>  &nbsp;* 重算本期核算状态=已确认的合同，则创建项目核算单据，是否重算=是，并更新当前计算批次号<br>- 存量单据：直接更新计算批次号</blockquote></li><li><strong>步骤3 - 后台计算：</strong>根据计算范围执行项目核算收入计算逻辑</li><li><strong>步骤4 - 自动后台计算：</strong>退出界面则自动后台计算</li><li><strong>步骤5 - 完成提示：</strong>计算后弹框提示<em>"你有项目收入核算任务已经计算完成，请查看详情！"</em>点击后跳转查询核算报告</li></ol><div><strong>取消按钮：</strong>关闭抽屉弹窗</div>'>18</span>
+                    <div class="flex justify-end space-x-3">
+                        <button id="cancel-add-task" class="px-6 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            取消
+                        </button>
+                        <button id="confirm-add-task" class="px-6 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                            确认
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         tailwind.config = {
             theme: {
@@ -60,6 +178,10 @@
                             </button>
                         </div>
                         <div class="flex items-center space-x-3">
+                            <button id="add-task-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
+                                <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                                新增任务
+                            </button>
                             <button id="batch-calculate" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">批量计算</button>
                             <button id="batch-recalculate" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">批量重算</button>
                             <button id="batch-delete" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">批量删除</button>
@@ -169,6 +291,7 @@
                                         <div class="flex space-x-2">
                                             <button class="text-primary hover:text-blue-700 view-detail">分摊明细</button>
                                             <button class="text-primary hover:text-blue-700 calculate">计算</button>
+                                            <button class="text-primary hover:text-blue-700 report-query-btn" data-batch-id="JSFP2604150001">报告查询</button>
                                             <button class="text-red-500 hover:text-red-700 delete">删除</button>
                                         </div>
                                     </td>
@@ -196,6 +319,7 @@
                                         <div class="flex space-x-2">
                                             <button class="text-primary hover:text-blue-700 view-detail">分摊明细</button>
                                             <button class="text-primary hover:text-blue-700 calculate">计算</button>
+                                            <button class="text-primary hover:text-blue-700 report-query-btn hidden" data-batch-id="JSFP2604140001">报告查询</button>
                                             <button class="text-red-500 hover:text-red-700 delete">删除</button>
                                         </div>
                                     </td>
@@ -321,10 +445,10 @@
                     </div>
                 </div>
 
-                <div class="req-marker relative block" id="req-marker-failure-list">
-                    <span class="req-badge" data-req="21"
-                          data-title="失败详情列表"
-                          data-content='<div class="req-section-title">失败详情列表</div><div><strong>显示样式：</strong>表格形式，支持横向滚动</div><div><strong>字段清单：</strong></div><ul><li><strong>财务主体：</strong>归属的财务组织</li><li><strong>合同号：</strong>唯一标识</li><li><strong>失败原因：</strong>详细错误描述</li></ul><div><em>常见失败场景：</em></div><blockquote>• 被分摊的物料数量均等于0（无可分摊的物料）<br>• 应收总额&lt;0<br>• 对账状态不等于对账成功<br>• 所有物料客户价全部=0<br>• 该合同已生成竣工销售出库单</blockquote>'>21</span>
+                <div class="req-marker relative block" id="req-marker-20-fail">
+                    <span class="req-badge" data-req="20-fail"
+                          data-title="失败详情列表 [20-fail]"
+                          data-content='<div class="req-section-title">失败详情列表 [20-fail]</div><div><strong>显示样式：</strong>表格形式，支持横向滚动</div><div><strong>字段清单：</strong></div><ul><li><strong>财务主体：</strong>归属的财务组织</li><li><strong>合同号：</strong>唯一标识</li><li><strong>失败原因：</strong>详细错误描述</li></ul><div><em>常见失败场景：</em></div><blockquote>• 被分摊的物料数量均等于0（无可分摊的物料）<br>• 应收总额&lt;0<br>• 对账状态不等于对账成功<br>• 所有物料客户价全部=0<br>• 该合同未生成竣工销售出库单</blockquote>'>20-fail</span>
                     <div class="table-wrapper">
                         <h4 class="text-sm font-semibold text-gray-700 mb-3">失败详情列表</h4>
                         <div class="overflow-x-auto">
@@ -461,6 +585,14 @@
                     detailModal.classList.remove('hidden');
                 });
             });
+
+            document.querySelectorAll('.report-query-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    var batchId = e.target.getAttribute('data-batch-id');
+                    console.log('查询批次报告:', batchId);
+                    reportModal.classList.remove('hidden');
+                });
+            });
             
             document.querySelectorAll('.calculate').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -503,6 +635,28 @@
             reportModal.addEventListener('click', (e) => {
                 if (e.target === reportModal) {
                     reportModal.classList.add('hidden');
+                }
+            });
+
+            const addTaskDrawer = document.getElementById('add-task-drawer');
+
+            document.getElementById('add-task-btn').addEventListener('click', () => {
+                addTaskDrawer.classList.remove('hidden');
+                lucide.createIcons();
+            });
+
+            document.getElementById('cancel-add-task').addEventListener('click', () => {
+                addTaskDrawer.classList.add('hidden');
+            });
+
+            document.getElementById('confirm-add-task').addEventListener('click', () => {
+                alert('确认创建计算任务，将按照选择的条件进行核算...');
+                addTaskDrawer.classList.add('hidden');
+            });
+
+            addTaskDrawer.addEventListener('click', (e) => {
+                if (e.target === addTaskDrawer) {
+                    addTaskDrawer.classList.add('hidden');
                 }
             });
         }
