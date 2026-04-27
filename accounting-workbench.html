@@ -11,10 +11,10 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#003eb3',
+                        primary: '#0055ff',
                         secondary: '#e6f0ff',
                         accent: '#ff6b6b',
-                        neutral: '#f5f7fa',
+                        neutral: '#f0f2f5',
                     },
                     borderRadius: {
                         'sm': '4px',
@@ -138,7 +138,7 @@
             margin-bottom: 8px;
         }
         .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
-        .status-green { background-color: #52c41a; }
+        .status-green { background-color: #00b365; }
         .status-red { background-color: #ff4d4f; }
         .status-gray { background-color: #999; }
         .status-blue { background-color: #1890ff; }
@@ -148,339 +148,972 @@
             width: 100%;
             overflow-x: auto;
         }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .detail-tab-content { display: none; }
+        .detail-tab-content.active { display: block; }
+
+        .subject-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background-color: #e6f0ff;
+            color: #0055ff;
+            border: 1px solid #b3d4ff;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 2px;
+        }
+
+        .subject-tag-all {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #d9d9d9;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            width: 280px;
+            background: white;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 4px;
+            z-index: 1000;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .stat-card {
+            background-color: #f8faff;
+            border: 1px solid #e0e8f5;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .metric-card {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .progress-section {
+            background-color: #f8faff;
+            border: 1px solid #e0e8f5;
+            border-radius: 8px;
+            padding: 16px;
+        }
     </style>
 </head>
 <body class="bg-neutral">
     <div class="flex h-screen">
         <div id="sidebar-container"></div>
         <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
-            <div class="space-y-6">
+            <div class="w-full min-h-[1024px] space-y-6">
 
-                <!-- 页面标题 -->
-                <div class="bg-white rounded-lg shadow-sm p-6">
-                    <h1 class="text-xl font-semibold text-gray-800">核算工作台</h1>
-                </div>
-
-                <!-- 业务全局监控区域 [1] -->
-                <div class="bg-white rounded-lg shadow-sm p-6 req-marker relative block" id="req-marker-1">
+                <!-- 顶部标题栏 [1] -->
+                <div class="flex items-start justify-between req-marker relative block" id="req-marker-1">
                     <span class="req-badge" data-req="1"
-                          data-title="需求描述：业务全局监控"
-                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[1] 需求描述：业务全局监控</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>采用卡片式布局展示4个核心指标</li><li>使用渐变色背景区分不同指标类型</li></ul><div class="req-section-title">字段清单</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>会计期间</strong>：取当前会计期间</li><li><strong>本期应核算项目</strong>：按项目类型（整装、软装、设计费）分别展示，区分在建、竣工项目，显示数量和占比</li><li><strong>整体核算进度</strong>：按项目类型分别展示各类型项目的核算完成、核算中数量、未开始的数量及占比</li><li><strong>项目检查通过率</strong>：按项目类型分别展示检查通过数量/同项目类型本期应核算数量</li><li><strong>最近动态</strong>：列表展示最近操作记录</li></ul><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>完工百分比法条件</em>：开工日期不为空且&lt;=当期会计期结束日期 and 合同状态=打开 and 项目类型=整装</li><li><em>完成合同法条件</em>：财务确认竣工日期不为空且&lt;=当期会计期结束日期 and 合同状态=打开 and 项目类型=软装</li><li><em>收款确收法条件</em>：合同状态=打开 and 项目类型=设计费 and 收款净额 ≠ 0</li></ul></div>'>1</span>
+                          data-title="需求描述：顶部标题栏"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[1] 需求描述：顶部标题栏</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>左侧显示页面标题"核算工作台"</li><li>右侧显示会计期间和财务主体选择器</li></ul><div class="req-section-title">字段清单</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>会计期间</strong>：取当前会计期间，只读展示</li><li><strong>财务主体</strong>：复选框下拉列表，支持多选筛选</li></ul><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>默认值</em>：财务主体默认选中"全部主体"</li><li><em>筛选范围</em>：影响全局监控和所有核算模块的数据展示</li></ul></div>'>1</span>
 
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4">业务全局监控</h2>
+                    <h1 class="text-2xl font-bold text-[#003366] mt-1">核算工作台</h1>
 
-                    <!-- 核心指标卡片 -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                        <div class="bg-gradient-to-r from-primary to-blue-600 text-white rounded-lg p-4">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium opacity-80">会计期间</p>
-                                    <h3 class="text-2xl font-bold mt-1">2026-04</h3>
-                                </div>
-                                <i data-lucide="calendar" class="w-8 h-8"></i>
-                            </div>
-                        </div>
-                        <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg p-4">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium opacity-80">本期应核算项目</p>
-                                    <h3 class="text-2xl font-bold mt-1">156</h3>
-                                </div>
-                                <i data-lucide="clipboard-list" class="w-8 h-8"></i>
-                            </div>
-                        </div>
-                        <div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg p-4">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium opacity-80">整体核算进度</p>
-                                    <h3 class="text-2xl font-bold mt-1">78%</h3>
-                                </div>
-                                <i data-lucide="trending-up" class="w-8 h-8"></i>
-                            </div>
-                        </div>
-                        <div class="bg-gradient-to-r from-purple-500 to-violet-600 text-white rounded-lg p-4">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium opacity-80">项目检查通过率</p>
-                                    <h3 class="text-2xl font-bold mt-1">92%</h3>
-                                </div>
-                                <i data-lucide="check-circle" class="w-8 h-8"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- 本期应核算项目统计 -->
-                        <div>
-                            <h3 class="text-md font-medium text-gray-700 mb-3">本期应核算项目统计</h3>
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <table class="min-w-full">
-                                    <thead>
-                                        <tr class="border-b border-gray-200">
-                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">项目类型</th>
-                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">在建</th>
-                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">竣工</th>
-                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">总计</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="border-b border-gray-100">
-                                            <td class="px-2 py-2 text-sm text-gray-700">整装</td>
-                                            <td class="px-2 py-2 text-sm text-gray-700">45</td>
-                                            <td class="px-2 py-2 text-sm text-gray-700">10</td>
-                                            <td class="px-2 py-2 text-sm text-gray-700">55</td>
-                                        </tr>
-                                        <tr class="border-b border-gray-100">
-                                            <td class="px-2 py-2 text-sm text-gray-700">软装</td>
-                                            <td class="px-2 py-2 text-sm text-gray-700">30</td>
-                                            <td class="px-2 py-2 text-sm text-gray-700">48</td>
-                                            <td class="px-2 py-2 text-sm text-gray-700">78</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-2 py-2 text-sm text-gray-700">设计费</td>
-                                            <td class="px-2 py-2 text-sm text-gray-700">15</td>
-                                            <td class="px-2 py-2 text-sm text-gray-700">8</td>
-                                            <td class="px-2 py-2 text-sm text-gray-700">23</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                    <div class="flex space-x-6 items-start">
+                        <!-- 会计期间 [2] -->
+                        <div class="flex items-center space-x-2 mt-1 req-marker inline-block" id="req-marker-2">
+                            <span class="req-badge" data-req="2"
+                                  data-title="需求描述：会计期间"
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[2] 需求描述：会计期间</h3><div class="req-section-title">字段说明</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>字段名称</strong>：会计期间</li><li><strong>数据来源</strong>：取当前会计期间</li><li><strong>控件类型</strong>：只读文本框</li><li><strong>格式示例</strong>：2026-03</li></ul><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>取数逻辑</em>：从系统配置中获取当前活跃的会计期间</li><li><em>交互限制</em>：用户不可修改，仅作信息展示</li></ul></div>'>2</span>
+                            <span class="text-[#666] text-sm">会计期间：</span>
+                            <div class="bg-white border border-[#d9d9d9] rounded px-3 py-1.5 text-sm text-[#333] font-medium">
+                                2026-03
                             </div>
                         </div>
 
-                        <!-- 最近动态 -->
-                        <div>
-                            <h3 class="text-md font-medium text-gray-700 mb-3">最近动态</h3>
-                            <div class="space-y-3">
-                                <div class="border border-gray-200 rounded-lg p-3 flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <i data-lucide="database" class="w-5 h-5 text-green-500 mr-3"></i>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-700">软装计算任务已完成</p>
-                                            <p class="text-xs text-gray-500">请点击查看结果</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-xs text-gray-400">5分钟前</span>
+                        <!-- 财务主体多选 [3] -->
+                        <div class="relative flex items-start space-x-2 mt-1 req-marker inline-block" id="req-marker-3">
+                            <span class="req-badge" data-req="3"
+                                  data-title="需求描述：财务主体多选"
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[3] 需求描述：财务主体多选</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用复选框下拉列表组件</li><li>已选项以标签形式展示，可点击×删除</li><li>支持多选功能</li></ul><div class="req-section-title">字段说明</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>控件类型</strong>：复选框下拉列表（Checkbox Dropdown）</li><li><strong>默认值</strong>：全部主体（显示全部数据）</li><li><strong>可选值</strong>：成都分公司、北京分公司、上海分公司、广州分公司</li><li><strong>交互方式</strong>：支持单选/多选筛选</li></ul><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>筛选范围</em>：影响本期应核算项目统计、各类型核算进度、所有核算模块的明细数据</li><li><em>默认行为</em>：不筛选时展示全部财务主体数据</li><li><em>互斥逻辑</em>：选择具体主体时自动取消"全部主体"；选择"全部主体"时自动清除其他选项</li></ul></div>'>3</span>
+                            <span class="text-[#666] text-sm mt-1.5">财务主体：</span>
+                            <div class="border border-[#d9d9d9] rounded p-1 text-xs min-w-[280px] max-w-[450px] cursor-pointer flex justify-between items-start bg-white subject-dropdown-trigger">
+                                <div class="flex-1 flex flex-wrap gap-1 max-h-[70px] overflow-y-auto pr-2" id="selected-subjects">
+                                    <span class="subject-tag px-2 py-1 rounded flex items-center space-x-1">
+                                        <span>成都分公司</span>
+                                        <span class="cursor-pointer hover:text-red-500 subject-remove" data-value="成都分公司">×</span>
+                                    </span>
+                                    <span class="subject-tag px-2 py-1 rounded flex items-center space-x-1">
+                                        <span>北京分公司</span>
+                                        <span class="cursor-pointer hover:text-red-500 subject-remove" data-value="北京分公司">×</span>
+                                    </span>
+                                    <span class="subject-tag px-2 py-1 rounded flex items-center space-x-1">
+                                        <span>上海分公司</span>
+                                        <span class="cursor-pointer hover:text-red-500 subject-remove" data-value="上海分公司">×</span>
+                                    </span>
+                                    <span class="subject-tag px-2 py-1 rounded flex items-center space-x-1">
+                                        <span>广州分公司</span>
+                                        <span class="cursor-pointer hover:text-red-500 subject-remove" data-value="广州分公司">×</span>
+                                    </span>
                                 </div>
-                                <div class="border border-gray-200 rounded-lg p-3 flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <i data-lucide="refresh-cw" class="w-5 h-5 text-blue-500 mr-3"></i>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-700">软装项目核算任务已完成</p>
-                                            <p class="text-xs text-gray-500">请点击查看结果</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-xs text-gray-400">10分钟前</span>
+                                <span class="text-[#999] text-xs ml-2 px-1 mt-1.5">▼</span>
+                            </div>
+                            <div class="dropdown-menu hidden" id="subject-dropdown">
+                                <div class="px-3 py-2 hover:bg-[#f5f5f5] cursor-pointer flex items-center space-x-2 dropdown-item" data-value="全部主体">
+                                    <input type="checkbox" class="cursor-pointer subject-checkbox" data-value="全部主体" />
+                                    <span class="text-sm text-[#333]">全部主体</span>
                                 </div>
-                                <div class="border border-gray-200 rounded-lg p-3 flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <i data-lucide="scale" class="w-5 h-5 text-purple-500 mr-3"></i>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-700">整装项目核算任务已完成</p>
-                                            <p class="text-xs text-gray-500">请点击查看结果</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-xs text-gray-400">15分钟前</span>
+                                <div class="border-t border-[#f0f0f0] my-1"></div>
+                                <div class="px-3 py-2 hover:bg-[#f5f5f5] cursor-pointer flex items-center space-x-2 dropdown-item" data-value="成都分公司">
+                                    <input type="checkbox" checked class="cursor-pointer subject-checkbox" data-value="成都分公司" />
+                                    <span class="text-sm text-[#333]">成都分公司</span>
+                                </div>
+                                <div class="px-3 py-2 hover:bg-[#f5f5f5] cursor-pointer flex items-center space-x-2 dropdown-item" data-value="北京分公司">
+                                    <input type="checkbox" checked class="cursor-pointer subject-checkbox" data-value="北京分公司" />
+                                    <span class="text-sm text-[#333]">北京分公司</span>
+                                </div>
+                                <div class="px-3 py-2 hover:bg-[#f5f5f5] cursor-pointer flex items-center space-x-2 dropdown-item" data-value="上海分公司">
+                                    <input type="checkbox" checked class="cursor-pointer subject-checkbox" data-value="上海分公司" />
+                                    <span class="text-sm text-[#333]">上海分公司</span>
+                                </div>
+                                <div class="px-3 py-2 hover:bg-[#f5f5f5] cursor-pointer flex items-center space-x-2 dropdown-item" data-value="广州分公司">
+                                    <input type="checkbox" checked class="cursor-pointer subject-checkbox" data-value="广州分公司" />
+                                    <span class="text-sm text-[#333]">广州分公司</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 软装核算向导区域 [2] -->
-                <div class="bg-white rounded-lg shadow-sm p-6 req-marker relative block" id="req-marker-2">
-                    <span class="req-badge" data-req="2"
-                          data-title="需求描述：软装核算向导"
-                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[2] 需求描述：软装核算向导</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用步骤式进度条展示8个核算步骤</li><li>每个步骤显示完成进度和详情表格</li><li>支持展开/折叠详情信息</li></ul><div class="req-section-title">本期核算进度概览（8个步骤）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目</strong>：财务确认竣工日期不为空且&lt;=当期会计期结束日期 and 合同状态=打开 and 项目类型=软装</li><li><strong>软装对账成功进度</strong>：对账成功合同数量/本期应核算项目数量</li><li><strong>软装竣工出库进度</strong>：已出库合同数量/本期应核算项目数量</li><li><strong>软装出库成本获取进度</strong>：已完成出库成本获取合同数量/本期应核算项目数量</li><li><strong>软装工费成本获取进度</strong>：已完成工费成本获取合同数量/本期应核算项目数量</li><li><strong>软装收入分摊计算进度</strong>：已计算合同数量/本期应核算项目数量</li><li><strong>软装项目确认进度</strong>：已确认合同数量/已出库合同数量</li><li><strong>本期核算进度详情</strong>：仅显示未完成合同，包含15个字段</li></ol><div class="req-section-title">快捷入口</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>三方对账及出库</strong>：跳转到三方对账页面</li><li><strong>软装收入分摊</strong>：跳转到收入分摊任务页面</li><li><strong>软装项目收入核算</strong>：跳转到软装项目核算任务页面</li></ul></div>'>2</span>
+                <!-- 业务全局监控区域 [4] -->
+                <div class="bg-white rounded shadow-sm p-6 space-y-6 req-marker relative block" id="req-marker-4">
+                    <span class="req-badge" data-req="4"
+                          data-title="需求描述：业务全局监控"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[4] 需求描述：业务全局监控</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>采用4列网格布局展示核心统计卡片</li><li>使用浅蓝色背景卡片区分不同指标</li><li>下方展示各类型核算进度条</li></ul><div class="req-section-title">字段清单（4个统计卡片）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目总计</strong>：1250个</li><li><strong>整装项目</strong>：800个（占比64%），在建600，竣工200</li><li><strong>软装项目</strong>：350个（占比28%），在建300，竣工50</li><li><strong>设计费项目</strong>：100个（占比8%），在建80，竣工20</li></ol><div class="req-section-title">进度条说明</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>已完成</strong>（绿色）：核算完成的合同数量</li><li><strong>核算中</strong>（蓝色）：正在核算的合同数量</li><li><strong>未开始</strong>（灰色）：尚未开始核算的合同数量</li></ul><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>完工百分比法条件</em>：开工日期不为空且&lt;=当期会计期结束日期 and 合同状态=打开 and 项目类型=整装</li><li><em>完成合同法条件</em>：财务确认竣工日期不为空且&lt;=当期会计期结束日期 and 合同状态=打开 and 项目类型=软装</li><li><em>收款确收法条件</em>：合同状态=打开 and 项目类型=设计费 and 收款净额 ≠ 0</li></ul></div>'>4</span>
 
-                    <h2 class="text-lg font-semibold text-gray-800 mb-6">软装核算向导</h2>
+                    <h2 class="text-lg font-bold text-[#003366] border-l-4 border-[#0055ff] pl-3">业务全局监控</h2>
 
-                    <!-- 核算进度概览 -->
-                    <div class="mb-8">
-                        <h3 class="text-md font-medium text-gray-700 mb-4">本期核算进度概览</h3>
+                    <!-- 统计卡片 -->
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="stat-card">
+                            <div class="text-[#666] text-sm mb-2">本期应核算项目总计</div>
+                            <div class="flex items-end space-x-2">
+                                <span class="text-[28px] font-bold text-[#003366]">1250</span>
+                                <span class="text-sm text-[#666] mb-1">个</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-[#666] text-sm mb-2">整装项目</div>
+                            <div class="flex items-end space-x-2">
+                                <span class="text-[28px] font-bold text-[#003366]">800</span>
+                                <span class="text-sm text-[#666] mb-1">个</span>
+                                <span class="text-sm text-primary bg-secondary px-2 py-0.5 rounded mb-1">64%</span>
+                            </div>
+                            <div class="text-xs text-[#888] mt-2 flex space-x-4">
+                                <span>在建: 600</span>
+                                <span>竣工: 200</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-[#666] text-sm mb-2">软装项目</div>
+                            <div class="flex items-end space-x-2">
+                                <span class="text-[28px] font-bold text-[#003366]">350</span>
+                                <span class="text-sm text-[#666] mb-1">个</span>
+                                <span class="text-sm text-primary bg-secondary px-2 py-0.5 rounded mb-1">28%</span>
+                            </div>
+                            <div class="text-xs text-[#888] mt-2 flex space-x-4">
+                                <span>在建: 300</span>
+                                <span>竣工: 50</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-[#666] text-sm mb-2">设计费项目</div>
+                            <div class="flex items-end space-x-2">
+                                <span class="text-[28px] font-bold text-[#003366]">100</span>
+                                <span class="text-sm text-[#666] mb-1">个</span>
+                                <span class="text-sm text-primary bg-secondary px-2 py-0.5 rounded mb-1">8%</span>
+                            </div>
+                            <div class="text-xs text-[#888] mt-2 flex space-x-4">
+                                <span>在建: 80</span>
+                                <span>竣工: 20</span>
+                            </div>
+                        </div>
+                    </div>
 
-                        <!-- 步骤进度条 -->
-                        <div class="space-y-4">
-                            <!-- 步骤1 -->
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center">
-                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-green-500 text-white text-xs font-bold rounded-full mr-3">1</span>
-                                        <span class="text-sm font-medium text-gray-700">本期应核算项目</span>
-                                    </div>
-                                    <span class="text-sm text-gray-600">78 个项目</span>
+                    <!-- 各类型核算进度 -->
+                    <div class="progress-section">
+                        <h3 class="text-sm font-bold text-[#333] mb-4">各类型核算进度</h3>
+                        <div class="flex flex-col space-y-4">
+                            <!-- 整装进度 -->
+                            <div class="flex items-center text-xs">
+                                <div class="w-[60px] text-[#666]">整装</div>
+                                <div class="flex-1 h-3 bg-[#e8e8e8] rounded-full overflow-hidden flex">
+                                    <div class="bg-[#00b365] h-full" style="width: 50%" title="已完成 400"></div>
+                                    <div class="bg-[#1890ff] h-full" style="width: 37.5%" title="核算中 300"></div>
+                                    <div class="bg-[#f0f2f5] h-full" style="width: 12.5%" title="未开始 100"></div>
                                 </div>
-                                <div class="ml-9">
-                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div>
+                                <div class="w-[180px] flex justify-between ml-4 text-[#888]">
+                                    <span class="text-[#00b365]">已完成: 400</span>
+                                    <span class="text-[#1890ff]">核算中: 300</span>
+                                    <span>未开始: 100</span>
+                                </div>
+                            </div>
+
+                            <!-- 软装进度 -->
+                            <div class="flex items-center text-xs">
+                                <div class="w-[60px] text-[#666]">软装</div>
+                                <div class="flex-1 h-3 bg-[#e8e8e8] rounded-full overflow-hidden flex">
+                                    <div class="bg-[#00b365] h-full" style="width: 42.86%" title="已完成 150"></div>
+                                    <div class="bg-[#1890ff] h-full" style="width: 42.86%" title="核算中 150"></div>
+                                    <div class="bg-[#f0f2f5] h-full" style="width: 14.28%" title="未开始 50"></div>
+                                </div>
+                                <div class="w-[180px] flex justify-between ml-4 text-[#888]">
+                                    <span class="text-[#00b365]">已完成: 150</span>
+                                    <span class="text-[#1890ff]">核算中: 150</span>
+                                    <span>未开始: 50</span>
+                                </div>
+                            </div>
+
+                            <!-- 设计费进度 -->
+                            <div class="flex items-center text-xs">
+                                <div class="w-[60px] text-[#666]">设计费</div>
+                                <div class="flex-1 h-3 bg-[#e8e8e8] rounded-full overflow-hidden flex">
+                                    <div class="bg-[#00b365] h-full" style="width: 80%" title="已完成 80"></div>
+                                    <div class="bg-[#1890ff] h-full" style="width: 10%" title="核算中 10"></div>
+                                    <div class="bg-[#f0f2f5] h-full" style="width: 10%" title="未开始 10"></div>
+                                </div>
+                                <div class="w-[180px] flex justify-between ml-4 text-[#888]">
+                                    <span class="text-[#00b365]">已完成: 80</span>
+                                    <span class="text-[#1890ff]">核算中: 10</span>
+                                    <span>未开始: 10</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 核算模块区域 [5] -->
+                <div class="bg-white rounded shadow-sm p-4 req-marker relative block" id="req-marker-5">
+                    <span class="req-badge" data-req="5"
+                          data-title="需求描述：核算模块Tab切换"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[5] 需求描述：核算模块Tab切换</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用Tab标签页切换三种核算类型</li><li>激活状态：蓝色文字+底部蓝色边框</li><li>未激活状态：灰色文字，hover变蓝</li></ul><div class="req-section-title">Tab列表</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>软装核算</strong>：包含7个步骤指标、3个快捷入口、2个明细页签</li><li><strong>整装核算</strong>：包含2个步骤指标、1个快捷入口、2个明细页签</li><li><strong>设计费核算</strong>：包含2个步骤指标、1个快捷入口、2个明细页签</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>默认激活</em>：页面加载时默认显示"软装核算"Tab</li><li><em>数据联动</em>：Tab切换不影响上方全局监控数据</li></ul></div>'>5</span>
+
+                    <!-- Tab导航 -->
+                    <div class="flex border-b border-[#e8e8e8] mb-6">
+                        <div class="tab-item px-6 py-3 cursor-pointer text-base font-medium transition-colors text-primary border-b-2 border-primary active" data-tab="ruanzhuang">
+                            软装核算
+                        </div>
+                        <div class="tab-item px-6 py-3 cursor-pointer text-base font-medium transition-colors text-[#666] hover:text-primary" data-tab="zhengzhuang">
+                            整装核算
+                        </div>
+                        <div class="tab-item px-6 py-3 cursor-pointer text-base font-medium transition-colors text-[#666] hover:text-primary" data-tab="shejifei">
+                            设计费核算
+                        </div>
+                    </div>
+
+                    <!-- 软装核算内容 [6] -->
+                    <div class="tab-content active" id="tab-ruanzhuang">
+                        <div class="space-y-6 req-marker relative w-full" id="req-marker-6" style="display: block !important;">
+                            <span class="req-badge" data-req="6"
+                                  data-title="需求描述：软装核算"
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[6] 需求描述：软装核算</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>分为三个区域：指标概览、快捷步骤、明细表格</li><li>使用浅蓝色背景卡片统一风格</li></ul><div class="req-section-title">指标概览（7个指标卡片）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目</strong>：350个</li><li><strong>对账成功</strong>：300个，进度85.7%</li><li><strong>竣工出库</strong>：280个，进度80.0%</li><li><strong>出库成本获取</strong>：280个，进度80.0%</li><li><strong>工费成本获取</strong>：250个，进度71.4%</li><li><strong>收入分摊计算</strong>：200个，进度57.1%</li><li><strong>软装项目确认</strong>：150个，进度42.8%</li></ol><div class="req-section-title">整体核算进度</div><p style="line-height: 1.8;"><em>进度 = 已确认/本期应核算 = 150/350 = 42.8%</em></p><div class="req-section-title">快捷步骤（3个按钮）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>三方对账与出库</strong>：跳转到三方对账页面</li><li><strong>软装收入分摊</strong>：跳转到收入分摊任务页面</li><li><strong>软装项目收入核算</strong>：跳转到软装项目核算任务页面（含出库成本、工费成本获取）</li></ol><div class="req-section-title">明细页签</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期核算进度详情</strong>：15列表格，含筛选功能（完成状态、合同号）</li><li><strong>本期单据生成详情</strong>：12列表格，展示单据流转情况</li></ol><div class="req-section-title">取数逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>核算方法</strong>：完成合同法</li><li><strong>条件</strong>：财务确认竣工日期不为空且&lt;=当期会计期结束日期 and 合同状态=打开 and 项目类型=软装</li></ul></div>'>6</span>
+
+                            <!-- 软装指标概览 -->
+                            <div class="progress-section">
+                                <h3 class="text-sm font-bold text-[#003366] mb-4">软装核算进度概览</h3>
+                                <div class="flex space-x-2 mb-4">
+                                    <div class="metric-card flex-1">
+                                        <div class="text-[#666] text-xs mb-1">本期应核算项目</div>
+                                        <div class="text-[#333] text-xl font-bold">350<span class="text-xs font-normal">个</span></div>
+                                    </div>
+                                    <div class="metric-card flex-1">
+                                        <div class="text-[#666] text-xs mb-1">对账成功</div>
+                                        <div class="text-[#333] text-xl font-bold">300<span class="text-xs font-normal">个</span></div>
+                                        <div class="text-primary text-xs mt-1">进度 85.7%</div>
+                                    </div>
+                                    <div class="metric-card flex-1">
+                                        <div class="text-[#666] text-xs mb-1">竣工出库</div>
+                                        <div class="text-[#333] text-xl font-bold">280<span class="text-xs font-normal">个</span></div>
+                                        <div class="text-primary text-xs mt-1">进度 80.0%</div>
+                                    </div>
+                                    <div class="metric-card flex-1">
+                                        <div class="text-[#666] text-xs mb-1">出库成本获取</div>
+                                        <div class="text-[#333] text-xl font-bold">280<span class="text-xs font-normal">个</span></div>
+                                        <div class="text-primary text-xs mt-1">进度 80.0%</div>
+                                    </div>
+                                    <div class="metric-card flex-1">
+                                        <div class="text-[#666] text-xs mb-1">工费成本获取</div>
+                                        <div class="text-[#333] text-xl font-bold">250<span class="text-xs font-normal">个</span></div>
+                                        <div class="text-primary text-xs mt-1">进度 71.4%</div>
+                                    </div>
+                                    <div class="metric-card flex-1">
+                                        <div class="text-[#666] text-xs mb-1">收入分摊计算</div>
+                                        <div class="text-[#333] text-xl font-bold">200<span class="text-xs font-normal">个</span></div>
+                                        <div class="text-primary text-xs mt-1">进度 57.1%</div>
+                                    </div>
+                                    <div class="metric-card flex-1">
+                                        <div class="text-[#666] text-xs mb-1">软装项目确认</div>
+                                        <div class="text-[#333] text-xl font-bold">150<span class="text-xs font-normal">个</span></div>
+                                        <div class="text-primary text-xs mt-1">进度 42.8%</div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <div class="text-xs text-[#666]">整体核算进度</div>
+                                    <div class="h-2 bg-[#e8e8e8] rounded-full overflow-hidden w-full">
+                                        <div class="bg-primary h-full" style="width: 42.8%"></div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- 步骤2 -->
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center">
-                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-green-500 text-white text-xs font-bold rounded-full mr-3">2</span>
-                                        <span class="text-sm font-medium text-gray-700">软装对账成功进度</span>
-                                    </div>
-                                    <span class="text-sm text-gray-600">72/78 (92%)</span>
-                                </div>
-                                <div class="ml-9">
-                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div class="bg-green-500 h-2 rounded-full" style="width: 92%"></div>
-                                    </div>
+                            <!-- 快捷核算步骤 -->
+                            <div class="progress-section">
+                                <h3 class="text-sm font-bold text-[#003366] mb-4">核算步骤与快捷入口</h3>
+                                <div class="flex space-x-4 items-center">
+                                    <button id="btn-three-way-reconciliation" class="bg-[#1890ff] text-white px-4 py-2 rounded text-sm hover:bg-primary transition-colors cursor-pointer">三方对账与出库</button>
+                                    <span class="text-[#ccc]">→</span>
+                                    <button id="btn-revenue-allocation" class="bg-[#1890ff] text-white px-4 py-2 rounded text-sm hover:bg-primary transition-colors cursor-pointer">软装收入分摊</button>
+                                    <span class="text-[#ccc]">→</span>
+                                    <button id="btn-project-accounting" class="bg-[#1890ff] text-white px-4 py-2 rounded text-sm hover:bg-primary transition-colors cursor-pointer">软装项目收入核算</button>
                                 </div>
                             </div>
 
-                            <!-- 步骤3 -->
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center">
-                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-green-500 text-white text-xs font-bold rounded-full mr-3">3</span>
-                                        <span class="text-sm font-medium text-gray-700">软装竣工出库进度</span>
+                            <!-- 明细页签区 -->
+                            <div class="bg-white border border-[#e8e8e8] rounded">
+                                <div class="flex border-b border-[#e8e8e8] bg-[#fafafa]">
+                                    <div class="detail-tab-item px-4 py-3 cursor-pointer text-sm font-medium text-primary bg-white border-t-2 border-t-primary border-x border-x-[#e8e8e8] -mb-[1px] active" data-detail-tab="ruanzhuang-progress">
+                                        本期核算进度详情
                                     </div>
-                                    <span class="text-sm text-gray-600">70/78 (90%)</span>
-                                </div>
-                                <div class="ml-9">
-                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div class="bg-green-500 h-2 rounded-full" style="width: 90%"></div>
+                                    <div class="detail-tab-item px-4 py-3 cursor-pointer text-sm font-medium text-[#666] hover:text-primary" data-detail-tab="ruanzhuang-documents">
+                                        本期单据生成详情
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- 步骤4 -->
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center">
-                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-yellow-500 text-white text-xs font-bold rounded-full mr-3">4</span>
-                                        <span class="text-sm font-medium text-gray-700">软装出库成本获取进度</span>
+                                <div class="p-4">
+                                    <!-- 核算进度详情表格 -->
+                                    <div class="detail-tab-content active" id="detail-tab-ruanzhuang-progress">
+                                        <div class="space-y-4">
+                                            <!-- 筛选条件区 [9] -->
+                                            <div class="bg-[#f8faff] p-3 rounded border border-[#e0e8f5] req-marker relative inline-block w-full" id="req-marker-9" style="display: block;">
+                                                <span class="req-badge" data-req="9"
+                                                      data-title="需求描述：本期核算进度详情筛选"
+                                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[9] 需求描述：本期核算进度详情筛选</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用浅蓝色背景卡片包裹筛选条件</li><li>横向排列多个筛选项</li></ul><div class="req-section-title">筛选字段清单（4个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>对账状态</strong>：下拉选择（全部/对账成功/对账失败/未对账）</li><li><strong>出库状态</strong>：下拉选择（全部/已出库/未出库）</li><li><strong>完成状态</strong>：下拉选择（全部/已完成/未完成）</li><li><strong>合同号</strong>：文本输入框，支持模糊查询</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>多条件组合</em>：支持多条件AND组合筛选</li><li><em>实时过滤</em>：输入/选择后实时过滤表格数据</li></ul></div>'>9</span>
+                                                <div class="flex items-center flex-wrap gap-4">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">对账状态:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="success">对账成功</option>
+                                                            <option value="fail">对账失败</option>
+                                                            <option value="pending">未对账</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">出库状态:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="shipped">已出库</option>
+                                                            <option value="not_shipped">未出库</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">完成状态:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="1">已完成</option>
+                                                            <option value="0">未完成</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">合同号:</span>
+                                                        <input type="text" placeholder="请输入合同号" class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none w-[200px]" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="table-wrapper">
+                                                <table class="w-[1600px] text-left border-collapse text-xs">
+                                                    <thead>
+                                                        <tr class="bg-[#f0f2f5] text-[#333]">
+                                                            <th class="p-2 border border-[#e8e8e8]">财务主体</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">合同号</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">对账状态</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">对账时间</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">出库状态</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">出库时间</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">出库成本获取状态</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">出库成本获取时间</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">工费成本获取状态</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">工费成本获取时间</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">软装项目计算状态</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">软装项目计算时间</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">软装项目确认状态</th>
+                                                            <th class="p-2 border border-[#e8e8e8]">软装项目确认时间</th>
+                                                            <th class="p-2 border border-[#e8e8e8] text-center w-[80px]">完成状态</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="hover:bg-[#f9fafc]">
+                                                            <td class="p-2 border border-[#e8e8e8]">成都分公司</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000001</td>
+                                                            <td class="p-2 border border-[#e8e8e8]">对账成功</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 09:00:00</td>
+                                                            <td class="p-2 border border-[#e8e8e8]">已出库</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
+                                                            <td class="p-2 border border-[#e8e8e8]">已获取</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
+                                                            <td class="p-2 border border-[#e8e8e8]">已获取</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
+                                                            <td class="p-2 border border-[#e8e8e8]">已计算</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 18:00:00</td>
+                                                            <td class="p-2 border border-[#e8e8e8]">已确认</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 20:00:00</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-center">✅</td>
+                                                        </tr>
+                                                        <tr class="hover:bg-[#f9fafc]">
+                                                            <td class="p-2 border border-[#e8e8e8]">成都分公司</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000002</td>
+                                                            <td class="p-2 border border-[#e8e8e8]">对账成功</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 09:00:00</td>
+                                                            <td class="p-2 border border-[#e8e8e8]">已出库</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
+                                                            <td class="p-2 border border-[#e8e8e8]">已获取</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
+                                                            <td class="p-2 border border-[#e8e8e8]">已获取</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
+                                                            <td class="p-2 border border-[#e8e8e8]">已计算</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 18:00:00</td>
+                                                            <td class="p-2 border border-[#e8e8e8]">未确认</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-[#888]">-</td>
+                                                            <td class="p-2 border border-[#e8e8e8] text-center">❌</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <span class="text-sm text-gray-600">68/78 (87%)</span>
-                                </div>
-                                <div class="ml-9">
-                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 87%"></div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- 步骤5 -->
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center">
-                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-yellow-500 text-white text-xs font-bold rounded-full mr-3">5</span>
-                                        <span class="text-sm font-medium text-gray-700">软装工费成本获取进度</span>
-                                    </div>
-                                    <span class="text-sm text-gray-600">68/78 (87%)</span>
-                                </div>
-                                <div class="ml-9">
-                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 87%"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 步骤6 -->
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center">
-                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-blue-500 text-white text-xs font-bold rounded-full mr-3">6</span>
-                                        <span class="text-sm font-medium text-gray-700">软装收入分摊计算进度</span>
-                                    </div>
-                                    <span class="text-sm text-gray-600">65/78 (83%)</span>
-                                </div>
-                                <div class="ml-9">
-                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div class="bg-blue-500 h-2 rounded-full" style="width: 83%"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 步骤7 -->
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center">
-                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-blue-500 text-white text-xs font-bold rounded-full mr-3">7</span>
-                                        <span class="text-sm font-medium text-gray-700">软装项目确认进度</span>
-                                    </div>
-                                    <span class="text-sm text-gray-600">62/70 (89%)</span>
-                                </div>
-                                <div class="ml-9">
-                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div class="bg-blue-500 h-2 rounded-full" style="width: 89%"></div>
+                                    <!-- 单据生成详情表格 -->
+                                    <div class="detail-tab-content" id="detail-tab-ruanzhuang-documents">
+                                        <div class="space-y-4">
+                                            <!-- 筛选条件区 [10] -->
+                                            <div class="bg-[#f8faff] p-3 rounded border border-[#e0e8f5] req-marker relative inline-block w-full" id="req-marker-10" style="display: block;">
+                                                <span class="req-badge" data-req="10"
+                                                      data-title="需求描述：本期单据生成详情筛选"
+                                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[10] 需求描述：本期单据生成详情筛选</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用浅蓝色背景卡片包裹筛选条件</li><li>横向排列多个筛选项，支持换行</li></ul><div class="req-section-title">筛选字段清单（7个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>合同号</strong>：文本输入框，支持模糊查询</li><li><strong>来源单据</strong>：下拉选择（全部/三方对账单等）</li><li><strong>来源单据编号</strong>：文本输入框，支持模糊查询</li><li><strong>目标单据</strong>：下拉选择（全部/销售出库单等）</li><li><strong>目标单据编号</strong>：文本输入框，支持模糊查询</li><li><strong>同步EBS状态</strong>：下拉选择（全部/已同步/未同步/同步失败）</li><li><strong>同步KD状态</strong>：下拉选择（全部/已同步/未同步/同步失败）</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>多条件组合</em>：支持多条件AND组合筛选</li><li><em>实时过滤</em>：输入/选择后实时过滤表格数据</li></ul></div>'>10</span>
+                                                <div class="flex items-center flex-wrap gap-4">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">合同号:</span>
+                                                        <input type="text" placeholder="请输入合同号" class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none w-[180px]" />
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">来源单据:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="三方对账单">三方对账单</option>
+                                                            <option value="其他">其他</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">来源单据编号:</span>
+                                                        <input type="text" placeholder="请输入编号" class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none w-[180px]" />
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">目标单据:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="销售出库单">销售出库单</option>
+                                                            <option value="应收单">应收单</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">目标单据编号:</span>
+                                                        <input type="text" placeholder="请输入编号" class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none w-[180px]" />
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">同步EBS状态:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="synced">已同步</option>
+                                                            <option value="not_synced">未同步</option>
+                                                            <option value="failed">同步失败</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">同步KD状态:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="synced">已同步</option>
+                                                            <option value="not_synced">未同步</option>
+                                                            <option value="failed">同步失败</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="table-wrapper">
+                                            <table class="w-[1400px] text-left border-collapse text-xs">
+                                                <thead>
+                                                    <tr class="bg-[#f0f2f5] text-[#333]">
+                                                        <th class="p-2 border border-[#e8e8e8]">财务主体</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">合同号</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">来源单据</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">来源单据编号</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">目标单据生成节点</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">目标单据</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">目标单据编号</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">目标单据生成时间</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">同步EBS状态</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">同步EBS时间</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">同步KD状态</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">同步KD时间</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="hover:bg-[#f9fafc]">
+                                                        <td class="p-2 border border-[#e8e8e8]">成都分公司</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000001</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">三方对账单</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">RZ901000001-20260301</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">对账成功</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">销售出库单</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">XSCKD000001</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">
+                                                            <span class="text-[#faad14]">未同步</span>
+                                                        </td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">
+                                                            <span class="text-[#00b365]">已同步</span>
+                                                        </td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 18:00:00</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 软装核算和整装核算进度 -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <!-- 软装核算进度 [3] -->
-                        <div class="border border-gray-200 rounded-lg p-4 req-marker relative inline-block" id="req-marker-3">
-                            <span class="req-badge" data-req="3"
-                                  data-title="需求描述：软装核算进度"
-                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[3] 需求描述：软装核算进度</h3><div class="req-section-title">计算公式</div><p style="line-height: 1.8;"><em>软装核算进度 = （本期应核算项目中软装项目核算状态=已确认的合同数量 / 本期应核算项目数量）* 100</em></p><div class="req-section-title">标准核算步骤及快捷入口</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>三方对账及出库</strong><br/>进度：对账成功合同数量/本期应核算项目数量<br/>按钮：跳转到三方对账页面</li><li><strong>软装收入分摊</strong><br/>进度：已计算合同数量/本期应核算项目数量<br/>按钮：跳转到收入分摊任务页面</li><li><strong>软装项目收入核算</strong><br/>进度：已确认合同数量/已出库合同数量<br/>按钮：跳转到软装项目核算任务页面<br/><em>注：核算前就包含了出库成本的获取，工费成本的获取</em></li></ol></div>'>3</span>
+                    <!-- 整装核算内容 [7] -->
+                    <div class="tab-content" id="tab-zhengzhuang">
+                        <div class="space-y-6 req-marker relative w-full" id="req-marker-7" style="display: block !important;">
+                            <span class="req-badge" data-req="7"
+                                  data-title="需求描述：整装核算"
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[7] 需求描述：整装核算</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>分为三个区域：指标概览、快捷步骤、明细表格</li><li>使用浅蓝色背景卡片统一风格</li></ul><div class="req-section-title">指标概览（2个指标卡片）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目</strong>：800个</li><li><strong>整装项目确认</strong>：400个，进度50.0%</li></ol><div class="req-section-title">整体核算进度</div><p style="line-height: 1.8;"><em>进度 = 已确认/本期应核算 = 400/800 = 50.0%</em></p><div class="req-section-title">快捷步骤（1个按钮）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>整装项目收入核算</strong>：跳转到整装项目收入核算任务页面（含出库成本、工费成本获取）</li></ol><div class="req-section-title">明细页签</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期单据生成详情</strong>：7列表格，含筛选功能</li><li><strong>本期单据同步详情</strong>：12列表格，展示EBS/KD同步状态</li></ol><div class="req-section-title">取数逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>核算方法</strong>：完工百分比法</li><li><strong>条件</strong>：开工日期不为空且&lt;=当期会计期结束日期 and 合同状态=打开 and 项目类型=整装</li></ul></div>'>7</span>
 
-                            <h4 class="text-md font-medium text-gray-700 mb-3">软装核算进度</h4>
-                            <div class="mb-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm text-gray-600">当前进度</span>
-                                    <span class="text-sm font-semibold text-primary">80%</span>
+                            <!-- 整装指标概览 -->
+                            <div class="progress-section">
+                                <h3 class="text-sm font-bold text-[#003366] mb-4">整装核算进度概览</h3>
+                                <div class="flex space-x-4 mb-4">
+                                    <div class="metric-card w-[200px]">
+                                        <div class="text-[#666] text-xs mb-2">本期应核算项目</div>
+                                        <div class="text-[#333] text-2xl font-bold">800<span class="text-xs font-normal"> 个</span></div>
+                                    </div>
+                                    <div class="metric-card w-[200px]">
+                                        <div class="text-[#666] text-xs mb-2">整装项目确认</div>
+                                        <div class="text-[#333] text-2xl font-bold">400<span class="text-xs font-normal"> 个</span></div>
+                                        <div class="text-primary text-xs mt-1">进度 50.0%</div>
+                                    </div>
                                 </div>
-                                <div class="w-full bg-gray-200 rounded-full h-3">
-                                    <div class="bg-gradient-to-r from-primary to-blue-500 h-3 rounded-full transition-all duration-500" style="width: 80%"></div>
+                                <div class="flex flex-col space-y-2">
+                                    <div class="text-xs text-[#666]">整体核算进度</div>
+                                    <div class="h-2 bg-[#e8e8e8] rounded-full overflow-hidden w-[416px]">
+                                        <div class="bg-primary h-full" style="width: 50%"></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="space-y-2">
-                                <a href="soft-accounting.html" class="flex items-center justify-between p-2 hover:bg-gray-50 rounded border border-gray-200">
-                                    <div class="flex items-center">
-                                        <i data-lucide="arrow-right-circle" class="w-4 h-4 text-primary mr-2"></i>
-                                        <span class="text-sm text-gray-700">三方对账及出库</span>
+
+                            <!-- 快捷核算步骤 -->
+                            <div class="progress-section">
+                                <h3 class="text-sm font-bold text-[#003366] mb-4">整装核算步骤与快捷入口</h3>
+                                <button class="bg-[#1890ff] text-white px-4 py-2 rounded text-sm hover:bg-primary transition-colors">
+                                    整装项目收入核算
+                                </button>
+                            </div>
+
+                            <!-- 明细页签区 -->
+                            <div class="bg-white border border-[#e8e8e8] rounded">
+                                <div class="flex border-b border-[#e8e8e8] bg-[#fafafa]">
+                                    <div class="detail-tab-item zhengzhuang-detail px-4 py-3 cursor-pointer text-sm font-medium text-primary bg-white border-t-2 border-t-primary border-x border-x-[#e8e8e8] -mb-[1px] active" data-detail-tab="zhengzhuang-generate">
+                                        本期单据生成详情
                                     </div>
-                                    <span class="text-xs text-gray-500">92%</span>
-                                </a>
-                                <a href="soft-accounting.html" class="flex items-center justify-between p-2 hover:bg-gray-50 rounded border border-gray-200">
-                                    <div class="flex items-center">
-                                        <i data-lucide="arrow-right-circle" class="w-4 h-4 text-primary mr-2"></i>
-                                        <span class="text-sm text-gray-700">软装收入分摊</span>
+                                    <div class="detail-tab-item zhengzhuang-detail px-4 py-3 cursor-pointer text-sm font-medium text-[#666] hover:text-primary" data-detail-tab="zhengzhuang-sync">
+                                        本期单据同步详情
                                     </div>
-                                    <span class="text-xs text-gray-500">83%</span>
-                                </a>
-                                <a href="soft-accounting.html" class="flex items-center justify-between p-2 hover:bg-gray-50 rounded border border-gray-200">
-                                    <div class="flex items-center">
-                                        <i data-lucide="arrow-right-circle" class="w-4 h-4 text-primary mr-2"></i>
-                                        <span class="text-sm text-gray-700">软装项目收入核算</span>
+                                </div>
+
+                                <div class="p-4">
+                                    <!-- 生成详情 -->
+                                    <div class="detail-tab-content active" id="detail-tab-zhengzhuang-generate">
+                                        <div class="space-y-4">
+                                            <!-- 筛选条件区 [11] -->
+                                            <div class="bg-[#f8faff] p-3 rounded border border-[#e0e8f5] req-marker relative inline-block w-full" id="req-marker-11" style="display: block;">
+                                                <span class="req-badge" data-req="11"
+                                                      data-title="需求描述：整装核算-本期单据生成详情筛选"
+                                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[11] 需求描述：整装核算-本期单据生成详情筛选</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用浅蓝色背景卡片包裹筛选条件</li><li>横向排列多个筛选项</li></ul><div class="req-section-title">筛选字段清单（2个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>完成状态</strong>：下拉选择（全部/已完成/未完成）</li><li><strong>合同号</strong>：文本输入框，支持模糊查询</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>多条件组合</em>：支持多条件AND组合筛选</li><li><em>实时过滤</em>：输入/选择后实时过滤表格数据</li></ul></div>'>11</span>
+                                                <div class="flex items-center flex-wrap gap-4">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">完成状态:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="1">已完成</option>
+                                                            <option value="0">未完成</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">合同号:</span>
+                                                        <input type="text" placeholder="请输入合同号" class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none w-[200px]" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="table-wrapper">
+                                            <table class="w-full text-left border-collapse text-xs">
+                                                <thead>
+                                                    <tr class="bg-[#f0f2f5] text-[#333]">
+                                                        <th class="p-2 border border-[#e8e8e8]">财务主体</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">合同号</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">整装项目计算状态</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">整装项目计算时间</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">整装项目确认状态</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">整装项目确认时间</th>
+                                                        <th class="p-2 border border-[#e8e8e8] text-center w-[80px]">完成状态</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="hover:bg-[#f9fafc]">
+                                                        <td class="p-2 border border-[#e8e8e8]">成都分公司</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">ZZ901000001</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">已计算</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 18:00:00</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">已确认</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 20:00:00</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-center">✅</td>
+                                                    </tr>
+                                                    <tr class="hover:bg-[#f9fafc]">
+                                                        <td class="p-2 border border-[#e8e8e8]">成都分公司</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">ZZ901000002</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">已计算</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 18:00:00</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">未确认</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">-</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-center">❌</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <span class="text-xs text-gray-500">89%</span>
-                                </a>
+
+                                    <!-- 同步详情 -->
+                                    <div class="detail-tab-content" id="detail-tab-zhengzhuang-sync">
+                                        <div class="space-y-4">
+                                            <!-- 筛选条件区 [12] -->
+                                            <div class="bg-[#f8faff] p-3 rounded border border-[#e0e8f5] req-marker relative inline-block w-full" id="req-marker-12" style="display: block;">
+                                                <span class="req-badge" data-req="12"
+                                                      data-title="需求描述：整装核算-本期单据同步详情筛选"
+                                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[12] 需求描述：整装核算-本期单据同步详情筛选</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用浅蓝色背景卡片包裹筛选条件</li><li>横向排列多个筛选项，支持换行</li></ul><div class="req-section-title">筛选字段清单（7个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>合同号</strong>：文本输入框，支持模糊查询</li><li><strong>来源单据</strong>：下拉选择（全部/整装项目核算单等）</li><li><strong>来源单据编号</strong>：文本输入框，支持模糊查询</li><li><strong>目标单据</strong>：下拉选择（全部/应收单等）</li><li><strong>目标单据编号</strong>：文本输入框，支持模糊查询</li><li><strong>同步EBS状态</strong>：下拉选择（全部/已同步/未同步/同步失败）</li><li><strong>同步KD状态</strong>：下拉选择（全部/已同步/未同步/同步失败）</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>多条件组合</em>：支持多条件AND组合筛选</li><li><em>实时过滤</em>：输入/选择后实时过滤表格数据</li></ul></div>'>12</span>
+                                                <div class="flex items-center flex-wrap gap-4">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">合同号:</span>
+                                                        <input type="text" placeholder="请输入合同号" class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none w-[180px]" />
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">来源单据:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="整装项目核算单">整装项目核算单</option>
+                                                            <option value="其他">其他</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">来源单据编号:</span>
+                                                        <input type="text" placeholder="请输入编号" class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none w-[180px]" />
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">目标单据:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="应收单">应收单</option>
+                                                            <option value="其他">其他</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">目标单据编号:</span>
+                                                        <input type="text" placeholder="请输入编号" class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none w-[180px]" />
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">同步EBS状态:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="synced">已同步</option>
+                                                            <option value="not_synced">未同步</option>
+                                                            <option value="failed">同步失败</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">同步KD状态:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="synced">已同步</option>
+                                                            <option value="not_synced">未同步</option>
+                                                            <option value="failed">同步失败</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="table-wrapper">
+                                            <table class="w-full text-left border-collapse text-xs min-w-[1200px]">
+                                                <thead>
+                                                    <tr class="bg-[#f0f2f5] text-[#333]">
+                                                        <th class="p-2 border border-[#e8e8e8]">财务主体</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">合同号</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">来源单据</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">来源单据编号</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">目标单据生成节点</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">目标单据</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">目标单据编号</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">目标单据生成时间</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">同步EBS状态</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">同步EBS时间</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">同步KD状态</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">同步KD时间</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="hover:bg-[#f9fafc]">
+                                                        <td class="p-2 border border-[#e8e8e8]">成都分公司</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">ZZ901000001</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">整装项目核算单</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">ZZ901000001-20260301</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">项目核算收入确认</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">应收单</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">AR20260199</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">
+                                                            <span class="text-[#00b365]">已同步</span>
+                                                        </td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">
+                                                            <span class="text-[#faad14]">未同步</span>
+                                                        </td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 18:00:00</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- 整装核算进度 [4] -->
-                        <div class="border border-gray-200 rounded-lg p-4 req-marker relative inline-block" id="req-marker-4">
-                            <span class="req-badge" data-req="4"
-                                  data-title="需求描述：整装核算进度"
-                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[4] 需求描述：整装核算进度</h3><div class="req-section-title">计算公式</div><p style="line-height: 1.8;"><em>整装核算进度 = （本期应核算项目中整装项目核算状态=已确认的合同数量 / 本期应核算项目数量）* 100</em></p><div class="req-section-title">标准核算步骤及快捷入口</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>整装项目收入核算</strong><br/>按钮：跳转到整装项目收入核算任务页面</li></ol></div>'>4</span>
+                    <!-- 设计费核算内容 [8] -->
+                    <div class="tab-content" id="tab-shejifei">
+                        <div class="space-y-6 req-marker relative w-full" id="req-marker-8" style="display: block !important;">
+                            <span class="req-badge" data-req="8"
+                                  data-title="需求描述：设计费核算"
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[8] 需求描述：设计费核算</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>分为三个区域：指标概览、快捷步骤、明细表格</li><li>使用浅蓝色背景卡片统一风格</li></ul><div class="req-section-title">指标概览（2个指标卡片）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目</strong>：100个</li><li><strong>设计费项目确认</strong>：80个，进度80.0%</li></ol><div class="req-section-title">整体核算进度</div><p style="line-height: 1.8;"><em>进度 = 已确认/本期应核算 = 80/100 = 80.0%</em></p><div class="req-section-title">快捷步骤（1个按钮）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>设计费项目收入核算</strong>：跳转到设计费项目核算任务页面</li></ol><div class="req-section-title">明细页签</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期单据生成详情</strong>：7列表格，含筛选功能</li><li><strong>本期单据同步详情</strong>：12列表格，展示EBS/KD同步状态</li></ol><div class="req-section-title">取数逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>核算方法</strong>：收款确收法</li><li><strong>条件</strong>：合同状态=打开 and 项目类型=设计费 and 收款净额 ≠ 0</li></ul></div>'>8</span>
 
-                            <h4 class="text-md font-medium text-gray-700 mb-3">整装核算进度</h4>
-                            <div class="mb-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm text-gray-600">当前进度</span>
-                                    <span class="text-sm font-semibold text-green-600">75%</span>
+                            <!-- 设计费指标概览 -->
+                            <div class="progress-section">
+                                <h3 class="text-sm font-bold text-[#003366] mb-4">设计费核算进度概览</h3>
+                                <div class="flex space-x-4 mb-4">
+                                    <div class="metric-card w-[200px]">
+                                        <div class="text-[#666] text-xs mb-2">本期应核算项目</div>
+                                        <div class="text-[#333] text-2xl font-bold">100<span class="text-xs font-normal"> 个</span></div>
+                                    </div>
+                                    <div class="metric-card w-[200px]">
+                                        <div class="text-[#666] text-xs mb-2">设计费项目确认</div>
+                                        <div class="text-[#333] text-2xl font-bold">80<span class="text-xs font-normal"> 个</span></div>
+                                        <div class="text-primary text-xs mt-1">进度 80.0%</div>
+                                    </div>
                                 </div>
-                                <div class="w-full bg-gray-200 rounded-full h-3">
-                                    <div class="bg-gradient-to-r from-green-500 to-emerald-600 h-3 rounded-full transition-all duration-500" style="width: 75%"></div>
+                                <div class="flex flex-col space-y-2">
+                                    <div class="text-xs text-[#666]">整体核算进度</div>
+                                    <div class="h-2 bg-[#e8e8e8] rounded-full overflow-hidden w-[416px]">
+                                        <div class="bg-primary h-full" style="width: 80%"></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="space-y-2">
-                                <a href="decoration-accounting.html" class="flex items-center justify-between p-2 hover:bg-gray-50 rounded border border-gray-200">
-                                    <div class="flex items-center">
-                                        <i data-lucide="arrow-right-circle" class="w-4 h-4 text-green-600 mr-2"></i>
-                                        <span class="text-sm text-gray-700">整装项目收入核算</span>
+
+                            <!-- 快捷核算步骤 -->
+                            <div class="progress-section">
+                                <h3 class="text-sm font-bold text-[#003366] mb-4">设计费核算步骤</h3>
+                                <button class="bg-[#1890ff] text-white px-4 py-2 rounded text-sm hover:bg-primary transition-colors">
+                                    设计费项目收入核算
+                                </button>
+                            </div>
+
+                            <!-- 明细页签区 -->
+                            <div class="bg-white border border-[#e8e8e8] rounded">
+                                <div class="flex border-b border-[#e8e8e8] bg-[#fafafa]">
+                                    <div class="detail-tab-item shejifei-detail px-4 py-3 cursor-pointer text-sm font-medium text-primary bg-white border-t-2 border-t-primary border-x border-x-[#e8e8e8] -mb-[1px] active" data-detail-tab="shejifei-generate">
+                                        本期单据生成详情
                                     </div>
-                                    <span class="text-xs text-gray-500">75%</span>
-                                </a>
+                                    <div class="detail-tab-item shejifei-detail px-4 py-3 cursor-pointer text-sm font-medium text-[#666] hover:text-primary" data-detail-tab="shejifei-sync">
+                                        本期单据同步详情
+                                    </div>
+                                </div>
+
+                                <div class="p-4">
+                                    <!-- 生成详情 -->
+                                    <div class="detail-tab-content active" id="detail-tab-shejifei-generate">
+                                        <div class="space-y-4">
+                                            <!-- 筛选条件区 [13] -->
+                                            <div class="bg-[#f8faff] p-3 rounded border border-[#e0e8f5] req-marker relative inline-block w-full" id="req-marker-13" style="display: block;">
+                                                <span class="req-badge" data-req="13"
+                                                      data-title="需求描述：设计费核算-本期单据生成详情筛选"
+                                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[13] 需求描述：设计费核算-本期单据生成详情筛选</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用浅蓝色背景卡片包裹筛选条件</li><li>横向排列多个筛选项</li></ul><div class="req-section-title">筛选字段清单（2个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>完成状态</strong>：下拉选择（全部/已完成/未完成）</li><li><strong>合同号</strong>：文本输入框，支持模糊查询</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>多条件组合</em>：支持多条件AND组合筛选</li><li><em>实时过滤</em>：输入/选择后实时过滤表格数据</li></ul></div>'>13</span>
+                                                <div class="flex items-center flex-wrap gap-4">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">完成状态:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="1">已完成</option>
+                                                            <option value="0">未完成</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">合同号:</span>
+                                                        <input type="text" placeholder="请输入合同号" class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none w-[200px]" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="table-wrapper">
+                                            <table class="w-full text-left border-collapse text-xs">
+                                                <thead>
+                                                    <tr class="bg-[#f0f2f5] text-[#333]">
+                                                        <th class="p-2 border border-[#e8e8e8]">财务主体</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">合同号</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">计算状态</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">计算时间</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">确认状态</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">确认时间</th>
+                                                        <th class="p-2 border border-[#e8e8e8] text-center w-[80px]">完成状态</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="hover:bg-[#f9fafc]">
+                                                        <td class="p-2 border border-[#e8e8e8]">成都分公司</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">SJ901000001</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">已计算</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 18:00:00</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">已确认</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 20:00:00</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-center">✅</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- 同步详情 -->
+                                    <div class="detail-tab-content" id="detail-tab-shejifei-sync">
+                                        <div class="space-y-4">
+                                            <!-- 筛选条件区 [14] -->
+                                            <div class="bg-[#f8faff] p-3 rounded border border-[#e0e8f5] req-marker relative inline-block w-full" id="req-marker-14" style="display: block;">
+                                                <span class="req-badge" data-req="14"
+                                                      data-title="需求描述：设计费核算-本期单据同步详情筛选"
+                                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[14] 需求描述：设计费核算-本期单据同步详情筛选</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用浅蓝色背景卡片包裹筛选条件</li><li>横向排列多个筛选项，支持换行</li></ul><div class="req-section-title">筛选字段清单（7个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>合同号</strong>：文本输入框，支持模糊查询</li><li><strong>来源单据</strong>：下拉选择（全部/设计费项目核算单等）</li><li><strong>来源单据编号</strong>：文本输入框，支持模糊查询</li><li><strong>目标单据</strong>：下拉选择（全部/应收单等）</li><li><strong>目标单据编号</strong>：文本输入框，支持模糊查询</li><li><strong>同步EBS状态</strong>：下拉选择（全部/已同步/未同步/同步失败）</li><li><strong>同步KD状态</strong>：下拉选择（全部/已同步/未同步/同步失败）</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>多条件组合</em>：支持多条件AND组合筛选</li><li><em>实时过滤</em>：输入/选择后实时过滤表格数据</li></ul></div>'>14</span>
+                                                <div class="flex items-center flex-wrap gap-4">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">合同号:</span>
+                                                        <input type="text" placeholder="请输入合同号" class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none w-[180px]" />
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">来源单据:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="设计费项目核算单">设计费项目核算单</option>
+                                                            <option value="其他">其他</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">来源单据编号:</span>
+                                                        <input type="text" placeholder="请输入编号" class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none w-[180px]" />
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">目标单据:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="应收单">应收单</option>
+                                                            <option value="其他">其他</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">目标单据编号:</span>
+                                                        <input type="text" placeholder="请输入编号" class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none w-[180px]" />
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">同步EBS状态:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="synced">已同步</option>
+                                                            <option value="not_synced">未同步</option>
+                                                            <option value="failed">同步失败</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-xs text-[#333] font-medium">同步KD状态:</span>
+                                                        <select class="border border-[#d9d9d9] rounded px-2 py-1 text-xs outline-none bg-white">
+                                                            <option value="">全部</option>
+                                                            <option value="synced">已同步</option>
+                                                            <option value="not_synced">未同步</option>
+                                                            <option value="failed">同步失败</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="table-wrapper">
+                                            <table class="w-full text-left border-collapse text-xs min-w-[1200px]">
+                                                <thead>
+                                                    <tr class="bg-[#f0f2f5] text-[#333]">
+                                                        <th class="p-2 border border-[#e8e8e8]">财务主体</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">合同号</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">来源单据</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">来源单据编号</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">目标单据生成节点</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">目标单据</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">目标单据编号</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">目标单据生成时间</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">同步EBS状态</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">同步EBS时间</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">同步KD状态</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">同步KD时间</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="hover:bg-[#f9fafc]">
+                                                        <td class="p-2 border border-[#e8e8e8]">成都分公司</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">SJ901000001</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">设计费项目核算单</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">SJ901000001-20260301</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">项目核算收入确认</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">应收单</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">AR20260200</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">
+                                                            <span class="text-[#00b365]">已同步</span>
+                                                        </td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">
+                                                            <span class="text-[#faad14]">未同步</span>
+                                                        </td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 18:00:00</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -492,6 +1125,7 @@
 
     <div id="req-tooltip-container"></div>
     <script src="js/req-annotation.js"></script>
+    <script src="js/subject-dropdown.js"></script>
     <script>
         async function loadSidebar() {
             try {
@@ -519,6 +1153,71 @@
             document.addEventListener('DOMContentLoaded', loadSidebar);
         } else {
             loadSidebar();
+        }
+
+        // Tab 切换逻辑
+        document.querySelectorAll('.tab-item').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                var tabId = this.getAttribute('data-tab');
+
+                document.querySelectorAll('.tab-item').forEach(function(t) {
+                    t.classList.remove('active', 'text-primary', 'border-b-2', 'border-primary');
+                    t.classList.add('text-[#666]');
+                });
+                this.classList.add('active', 'text-primary', 'border-b-2', 'border-primary');
+                this.classList.remove('text-[#666]');
+
+                document.querySelectorAll('.tab-content').forEach(function(content) {
+                    content.classList.remove('active');
+                });
+                document.getElementById('tab-' + tabId).classList.add('active');
+            });
+        });
+
+        // 明细页签切换逻辑
+        document.querySelectorAll('.detail-tab-item').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                var detailTabId = this.getAttribute('data-detail-tab');
+                var parentClass = this.classList.contains('zhengzhuang-detail') ? 'zhengzhuang-detail' :
+                                  this.classList.contains('shejifei-detail') ? 'shejifei-detail' : '';
+
+                var siblingTabs = parentClass ? document.querySelectorAll('.' + parentClass) :
+                                 this.parentElement.querySelectorAll('.detail-tab-item');
+                siblingTabs.forEach(function(t) {
+                    t.classList.remove('active', 'text-primary', 'bg-white', 'border-t-2', 'border-t-primary', 'border-x', 'border-x-[#e8e8e8]', '-mb-[1px]');
+                    t.classList.add('text-[#666]');
+                });
+                this.classList.add('active', 'text-primary', 'bg-white', 'border-t-2', 'border-t-primary', 'border-x', 'border-x-[#e8e8e8]', '-mb-[1px]');
+                this.classList.remove('text-[#666]');
+
+                document.querySelectorAll('.detail-tab-content').forEach(function(content) {
+                    content.classList.remove('active');
+                });
+                document.getElementById('detail-tab-' + detailTabId).classList.add('active');
+            });
+        });
+
+        // 核算步骤快捷入口跳转逻辑
+        var btnThreeWayReconciliation = document.getElementById('btn-three-way-reconciliation');
+        var btnRevenueAllocation = document.getElementById('btn-revenue-allocation');
+        var btnProjectAccounting = document.getElementById('btn-project-accounting');
+
+        if (btnThreeWayReconciliation) {
+            btnThreeWayReconciliation.addEventListener('click', function() {
+                window.location.href = 'stock-reconciliation.html';
+            });
+        }
+
+        if (btnRevenueAllocation) {
+            btnRevenueAllocation.addEventListener('click', function() {
+                window.location.href = 'soft-accounting.html?tab=revenue-task-tab';
+            });
+        }
+
+        if (btnProjectAccounting) {
+            btnProjectAccounting.addEventListener('click', function() {
+                window.location.href = 'soft-accounting.html?tab=project-task-tab';
+            });
         }
     </script>
 </body>

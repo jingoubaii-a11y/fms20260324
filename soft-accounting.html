@@ -948,7 +948,7 @@
                         <div class="req-marker relative block" id="req-marker-23">
                             <span class="req-badge" data-req="23"
                                   data-title="需求描述：列表"
-                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[23] 需求描述：列表（22个字段+详情操作）</h3><div class="req-section-title">字段清单</div><ol style="margin-left: 20px; line-height: 1.6;"><li>单据编号、会计期间、财务主体、单据类型（枚举）、计算状态（枚举）、核算确认状态（枚举）、合同号、合同名称、需求类型、产品分类、签单日期、实际开工日期、实际竣工日期、财务确认竣工日期、本次确认收入、本次确认成本、计算批次、是否重算、本月计算次数、核算确认时间、计算完成时间、错误信息、创建时间、创建人</li></ol><div class="req-section-title">操作列</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>详情</strong>：点击后弹窗展示完整字段信息（60+个字段）</li></ul><div class="req-section-title">状态机</div><blockquote style="border-left: 3px solid #ccc; padding-left: 12px; background: #fafafa; padding: 8px 12px;">核算确认状态机：<br/>[新增]→未确认→[确认收入]→已确认</blockquote></div>'>23</span>
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[23] 需求描述：列表（22个字段+详情+流程查看操作）</h3><div class="req-section-title">字段清单</div><ol style="margin-left: 20px; line-height: 1.6;"><li>单据编号、会计期间、财务主体、单据类型（枚举）、计算状态（枚举）、核算确认状态（枚举）、合同号、合同名称、需求类型、产品分类、签单日期、实际开工日期、实际竣工日期、财务确认竣工日期、本次确认收入、本次确认成本、计算批次、是否重算、本月计算次数、核算确认时间、计算完成时间、错误信息、创建时间、创建人</li></ol><div class="req-section-title">操作列</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>详情</strong>：点击后弹窗展示完整字段信息（60+个字段）</li><li><strong>流程查看</strong>[26]：点击后弹框展示审批流程详情，包括流程状态、流程节点、操作人信息等<em>（仅当单据存在审批流时显示）</em></li></ul><div class="req-section-title">状态机</div><blockquote style="border-left: 3px solid #ccc; padding-left: 12px; background: #fafafa; padding: 8px 12px;">核算确认状态机：<br/>[新增]→未确认→[确认收入]→已确认<br/><em>注：整装需经过"审批中"中间状态</em></blockquote></div>'>23</span>
                             <div class="bg-white rounded-lg shadow-sm overflow-hidden">
                                 <div class="table-wrapper">
                                     <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -1008,7 +1008,15 @@
                                                 <td class="px-3 py-3 text-gray-600 whitespace-nowrap">2026-04-15 10:00:00</td>
                                                 <td class="px-3 py-3 text-gray-700 whitespace-nowrap">系统管理员</td>
                                                 <td class="px-3 py-3 text-center whitespace-nowrap">
-                                                    <button class="text-primary hover:text-blue-700 font-medium">详情</button>
+                                                    <div class="flex items-center justify-center space-x-2">
+                                                        <button class="text-primary hover:text-blue-700 font-medium">详情</button>
+                                                        <div class="req-marker inline-flex items-center" id="req-marker-26">
+                                                            <span class="req-badge" data-req="26"
+                                                                  data-title="流程查看按钮"
+                                                                  data-content='<div class="req-section-title">流程查看按钮</div><div><strong>显示样式：</strong>文字链接按钮，与"详情"按钮并列</div><div><strong>功能说明：</strong>点击后弹框展示审批流程详情</div><div><strong>弹框内容：</strong></div><div>&nbsp;&nbsp;• 流程状态（进行中/已完成/已驳回等）</div><div>&nbsp;&nbsp;• 流程节点列表（当前节点、历史节点）</div><div>&nbsp;&nbsp;• 各节点操作人信息</div><div>&nbsp;&nbsp;• 各节点操作时间</div><div><em>业务规则：仅当单据存在审批流时才显示此按钮，无审批流时隐藏</em></div><div><strong>交互逻辑：</strong></div><div>&nbsp;&nbsp;1. 点击按钮打开弹框</div><div>&nbsp;&nbsp;2. 弹框以模态方式展示，支持关闭</div><div>&nbsp;&nbsp;3. 数据从工作流引擎实时获取</div><blockquote>注意事项：需对接工作流API获取流程实例数据</blockquote>'>26</span>
+                                                            <button class="text-primary hover:text-blue-700 font-medium flow-query-btn">流程查看</button>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             <tr class="hover:bg-gray-50">
@@ -1037,7 +1045,15 @@
                                                 <td class="px-3 py-3 text-gray-600 whitespace-nowrap">2026-04-16 11:00:00</td>
                                                 <td class="px-3 py-3 text-gray-700 whitespace-nowrap">财务专员A</td>
                                                 <td class="px-3 py-3 text-center whitespace-nowrap">
-                                                    <button class="text-primary hover:text-blue-700 font-medium">详情</button>
+                                                    <div class="flex items-center justify-center space-x-2">
+                                                        <button class="text-primary hover:text-blue-700 font-medium">详情</button>
+                                                        <div class="req-marker inline-flex items-center" id="req-marker-26-copy">
+                                                            <span class="req-badge" data-req="26"
+                                                                  data-title="流程查看按钮"
+                                                                  data-content='<div class="req-section-title">流程查看按钮</div><div><strong>显示样式：</strong>文字链接按钮，与"详情"按钮并列</div><div><strong>功能说明：</strong>点击后弹框展示审批流程详情</div><div><strong>弹框内容：</strong></div><div>&nbsp;&nbsp;• 流程状态（进行中/已完成/已驳回等）</div><div>&nbsp;&nbsp;• 流程节点列表（当前节点、历史节点）</div><div>&nbsp;&nbsp;• 各节点操作人信息</div><div>&nbsp;&nbsp;• 各节点操作时间</div><div><em>业务规则：仅当单据存在审批流时才显示此按钮，无审批流时隐藏</em></div><div><strong>交互逻辑：</strong></div><div>&nbsp;&nbsp;1. 点击按钮打开弹框</div><div>&nbsp;&nbsp;2. 弹框以模态方式展示，支持关闭</div><div>&nbsp;&nbsp;3. 数据从工作流引擎实时获取</div><blockquote>注意事项：需对接工作流API获取流程实例数据</blockquote>'>26</span>
+                                                            <button class="text-primary hover:text-blue-700 font-medium flow-query-btn">流程查看</button>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -1594,10 +1610,10 @@
     <!-- ========== ⑤ 新增项目核算任务弹窗 (Tab4: 软装项目核算任务) [20] ========== -->
     <div id="soft-project-task-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-gray-200 flex justify-between items-center req-marker relative block" id="req-marker-20-modal">
-                <span class="req-badge" data-req="20"
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center req-marker relative block" id="req-marker-18-modal">
+                <span class="req-badge" data-req="18"
                       data-title="需求描述：新增软装项目收入核算任务（抽屉）"
-                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[20] 需求描述：新增软装项目收入核算任务（抽屉）</h3><div class="req-section-title">打开方式</div><p style="line-height: 1.8;">点击<em>新增计算任务</em>按钮后弹出此抽屉/弹窗</p><div class="req-section-title">字段清单（5个字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>项目类型</strong>：<em>锁定</em>，默认<code>软装</code><br/>枚举值：整装 | 软装 | 设计费</li><li><strong>核算方法</strong>：<em>锁定</em>，默认<code>完成合同法</code><br/>枚举值：完成合同法 | 完工百分比 | 收款确收</li><li><strong>财务组织</strong>：<em>下拉多选，支持全选，必填</em></li><li><strong>核算期间</strong>：<em>锁定</em>，自动带出当前会计期间，必填</li><li><strong>合同号</strong>：<em>输入后下拉多选，非必填</em><br/>不填则没有合同过滤条件</li></ol><div class="req-section-title">默认筛选条件（未勾选重算选项时）</div><blockquote style="border-left: 3px solid #ccc; padding-left: 12px; margin: 8px 0; color: #666; background: #fafafa; padding: 10px; font-size: 12px;"><strong>以下两个重算选项均未勾选时</strong>，项目需要同时满足以下3个条件，若不满足则提示错误信息"未满足条件xxx"：<ol style="margin-left: 16px; margin-top: 6px; line-height: 1.8;"><li>计算状态 = 未计算 <strong>or</strong> 计算失败</li><li>确认状态 = 未确认 <strong>且</strong> 没有审批中的项目收入确认审批流程</li><li>未创建当期核算单据</li></ol></blockquote><div class="req-section-title">重算选项（布尔开关）</div><p style="font-size: 12px; color: #888; margin-bottom: 8px;">若勾选以下布尔选项，就在以上三个条件上取对应勾选条件的<strong>并集</strong></p><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>是否重算项目收入已计算且未确认的合同</strong>：布尔，<em>默认不勾选</em><br/><blockquote style="border-left: 3px solid #f0ad4e; padding-left: 12px; margin: 6px 0; color: #666; background: #fffdf7; padding: 8px; font-size: 11px;">勾选后合同需要满足条件：<br/>1. 计算状态 = 未计算 or 计算失败 or <span class="status-dot status-orange" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f0ad4e;margin-right:4px;"></span>已计算<br/>2. 确认状态 = 未确认 且 没有审批中的项目收入确认审批流程</blockquote></li><li><strong>是否重算项目收入已计算且已确认的合同</strong>：布尔，<em>默认不勾选</em><br/><blockquote style="border-left: 3px solid #d9534f; padding-left: 12px; margin: 6px 0; color: #666; background: #fdf7f7; padding: 8px; font-size: 11px;">勾选后合同需要满足条件：<br/>1. 计算状态 = 未计算 or 计算失败 or <span class="status-dot status-red" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d9534f;margin-right:4px;"></span>已计算<br/>2. 确认状态 = <span class="status-dot status-red" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d9534f;margin-right:4px;"></span>已确认</blockquote></li></ul><div class="req-section-title">操作 - 确认交互逻辑（5步完整流程）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>二次确认判断</strong>：点击确认后，若勾选了<em>"是否重算已计算且已确认的合同"</em>需进行<strong>二次确认</strong>，否则直接执行下一步</li><li><strong>确认计算范围</strong>：在本期应核算项目条件基础上加上根据新增任务选择的项（合同号、是否重算的计算状态、确认状态），但需<strong>排除掉合同有计算批次且对应批次计算任务正在计算中</strong>的项目</li><li><strong>创建项目核算单据</strong>：<br/><ul style="margin-left: 16px; margin-top: 6px;"><li><em>增量单据</em>：<br/>- 未创建核算单据的合同 → 创建项目核算单据，<strong>是否重算=否</strong>，并更新当前计算批次号<br/>- 重算本期核算状态=已确认的合同 → 创建项目核算单据，<strong>是否重算=是</strong>，并更新当前计算批次号</li><li><em>存量单据</em>：直接更新计算批次号</li></ul></li><li><strong>执行计算逻辑</strong>：根据计算范围执行项目核算收入计算逻辑</li><li><strong>后台异步处理</strong>：<br/>- 退出界面则自动后台计算<br/>- 计算完成后弹框提示<code>"你有项目收入核算任务已经计算完成，请查看详情！"</code><br/>点击提示后跳转查询核算报告</li></ol><div class="req-section-title">操作 - 取消</div><p style="line-height: 1.8;">关闭弹窗，不做任何处理</p></div>'>20</span>
+                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[18] 需求描述：新增软装项目收入核算任务（抽屉）</h3><div class="req-section-title">打开方式</div><p style="line-height: 1.8; margin-bottom: 12px;">点击<em>新增计算任务</em>按钮后弹出此抽屉/弹窗</p><div class="req-section-title">字段清单（5个字段）</div><ol style="margin-left: 20px; line-height: 1.8; margin-bottom: 16px;"><li><strong>项目类型</strong>：<span class="status-dot status-gray" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#999;margin-right:4px;"></span><em>锁定</em>，默认<code>软装</code><br/>枚举值：整装 | 软装 | 设计费</li><li><strong>核算方法</strong>：<span class="status-dot status-gray" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#999;margin-right:4px;"></span><em>锁定</em>，默认<code>完成合同法</code><br/>枚举值：完成合同法 | 完工百分比 | 收款确收</li><li><strong>财务组织</strong>：<em>下拉多选，支持全选，必填</em></li><li><strong>核算期间</strong>：<span class="status-dot status-gray" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#999;margin-right:4px;"></span><em>锁定</em>，自动带出当前会计期间，必填</li><li><strong>合同号</strong>：<em>输入后下拉多选，非必填</em><br/>不填则没有合同过滤条件</li></ol><div class="req-section-title">默认筛选条件（未勾选重算选项时）</div><blockquote style="border-left: 3px solid #ccc; padding-left: 12px; margin: 8px 0 16px 0; color: #666; background: #fafafa; padding: 10px; font-size: 12px;"><strong>以下两个重算选项均未勾选时</strong>，项目需要同时满足以下3个条件，若不满足则提示错误信息<strong>"未满足条件xxx"</strong>：<ol style="margin-left: 16px; margin-top: 6px; line-height: 1.8;"><li>计算状态 = <span class="status-dot status-blue" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#17a2b8;margin-right:4px;"></span>未计算 <strong>or</strong> <span class="status-dot status-red" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#dc3545;margin-right:4px;"></span>计算失败</li><li>确认状态 = 未确认 <strong>且</strong> 没有审批中的项目收入确认审批流程</li><li>未创建当期核算单据</li></ol></blockquote><div class="req-section-title">重算选项（布尔开关）</div><p style="font-size: 12px; color: #888; margin-bottom: 8px;">若勾选以下布尔选项，就在以上三个条件上取对应勾选条件的<strong>并集</strong></p><ul style="margin-left: 20px; line-height: 1.8; margin-bottom: 16px;"><li><strong>选项1：是否重算项目收入已计算且未确认的合同</strong>：布尔，<em>默认不勾选</em><br/><blockquote style="border-left: 3px solid #f0ad4e; padding-left: 12px; margin: 6px 0; color: #666; background: #fffdf7; padding: 8px; font-size: 11px;">勾选后合同需要满足条件：<br/>1. 计算状态 = 未计算 or 计算失败 or <span class="status-dot status-orange" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f0ad4e;margin-right:4px;"></span><strong>已计算</strong><br/>2. 确认状态 = 未确认 且 没有审批中的项目收入确认审批流程</blockquote></li><li><strong>选项2：是否重算项目收入已计算且已确认的合同</strong>：布尔，<em>默认不勾选</em><br/><blockquote style="border-left: 3px solid #28a745; padding-left: 12px; margin: 6px 0; color: #666; background: #f0fff0; padding: 8px; font-size: 11px;">勾选后合同需要满足条件：<br/>1. 计算状态 = 未计算 or 计算失败 or <span class="status-dot status-orange" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f0ad4e;margin-right:4px;"></span><strong>已计算</strong><br/>2. 确认状态 = <span class="status-dot status-green" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#28a745;margin-right:4px;"></span><strong>已确认</strong></blockquote></li></ul><div class="req-section-title">操作按钮逻辑</div><div style="margin-bottom: 12px;"><strong style="color: #007bff;">确认按钮交互逻辑（5步）：</strong><ol style="margin-left: 20px; line-height: 1.8; margin-top: 8px;"><li><strong>步骤1 - 二次确认判断</strong>：<br/>点击确认后，若<strong>勾选了重算已确认的合同</strong>需要进行<em>二次确认</em>，否则直接创建一个软装销售收入计算任务<br/><blockquote style="border-left: 3px solid #17a2b8; padding-left: 10px; margin: 6px 0; background: #f0f8ff; padding: 8px; font-size: 11px;"><strong>确认计算范围</strong>：在本期应核算项目条件基础上加上根据新增任务选择的项（合同号、是否重算的计算状态、确认状态），但需排除掉<strong>合同有计算批次且对应批次计算任务正在计算中</strong>的项目</blockquote></li><li><strong>步骤2 - 创建项目核算单据</strong>：<br/><table style="width:100%;font-size:11px;margin:6px 0;border-collapse:collapse;"><tr style="background:#f5f5f5;"><th style="border:1px solid #ddd;padding:4px;text-align:left;">单据类型</th><th style="border:1px solid #ddd;padding:4px;text-align:left;">适用场景</th><th style="border:1px solid #ddd;padding:4px;text-align:left;">处理方式</th></tr><tr><td style="border:1px solid #ddd;padding:4px;"><span class="status-dot status-green" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#28a745;margin-right:4px;"></span>增量单据</td><td style="border:1px solid #ddd;padding:4px;">未创建核算单据的合同</td><td style="border:1px solid #ddd;padding:4px;">创建项目核算单据（是否重算=否），并更新当前计算批次号</td></tr><tr><td style="border:1px solid #ddd;padding:4px;"><span class="status-dot status-green" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#28a745;margin-right:4px;"></span>增量单据</td><td style="border:1px solid #ddd;padding:4px;">重算本期核算状态=已确认的合同</td><td style="border:1px solid #ddd;padding:4px;">创建项目核算单据（是否重算=是），并更新当前计算批次号</td></tr><tr><td style="border:1px solid #ddd;padding:4px;"><span class="status-dot status-orange" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#f0ad4e;margin-right:4px;"></span>存量单据</td><td style="border:1px solid #ddd;padding:4px;">已有核算单据的合同</td><td style="border:1px solid #ddd;padding:4px;">直接更新计算批次号</td></tr></table></li><li><strong>步骤3 - 执行计算</strong>：<br/>根据计算范围执行<em>项目核算收入计算逻辑</em></li><li><strong>步骤4 - 后台计算</strong>：<br/>退出界面后<em>自动后台计算</em></li><li><strong>步骤5 - 完成提示</strong>：<br/>计算完成后弹框提示<em>"你有项目收入核算任务已经计算完成，请查看详情！"</em> → 点击后跳转查询核算报告</li></ol></div><div style="padding: 8px; background: #fff3cd; border-left: 3px solid #ffc107; font-size: 11px; margin-top: 12px;"><strong>取消按钮</strong>：关闭弹窗</div></div>'>18</span>
                 <h3 class="text-lg font-semibold text-gray-900">新增软装项目收入核算任务</h3>
                 <button id="close-soft-task-modal" class="text-gray-400 hover:text-gray-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -2719,6 +2735,30 @@
                     }
                 });
             }
+
+            // 流程查看按钮 → 打开流程弹窗
+            var workflowModal = document.getElementById('workflow-modal');
+            var closeWorkflowModal = document.getElementById('close-workflow-modal');
+
+            document.querySelectorAll('#project-order-tab .flow-query-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (workflowModal) {
+                        workflowModal.classList.remove('hidden');
+                        lucide.createIcons();
+                    }
+                });
+            });
+
+            if (closeWorkflowModal && workflowModal) {
+                closeWorkflowModal.addEventListener('click', function() {
+                    workflowModal.classList.add('hidden');
+                });
+                workflowModal.addEventListener('click', function(e) {
+                    if (e.target === workflowModal) {
+                        workflowModal.classList.add('hidden');
+                    }
+                });
+            }
         }
 
         if (document.readyState === 'loading') {
@@ -2727,5 +2767,109 @@
             loadSidebar();
         }
     </script>
+    <!-- 流程查看弹窗 [26] -->
+    <div id="workflow-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto req-marker relative inline-block" id="req-marker-26-modal">
+            <span class="req-badge" data-req="26"
+                  data-title="需求描述：流程查看弹窗"
+                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[26] 需求描述：流程查看弹窗</h3><div class="req-section-title">打开方式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击列表中的<strong>"流程查看"</strong>按钮打开此弹窗</li></ul><div class="req-section-title">显示条件</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">仅当单据存在审批流时才显示此按钮，无审批流时隐藏</blockquote><div class="req-section-title">弹框内容</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>流程状态</strong>：进行中/已完成/已驳回等</li><li><strong>流程节点列表</strong>：<ul><li>当前节点（高亮显示）</li><li>历史节点（已完成）</li></ul></li><li><strong>各节点操作人信息</strong></li><li><strong>各节点操作时间</strong></li></ol><div class="req-section-title">交互逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击按钮打开弹框</li><li>弹框以模态方式展示，支持关闭</li><li>数据从工作流引擎实时获取</li></ul></div>'>26</span>
+
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-lg font-semibold text-gray-900">流程详情</h3>
+                <button id="close-workflow-modal" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <!-- 流程状态 -->
+                <div class="mb-6 req-marker relative block" id="req-marker-26-status">
+                    <span class="req-badge" data-req="26"
+                          data-title="需求描述：流程状态"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[26] 流程状态</h3><p>展示当前审批流程的整体状态，包括：</p><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>进行中</strong>：橙色标识，表示流程正在审批中</li><li><strong>已完成</strong>：绿色标识，表示流程已通过所有节点</li><li><strong>已驳回</strong>：红色标识，表示流程被驳回</li></ul></div>'>26</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">流程状态</h4>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center">
+                            <span class="status-dot status-orange"></span>
+                            <span class="ml-2 text-sm font-medium text-gray-700">审批中</span>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            发起时间：2026-04-16 09:00
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 流程节点时间线 -->
+                <div class="mb-6 req-marker relative block" id="req-marker-26-nodes">
+                    <span class="req-badge" data-req="26"
+                          data-title="需求描述：流程节点"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[26] 流程节点</h3><p>以时间线形式展示审批流程的各个节点：</p><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>发起人提交</strong>：流程起始节点</li><li><strong>部门经理审批</strong>：第一级审批</li><li><strong>财务审核</strong>：第二级审批</li><li><strong>总经理审批</strong>：最终审批（如需要）</li></ul><p style="margin-top: 8px;">每个节点包含：</p><ul style="margin-left: 20px; line-height: 1.8;"><li>节点名称</li><li>操作人</li><li>操作时间</li><li>操作结果（同意/驳回）</li><li>备注意见</li></ul></div>'>26</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">流程节点</h4>
+                    <div class="space-y-4">
+                        <!-- 节点1：已完成的节点 -->
+                        <div class="flex">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                                </div>
+                                <div class="w-0.5 h-full bg-green-200 mt-2"></div>
+                            </div>
+                            <div class="flex-1 pb-6">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h5 class="text-sm font-medium text-gray-900">发起人提交</h5>
+                                        <p class="text-xs text-gray-500 mt-1">操作人：财务专员A | 时间：2026-04-16 09:00</p>
+                                    </div>
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已通过</span>
+                                </div>
+                                <div class="mt-2 p-3 bg-gray-50 rounded-md">
+                                    <p class="text-sm text-gray-600">提交软装项目核算单确认申请</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 节点2：当前进行中的节点 -->
+                        <div class="flex">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center animate-pulse">
+                                    <i data-lucide="clock" class="w-5 h-5 text-orange-600"></i>
+                                </div>
+                                <div class="w-0.5 h-full bg-gray-200 mt-2"></div>
+                            </div>
+                            <div class="flex-1 pb-6">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h5 class="text-sm font-medium text-gray-900">财务经理审核</h5>
+                                        <p class="text-xs text-gray-500 mt-1">操作人：财务经理B | 等待中...</p>
+                                    </div>
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">审批中</span>
+                                </div>
+                                <div class="mt-2 p-3 bg-orange-50 rounded-md border-l-4 border-orange-400">
+                                    <p class="text-sm text-orange-700"><em>等待财务经理审核确认...</em></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 节点3：待处理的节点 -->
+                        <div class="flex opacity-50">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <i data-lucide="circle" class="w-5 h-5 text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h5 class="text-sm font-medium text-gray-500">财务总监审批</h5>
+                                        <p class="text-xs text-gray-400 mt-1">待处理</p>
+                                    </div>
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600">待处理</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
