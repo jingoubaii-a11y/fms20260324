@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>核算工作台 - 设计费核算</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 24px; border-radius: 8px; }
+        h1 { color: #003366; font-size: 24px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #1890ff; }
+
+        /* 指标卡片 */
+        .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .metric-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 6px; padding: 16px; text-align: center; }
+        .metric-label { font-size: 12px; color: #666; margin-bottom: 8px; }
+        .metric-value { font-size: 28px; font-weight: bold; color: #003366; }
+        .metric-value-blue { color: #1890ff; }
+        .metric-sub { font-size: 11px; color: #1890ff; margin-top: 4px; }
+
+        /* 进度条 */
+        .progress-section { margin-bottom: 24px; }
+        .progress-title { font-size: 13px; color: #333; margin-bottom: 10px; font-weight: 600; }
+        .progress-bar { width: 100%; height: 20px; background: #e8e8e8; border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #52c41a 0%, #1890ff 100%); transition: width 0.3s; }
+
+        /* 内容区域 */
+        .section { background: white; border: 1px solid #e8e8e8; border-radius: 8px; margin-bottom: 20px; padding: 20px; }
+        .section-title { font-size: 15px; color: #003366; font-weight: bold; margin-bottom: 16px; }
+
+        /* 按钮 */
+        .btn-primary { background: #1890ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .btn-primary:hover { background: #096dd9; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 0; border-bottom: 2px solid #e8e8e8; margin-bottom: 0; background: #fafafa; }
+        .tab { padding: 12px 24px; cursor: pointer; font-size: 13px; font-weight: 600; color: #666; border: none; background: transparent; position: relative; top: 2px; }
+        .tab.active { color: #1890ff; background: white; border: 1px solid #e8e8e8; border-bottom: 2px solid white; z-index: 1; }
+
+        /* 筛选区 */
+        .filter-area { background: #f8faff; padding: 16px 20px; border-bottom: 1px solid #e8e8e8; }
+        .filter-item { display: inline-block; margin-right: 24px; margin-bottom: 8px; }
+        .filter-label { font-size: 12px; color: #333; font-weight: 600; margin-right: 6px; }
+        select, input[type="text"] { border: 1px solid #d9d9d9; border-radius: 4px; padding: 5px 10px; font-size: 12px; outline: none; }
+
+        /* 表格 */
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        thead th { background: #f0f2f5; color: #333; padding: 10px; text-align: left; border: 1px solid #e8e8e8; font-weight: 600; }
+        tbody td { padding: 10px; border: 1px solid #e8e8e8; }
+        tbody tr:hover { background: #f9fafc; }
+        a { color: #1890ff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .text-success { color: #00b365; }
+        .text-gray { color: #888; }
+        .text-warning { color: #faad14; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📊 核算工作台 - 设计费核算模块</h1>
+
+    <!-- 业务全局监控 -->
+    <div class="section">
+        <div class="section-title">业务全局监控</div>
+        <div class="metrics">
+            <div class="metric-card">
+                <div class="metric-label">本期应核算项目总计</div>
+                <div class="metric-value">1250<span style="font-size:14px;">↑</span></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">整装项目</div>
+                <div class="metric-value">800<span style="font-size:14px;">↑</span></div>
+                <div class="metric-sub">进度 64%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">软装项目</div>
+                <div class="metric-value">350<span style="font-size:14px;">↑</span></div>
+                <div class="metric-sub">进度 28%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">设计费项目</div>
+                <div class="metric-value metric-value-blue">100<span style="font-size:14px;">↑</span></div>
+                <div class="metric-sub">进度 8%</div>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-title">各类型核算进度</div>
+            <div style="margin-bottom: 12px;">
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:#666; margin-bottom:4px;">
+                    <span>整装</span><span>已完成:400 | 核算中:300 | 未开始:100</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
+            </div>
+            <div style="margin-bottom: 12px;">
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:#666; margin-bottom:4px;">
+                    <span>软装</span><span>已完成:150 | 核算中:150 | 未开始:50</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
+            </div>
+            <div>
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:#666; margin-bottom:4px;">
+                    <span>设计费</span><span>已完成:80 | 核算中:10 | 未开始:10</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 设计费核算模块（重点）========== -->
+    <div id="shejifei-module" style="background:white; border:2px solid #1890ff; border-radius:8px; padding:24px; margin-top:24px;">
+
+        <!-- 进度概览 -->
+        <div style="margin-bottom:24px;">
+            <h2 style="color:#003366; font-size:18px; font-weight:bold; margin-bottom:16px; border-left:4px solid #1890ff; padding-left:12px;">📊 设计费核算进度概览</h2>
+            
+            <div style="display:flex; gap:20px; margin-bottom:20px;">
+                <div style="border:1px solid #d9d9d9; border-radius:8px; padding:20px; min-width:200px; text-align:center; background:#fff;">
+                    <div style="font-size:13px; color:#666; margin-bottom:10px;">本期应核算项目</div>
+                    <div style="font-size:40px; font-weight:bold; color:#003366;">100<span style="font-size:16px;">个</span></div>
+                </div>
+                
+                <div style="border:1px solid #d9d9d9; border-radius:8px; padding:20px; min-width:200px; text-align:center; background:#e6f7ff; border-color:#91d5ff;">
+                    <div style="font-size:13px; color:#666; margin-bottom:10px;">设计费项目确认</div>
+                    <div style="font-size:40px; font-weight:bold; color:#1890ff;">80<span style="font-size:16px;">个</span></div>
+                    <div style="font-size:14px; color:#1890ff; margin-top:8px; font-weight:600;">进度 80.0%</div>
+                </div>
+            </div>
+
+            <div>
+                <div style="font-size:13px; color:#333; font-weight:600; margin-bottom:8px;">整体核算进度</div>
+                <div style="width:100%; height:24px; background:#e8e8e8; border-radius:12px; overflow:hidden;">
+                    <div style="height:100%; background:linear-gradient(90deg, #1890ff 0%, #52c41a 100%); width:80%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快捷步骤 -->
+        <div style="margin-bottom:24px;">
+            <h3 style="color:#003366; font-size:15px; font-weight:bold; margin-bottom:12px; border-left:4px solid #faad14; padding-left:12px;">⚡ 设计费核算步骤与快捷入口</h3>
+            <button class="btn-primary" onclick="alert('跳转到设计费项目核算任务页面')">🚀 设计费项目收入核算</button>
+        </div>
+
+        <!-- 明细页签 -->
+        <div style="border:1px solid #e8e8e8; border-radius:8px; overflow:hidden;">
+            <!-- 页签导航 -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('generate')">📋 本期单据生成详情</button>
+                <button class="tab" onclick="switchTab('sync')">🔄 本期单据同步详情</button>
+            </div>
+
+            <!-- 生成详情内容 -->
+            <div id="tab-generate" style="padding:20px;">
+                <!-- 筛选条件 -->
+                <div class="filter-area" style="margin:-20px -20px 16px -20px;">
+                    <div class="filter-item">
+                        <span class="filter-label">完成状态:</span>
+                        <select>
+                            <option value="">全部</option>
+                            <option value="completed">已完成</option>
+                            <option value="pending">未完成</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">合同号:</span>
+                        <input type="text" placeholder="请输入合同号" style="width:200px;">
+                    </div>
+                </div>
+
+                <!-- 表格 -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>财务主体</th>
+                            <th>合同号</th>
+                            <th>设计费项目计算状态</th>
+                            <th>设计费项目计算时间</th>
+                            <th>设计费项目确认状态</th>
+                            <th>设计费项目确认时间</th>
+                            <th style="text-align:center;width:80px;">完成状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>成都分公司</td>
+                            <td><a href="#">SJ901000001</a></td>
+                            <td>已计算</td>
+                            <td class="text-gray">2026-03-01 18:00:00</td>
+                            <td>已确认</td>
+                            <td class="text-gray">2026-03-01 20:00:00</td>
+                            <td style="text-align:center;" class="text-success">✅</td>
+                        </tr>
+                        <tr>
+                            <td>成都分公司</td>
+                            <td><a href="#">SJ901000002</a></td>
+                            <td>已计算</td>
+                            <td class="text-gray">2026-03-01 18:00:00</td>
+                            <td>未确认</td>
+                            <td class="text-gray">-</td>
+                            <td style="text-align:center;">❌</td>
+                        </tr>
+                        <tr>
+                            <td>北京分公司</td>
+                            <td><a href="#">SJ901000003</a></td>
+                            <td>已计算</td>
+                            <td class="text-gray">2026-03-02 10:00:00</td>
+                            <td>已确认</td>
+                            <td class="text-gray">2026-03-02 14:00:00</td>
+                            <td style="text-align:center;" class="text-success">✅</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 同步详情内容（默认隐藏） -->
+            <div id="tab-sync" style="padding:20px;display:none;">
+                <div class="filter-area" style="margin:-20px -20px 16px -20px;">
+                    <div class="filter-item">
+                        <span class="filter-label">合同号:</span>
+                        <input type="text" placeholder="请输入合同号" style="width:180px;">
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">来源单据:</span>
+                        <select>
+                            <option value="">全部</option>
+                            <option>设计费项目核算单</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">同步EBS状态:</span>
+                        <select>
+                            <option value="">全部</option>
+                            <option>已同步</option>
+                            <option>未同步</option>
+                            <option>同步失败</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">同步KD状态:</span>
+                        <select>
+                            <option value="">全部</option>
+                            <option>已同步</option>
+                            <option>未同步</option>
+                            <option>同步失败</option>
+                        </select>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>财务主体</th>
+                            <th>合同号</th>
+                            <th>来源单据</th>
+                            <th>目标单据</th>
+                            <th>目标单据编号</th>
+                            <th>同步EBS状态</th>
+                            <th>同步KD状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>成都分公司</td>
+                            <td><a href="#">SJ901000001</a></td>
+                            <td>设计费项目核算单</td>
+                            <td>应收单</td>
+                            <td><a href="#">AR20260200</a></td>
+                            <td class="text-success">已同步</td>
+                            <td class="text-warning">未同步</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function switchTab(tabId) {
+    // 隐藏所有tab内容
+    document.getElementById('tab-generate').style.display = 'none';
+    document.getElementById('tab-sync').style.display = 'none';
+    
+    // 显示选中的tab
+    document.getElementById('tab-' + tabId).style.display = 'block';
+    
+    // 切换按钮样式
+    var tabs = document.querySelectorAll('.tab');
+    tabs.forEach(function(tab) {
+        tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
+// 页面加载提示
+console.log('✅✅✅ 设计费核算模块加载成功！');
+console.log('如果您能看到这个消息和上面的内容，说明页面完全正常！');
+</script>
+
+</body>
+</html>

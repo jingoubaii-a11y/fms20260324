@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设计费核算 - 最终测试</title>
+</head>
+<body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f5f5f5;">
+
+<h1 style="color: #003366; font-size: 24px; margin-bottom: 20px;">设计费核算模块</h1>
+
+<!-- 直接显示，没有任何包装 -->
+<div id="test-container">
+
+    <!-- 卡片1：进度概览 -->
+    <div style="background-color: white; border: 1px solid #e8e8e8; border-radius: 8px; padding: 24px; margin-bottom: 20px;">
+        <h2 style="color: #003366; font-size: 16px; margin-top: 0; margin-bottom: 16px;">设计费核算进度概览</h2>
+
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div style="border: 1px solid #d9d9d9; border-radius: 6px; padding: 20px; width: 200px; text-align: center;">
+                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">本期应核算项目</div>
+                <div style="font-size: 36px; font-weight: bold; color: #003366;">100<span style="font-size: 14px;">个</span></div>
+            </div>
+
+            <div style="border: 1px solid #d9d9d9; border-radius: 6px; padding: 20px; width: 200px; text-align: center;">
+                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">设计费项目确认</div>
+                <div style="font-size: 36px; font-weight: bold; color: #1890ff;">80<span style="font-size: 14px;">个</span></div>
+                <div style="font-size: 12px; color: #1890ff; margin-top: 5px;">进度 80.0%</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <div style="font-size: 13px; color: #333; margin-bottom: 8px;">整体核算进度</div>
+            <div style="width: 100%; max-width: 500px; height: 24px; background-color: #e8e8e8; border-radius: 12px; overflow: hidden;">
+                <div style="height: 100%; background-color: #1890ff; width: 80%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 卡片2：快捷步骤 -->
+    <div style="background-color: white; border: 1px solid #e8e8e8; border-radius: 8px; padding: 24px; margin-bottom: 20px;">
+        <h2 style="color: #003366; font-size: 14px; margin-top: 0; margin-bottom: 16px;">设计费核算步骤与快捷入口</h2>
+        <button style="background-color: #1890ff; color: white; border: none; padding: 12px 24px; border-radius: 4px; font-size: 14px; cursor: pointer;" onclick="alert('跳转到设计费项目核算任务页面')">设计费项目收入核算</button>
+    </div>
+
+    <!-- 卡片3：明细表格 -->
+    <div style="background-color: white; border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden;">
+        <!-- Tab标题 -->
+        <div style="display: flex; background-color: #fafafa; border-bottom: 1px solid #e8e8e8;">
+            <div style="padding: 14px 24px; font-size: 14px; font-weight: 600; color: #1890ff; border-bottom: 3px solid #1890ff; background-color: white; cursor: default;">本期单据生成详情</div>
+            <div style="padding: 14px 24px; font-size: 14px; color: #666; cursor: pointer;">本期单据同步详情</div>
+        </div>
+
+        <!-- 筛选区 -->
+        <div style="background-color: #f8faff; padding: 16px 20px; border-bottom: 1px solid #e8e8e8;">
+            <div style="display: inline-block; margin-right: 30px;">
+                <label style="font-size: 13px; color: #333; font-weight: 500; margin-right: 8px;">完成状态：</label>
+                <select style="border: 1px solid #d9d9d9; border-radius: 4px; padding: 5px 10px; font-size: 13px;">
+                    <option>全部</option>
+                    <option>已完成</option>
+                    <option>未完成</option>
+                </select>
+            </div>
+            <div style="display: inline-block;">
+                <label style="font-size: 13px; color: #333; font-weight: 500; margin-right: 8px;">合同号：</label>
+                <input type="text" placeholder="请输入合同号" style="border: 1px solid #d9d9d9; border-radius: 4px; padding: 5px 10px; font-size: 13px; width: 220px;">
+            </div>
+        </div>
+
+        <!-- 表格 -->
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+                <tr style="background-color: #f0f2f5;">
+                    <th style="padding: 12px; text-align: left; border: 1px solid #e8e8e8; font-weight: 600; color: #333;">财务主体</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #e8e8e8; font-weight: 600; color: #333;">合同号</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #e8e8e8; font-weight: 600; color: #333;">设计费项目计算状态</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #e8e8e8; font-weight: 600; color: #333;">设计费项目计算时间</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #e8e8e8; font-weight: 600; color: #333;">设计费项目确认状态</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #e8e8e8; font-weight: 600; color: #333;">设计费项目确认时间</th>
+                    <th style="padding: 12px; text-align: center; border: 1px solid #e8e8e8; font-weight: 600; color: #333; width: 90px;">完成状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr onmouseover="this.style.backgroundColor='#f9fafc'" onmouseout="this.style.backgroundColor='white'">
+                    <td style="padding: 12px; border: 1px solid #e8e8e8;">成都分公司</td>
+                    <td style="padding: 12px; border: 1px solid #e8e8e8;"><a href="#" style="color: #1890ff; text-decoration: none;">SJ901000001</a></td>
+                    <td style="padding: 12px; border: 1px solid #e8e8e8;">已计算</td>
+                    <td style="padding: 12px; border: 1px solid #e8e8e8; color: #888;">2026-03-01 18:00:00</td>
+                    <td style="padding: 12px; border: 1px solid #e8e8e8;">已确认</td>
+                    <td style="padding: 12px; border: 1px solid #e8e8e8; color: #888;">2026-03-01 20:00:00</td>
+                    <td style="padding: 12px; border: 1px solid #e8e8e8; text-align: center; color: #00b365; font-size: 18px;">✅</td>
+                </tr>
+                <tr onmouseover="this.style.backgroundColor='#f9fafc'" onmouseout="this.style.backgroundColor='white'">
+                    <td style="padding: 12px; border: 1px solid #e8e8e8;">成都分公司</td>
+                    <td style="padding: 12px; border: 1px solid #e8e8e8;"><a href="#" style="color: #1890ff; text-decoration: none;">SJ901000002</a></td>
+                    <td style="padding: 12px; border: 1px solid #e8e8e8;">已计算</td>
+                    <td style="padding: 12px; border: 1px solid #e8e8e8; color: #888;">2026-03-01 18:00:00</td>
+                    <td style="padding: 12px; border: 1px solid #e8e8e8;">未确认</td>
+                    <td style="padding: 12px; border: 1px solid #e8e8e8; color: #888;">-</td>
+                    <td style="padding: 12px; border: 1px solid #e8e8e8; text-align: center; font-size: 18px;">❌</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+// 页面加载完成后提示
+window.onload = function() {
+    console.log('✅ 设计费核算测试页面加载成功！');
+    console.log('如果您能看到内容，说明HTML/CSS正常工作');
+    
+    // 检查容器是否存在
+    var container = document.getElementById('test-container');
+    if (container) {
+        console.log('✅ 容器元素存在，子元素数量:', container.children.length);
+        
+        // 检查每个子元素是否可见
+        Array.from(container.children).forEach(function(child, index) {
+            var rect = child.getBoundingClientRect();
+            console.log('  卡片' + (index+1) + ':', '宽=' + rect.width, '高=' + rect.height);
+        });
+    }
+};
+</script>
+
+</body>
+</html>
