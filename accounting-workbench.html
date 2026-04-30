@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>核算工作台 - 财务中台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -74,6 +77,9 @@
             position: relative;
             display: inline-block;
             padding-top: 12px;
+        }
+        .req-marker.block {
+            display: block !important;
         }
         .req-marker > *:first-child {
             margin-top: -12px;
@@ -150,10 +156,10 @@
         }
 
         .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .tab-content.active { display: block !important; }
 
         .detail-tab-content { display: none; }
-        .detail-tab-content.active { display: block; }
+        .detail-tab-content.active { display: block !important; }
 
         .subject-tag {
             display: inline-flex;
@@ -704,7 +710,7 @@
 
                     <!-- 整装核算内容 [7] -->
                     <div class="tab-content" id="tab-zhengzhuang">
-                        <div class="space-y-6 req-marker relative w-full" id="req-marker-7" style="display: block !important;">
+                        <div class="space-y-6" style="display: block !important; position: relative;" id="req-marker-7">
                             <span class="req-badge" data-req="7"
                                   data-title="需求描述：整装核算"
                                   data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[7] 需求描述：整装核算</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>分为三个区域：指标概览、快捷步骤、明细表格</li><li>使用浅蓝色背景卡片统一风格</li></ul><div class="req-section-title">指标概览（2个指标卡片）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目</strong>：800个</li><li><strong>整装项目确认</strong>：400个，进度50.0%</li></ol><div class="req-section-title">整体核算进度</div><p style="line-height: 1.8;"><em>进度 = 已确认/本期应核算 = 400/800 = 50.0%</em></p><div class="req-section-title">快捷步骤（1个按钮）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>整装项目收入核算</strong>：跳转到整装项目收入核算任务页面（含出库成本、工费成本获取）</li></ol><div class="req-section-title">明细页签</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期单据生成详情</strong>：7列表格，含筛选功能</li><li><strong>本期单据同步详情</strong>：12列表格，展示EBS/KD同步状态</li></ol><div class="req-section-title">取数逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>核算方法</strong>：完工百分比法</li><li><strong>条件</strong>：开工日期不为空且&lt;=当期会计期结束日期 and 合同状态=打开 and 项目类型=整装</li></ul></div>'>7</span>
@@ -734,7 +740,7 @@
                             <!-- 快捷核算步骤 -->
                             <div class="progress-section">
                                 <h3 class="text-sm font-bold text-[#003366] mb-4">整装核算步骤与快捷入口</h3>
-                                <button class="bg-[#1890ff] text-white px-4 py-2 rounded text-sm hover:bg-primary transition-colors">
+                                <button class="bg-[#1890ff] text-white px-4 py-2 rounded text-sm hover:bg-primary transition-colors" onclick="window.location.href='http://localhost:8081/decoration-accounting.html'">
                                     整装项目收入核算
                                 </button>
                             </div>
@@ -917,13 +923,16 @@
 
                     <!-- 设计费核算内容 [8] -->
                     <div class="tab-content" id="tab-shejifei">
-                        <div class="space-y-6 req-marker relative w-full" id="req-marker-8" style="display: block !important;">
+                        <div class="space-y-6 req-marker relative w-full" id="req-marker-8">
                             <span class="req-badge" data-req="8"
                                   data-title="需求描述：设计费核算"
-                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[8] 需求描述：设计费核算</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>分为三个区域：指标概览、快捷步骤、明细表格</li><li>使用浅蓝色背景卡片统一风格</li></ul><div class="req-section-title">指标概览（2个指标卡片）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目</strong>：100个</li><li><strong>设计费项目确认</strong>：80个，进度80.0%</li></ol><div class="req-section-title">整体核算进度</div><p style="line-height: 1.8;"><em>进度 = 已确认/本期应核算 = 80/100 = 80.0%</em></p><div class="req-section-title">快捷步骤（1个按钮）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>设计费项目收入核算</strong>：跳转到设计费项目核算任务页面</li></ol><div class="req-section-title">明细页签</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期单据生成详情</strong>：7列表格，含筛选功能</li><li><strong>本期单据同步详情</strong>：12列表格，展示EBS/KD同步状态</li></ol><div class="req-section-title">取数逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>核算方法</strong>：收款确收法</li><li><strong>条件</strong>：合同状态=打开 and 项目类型=设计费 and 收款净额 ≠ 0</li></ul></div>'>8</span>
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[8] 需求描述：设计费核算</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>分为三个区域：指标概览、快捷步骤、明细表格</li><li>使用浅蓝色背景卡片统一风格</li></ul><div class="req-section-title">指标概览（2个指标卡片）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目</strong>：100个</li><li><strong>设计费项目确认</strong>：80个，进度80.0%</li></ol><div class="req-section-title">整体核算进度</div><p style="line-height: 1.8;"><em>进度 = 已确认/本期应核算 = 80/100 = 80.0%</em></p><div class="req-section-title">快捷步骤（1个按钮）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>设计费项目收入核算</strong>：跳转到设计费项目核算任务页面</li></ol><div class="req-section-title">明细页签</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期单据生成详情</strong>：6列表格，含筛选功能</li><li><strong>本期单据同步详情</strong>：7列表格，展示EBS/KD同步状态</li></ol><div class="req-section-title">取数逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>核算方法</strong>：收款确收法</li><li><strong>条件</strong>：合同状态=打开 and 项目类型=设计费 and 收款净额 ≠ 0</li></ul></div>'>8</span>
 
-                            <!-- 设计费指标概览 -->
-                            <div class="progress-section">
+                            <!-- 设计费指标概览 [13] -->
+                            <div class="progress-section req-marker relative inline-block w-full" id="req-marker-13">
+                                <span class="req-badge" data-req="13"
+                                      data-title="需求描述：设计费核算进度概览"
+                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[13] 需求描述：设计费核算进度概览</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用白色卡片包裹，带圆角和阴影</li><li>标题使用深蓝色（#003366）加粗显示</li></ul><div class="req-section-title">指标卡片（2个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目</strong>：显示应核算的项目总数，深蓝色数字</li><li><strong>设计费项目确认</strong>：显示已确认数量，蓝色数字，附带进度百分比</li></ol><div class="req-section-title">整体核算进度条</div><ul style="margin-left: 20px; line-height: 1.8;"><li>进度计算公式：<em>设计费核算进度=（已确认合同数量/本期应核算项目数量）*100</em></li><li>通过蓝色进度条展示当前进度</li><li>进度条高度8px，圆角full</li></ul><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li>数据来源：从设计费项目核算状态表统计</li><li>实时更新：页面加载时自动计算最新进度</li></ul></div>'>13</span>
                                 <h3 class="text-sm font-bold text-[#003366] mb-4">设计费核算进度概览</h3>
                                 <div class="flex space-x-4 mb-4">
                                     <div class="metric-card w-[200px]">
@@ -944,9 +953,12 @@
                                 </div>
                             </div>
 
-                            <!-- 快捷核算步骤 -->
-                            <div class="progress-section">
-                                <h3 class="text-sm font-bold text-[#003366] mb-4">设计费核算步骤</h3>
+                            <!-- 快捷核算步骤 [14] -->
+                            <div class="progress-section req-marker relative inline-block w-full" id="req-marker-14">
+                                <span class="req-badge" data-req="14"
+                                      data-title="需求描述：设计费核算快捷入口"
+                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[14] 需求描述：设计费核算快捷入口</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用白色卡片包裹，与概览区风格一致</li><li>按钮使用主题蓝色（#1890ff），hover时加深</li></ul><div class="req-section-title">核算步骤清单</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>设计费项目收入核算</strong> [14]<ul style="margin-left: 20px; line-height: 1.8; margin-top: 5px;"><li>功能：跳转到设计费项目核算任务页面</li><li>进度展示：已确认合同数量/本期应核算项目数量</li><li>交互：点击按钮触发页面跳转</li></ul></li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li>按钮权限：仅对有设计费核算权限的用户可见</li><li>跳转目标：/design-fee-accounting-task 页面</li></ul></div>'>14</span>
+                                <h3 class="text-sm font-bold text-[#003366] mb-4">设计费核算步骤与快捷入口</h3>
                                 <button class="bg-[#1890ff] text-white px-4 py-2 rounded text-sm hover:bg-primary transition-colors">
                                     设计费项目收入核算
                                 </button>
@@ -964,14 +976,14 @@
                                 </div>
 
                                 <div class="p-4">
-                                    <!-- 生成详情 -->
+                                    <!-- 生成详情 [15] -->
                                     <div class="detail-tab-content active" id="detail-tab-shejifei-generate">
                                         <div class="space-y-4">
-                                            <!-- 筛选条件区 [13] -->
-                                            <div class="bg-[#f8faff] p-3 rounded border border-[#e0e8f5] req-marker relative inline-block w-full" id="req-marker-13" style="display: block;">
-                                                <span class="req-badge" data-req="13"
-                                                      data-title="需求描述：设计费核算-本期单据生成详情筛选"
-                                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[13] 需求描述：设计费核算-本期单据生成详情筛选</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用浅蓝色背景卡片包裹筛选条件</li><li>横向排列多个筛选项</li></ul><div class="req-section-title">筛选字段清单（2个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>完成状态</strong>：下拉选择（全部/已完成/未完成）</li><li><strong>合同号</strong>：文本输入框，支持模糊查询</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>多条件组合</em>：支持多条件AND组合筛选</li><li><em>实时过滤</em>：输入/选择后实时过滤表格数据</li></ul></div>'>13</span>
+                                            <!-- 筛选条件区 [15] -->
+                                            <div class="bg-[#f8faff] p-3 rounded border border-[#e0e8f5] req-marker relative inline-block w-full" id="req-marker-15">
+                                                <span class="req-badge" data-req="15"
+                                                      data-title="需求描述：设计费核算-生成详情筛选"
+                                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[15] 需求描述：设计费核算-生成详情筛选</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用浅蓝色背景卡片包裹筛选条件</li><li>横向排列多个筛选项</li></ul><div class="req-section-title">筛选字段清单（2个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>完成状态</strong>：下拉选择（全部/已完成/未完成）</li><li><strong>合同号</strong>：文本输入框，支持模糊查询</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>多条件组合</em>：支持多条件AND组合筛选</li><li><em>实时过滤</em>：输入/选择后实时过滤表格数据</li><li><em>同整装项目核算单据生成详情相同</em></li></ul></div>'>15</span>
                                                 <div class="flex items-center flex-wrap gap-4">
                                                     <div class="flex items-center space-x-2">
                                                         <span class="text-xs text-[#333] font-medium">完成状态:</span>
@@ -993,36 +1005,46 @@
                                                     <tr class="bg-[#f0f2f5] text-[#333]">
                                                         <th class="p-2 border border-[#e8e8e8]">财务主体</th>
                                                         <th class="p-2 border border-[#e8e8e8]">合同号</th>
-                                                        <th class="p-2 border border-[#e8e8e8]">计算状态</th>
-                                                        <th class="p-2 border border-[#e8e8e8]">计算时间</th>
-                                                        <th class="p-2 border border-[#e8e8e8]">确认状态</th>
-                                                        <th class="p-2 border border-[#e8e8e8]">确认时间</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">设计费项目计算状态</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">设计费项目计算时间</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">设计费项目确认状态</th>
+                                                        <th class="p-2 border border-[#e8e8e8]">设计费项目确认时间</th>
                                                         <th class="p-2 border border-[#e8e8e8] text-center w-[80px]">完成状态</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr class="hover:bg-[#f9fafc]">
                                                         <td class="p-2 border border-[#e8e8e8]">成都分公司</td>
-                                                        <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">SJ901000001</td>
+                                                        <td class="p-2 border border-[#e8e8e8]"><a href="#" class="text-primary no-underline">SJ901000001</a></td>
                                                         <td class="p-2 border border-[#e8e8e8]">已计算</td>
                                                         <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 18:00:00</td>
                                                         <td class="p-2 border border-[#e8e8e8]">已确认</td>
                                                         <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 20:00:00</td>
-                                                        <td class="p-2 border border-[#e8e8e8] text-center">✅</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-center text-[#00b365]">✅</td>
+                                                    </tr>
+                                                    <tr class="hover:bg-[#f9fafc]">
+                                                        <td class="p-2 border border-[#e8e8e8]">成都分公司</td>
+                                                        <td class="p-2 border border-[#e8e8e8]"><a href="#" class="text-primary no-underline">SJ901000002</a></td>
+                                                        <td class="p-2 border border-[#e8e8e8]">已计算</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 18:00:00</td>
+                                                        <td class="p-2 border border-[#e8e8e8]">未确认</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-[#888]">-</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-center">❌</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <!-- 同步详情 -->
+                                    <!-- 同步详情 [16] -->
                                     <div class="detail-tab-content" id="detail-tab-shejifei-sync">
                                         <div class="space-y-4">
-                                            <!-- 筛选条件区 [14] -->
-                                            <div class="bg-[#f8faff] p-3 rounded border border-[#e0e8f5] req-marker relative inline-block w-full" id="req-marker-14" style="display: block;">
-                                                <span class="req-badge" data-req="14"
-                                                      data-title="需求描述：设计费核算-本期单据同步详情筛选"
-                                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[14] 需求描述：设计费核算-本期单据同步详情筛选</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用浅蓝色背景卡片包裹筛选条件</li><li>横向排列多个筛选项，支持换行</li></ul><div class="req-section-title">筛选字段清单（7个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>合同号</strong>：文本输入框，支持模糊查询</li><li><strong>来源单据</strong>：下拉选择（全部/设计费项目核算单等）</li><li><strong>来源单据编号</strong>：文本输入框，支持模糊查询</li><li><strong>目标单据</strong>：下拉选择（全部/应收单等）</li><li><strong>目标单据编号</strong>：文本输入框，支持模糊查询</li><li><strong>同步EBS状态</strong>：下拉选择（全部/已同步/未同步/同步失败）</li><li><strong>同步KD状态</strong>：下拉选择（全部/已同步/未同步/同步失败）</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>多条件组合</em>：支持多条件AND组合筛选</li><li><em>实时过滤</em>：输入/选择后实时过滤表格数据</li></ul></div>'>14</span>
+                                            <!-- 筛选条件区 [16] -->
+                                            <div class="bg-[#f8faff] p-3 rounded border border-[#e0e8f5] req-marker relative inline-block w-full" id="req-marker-16">
+                                                <span class="req-badge" data-req="16"
+                                                      data-title="需求描述：设计费核算-同步详情筛选"
+                                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[16] 需求描述：设计费核算-同步详情筛选</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>使用浅蓝色背景卡片包裹筛选条件</li><li>横向排列多个筛选项，支持换行</li></ul><div class="req-section-title">筛选字段清单（7个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>合同号</strong>：文本输入框，支持模糊查询</li><li><strong>来源单据</strong>：下拉选择（全部/设计费项目核算单等）</li><li><strong>来源单据编号</strong>：文本输入框，支持模糊查询</li><li><strong>目标单据</strong>：下拉选择（全部/应收单等）</li><li><strong>目标单据编号</strong>：文本输入框，支持模糊查询</li><li><strong>同步EBS状态</strong>：下拉选择（全部/已同步/未同步/同步失败）</li><li><strong>同步KD状态</strong>：下拉选择（全部/已同步/未同步/同步失败）</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>多条件组合</em>：支持多条件AND组合筛选</li><li><em>实时过滤</em>：输入/选择后实时过滤表格数据</li><li><em>同整装项目核算单据同步详情相同</em></li></ul></div>'>16</span>
                                                 <div class="flex items-center flex-wrap gap-4">
                                                     <div class="flex items-center space-x-2">
                                                         <span class="text-xs text-[#333] font-medium">合同号:</span>
@@ -1093,12 +1115,12 @@
                                                 <tbody>
                                                     <tr class="hover:bg-[#f9fafc]">
                                                         <td class="p-2 border border-[#e8e8e8]">成都分公司</td>
-                                                        <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">SJ901000001</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-primary cursor-pointer">SJ901000001</td>
                                                         <td class="p-2 border border-[#e8e8e8]">设计费项目核算单</td>
                                                         <td class="p-2 border border-[#e8e8e8]">SJ901000001-20260301</td>
                                                         <td class="p-2 border border-[#e8e8e8]">项目核算收入确认</td>
                                                         <td class="p-2 border border-[#e8e8e8]">应收单</td>
-                                                        <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">AR20260200</td>
+                                                        <td class="p-2 border border-[#e8e8e8] text-primary cursor-pointer">AR-SJ20260199</td>
                                                         <td class="p-2 border border-[#e8e8e8] text-[#888]">2026-03-01 11:00:00</td>
                                                         <td class="p-2 border border-[#e8e8e8]">
                                                             <span class="text-[#00b365]">已同步</span>
@@ -1111,12 +1133,14 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
 
             </div>
@@ -1124,7 +1148,7 @@
     </div>
 
     <div id="req-tooltip-container"></div>
-    <script src="js/req-annotation.js"></script>
+    <!-- <script src="js/req-annotation.js"></script> -->
     <script src="js/subject-dropdown.js"></script>
     <script>
         async function loadSidebar() {
@@ -1204,7 +1228,7 @@
 
         if (btnThreeWayReconciliation) {
             btnThreeWayReconciliation.addEventListener('click', function() {
-                window.location.href = 'stock-reconciliation.html';
+                window.location.href = 'soft-accounting.html?tab=revenue-task-tab';
             });
         }
 
@@ -1219,6 +1243,8 @@
                 window.location.href = 'soft-accounting.html?tab=project-task-tab';
             });
         }
+
     </script>
+
 </body>
 </html>

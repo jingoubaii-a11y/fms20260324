@@ -145,6 +145,32 @@
         input:checked + .slider:before {
             transform: translateX(20px);
         }
+
+        .req-badge {
+            display: inline-block;
+            background-color: rgb(250, 173, 20);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 16px;
+            padding: 0px 5px;
+            border-radius: 2px;
+            position: absolute;
+            top: -10px;
+            right: -6px;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .req-badge-float {
+            position: fixed !important;
+            z-index: 9999;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            pointer-events: auto;
+        }
+        .req-marker {
+            position: relative;
+        }
     </style>
 </head>
 <body class="bg-neutral">
@@ -224,6 +250,7 @@
                                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">需求类型名称</th>
                                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">说明</th>
                                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">项目类型</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">业务线</th>
                                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">关联订单需求标签</th>
                                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
                                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
@@ -235,6 +262,7 @@
                                 <td class="px-4 py-2 text-sm text-gray-700">整装需求</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">整体装修需求</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">整装</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">零售–零售–SHJ–整装业务</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">全屋整装,新房装修</td>
                                 <td class="px-4 py-2">
                                     <label class="switch">
@@ -254,6 +282,7 @@
                                 <td class="px-4 py-2 text-sm text-gray-700">软装需求</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">软装配饰需求</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">软装</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">零售–零售–SHJ–软装业务</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">软装设计,家具配置</td>
                                 <td class="px-4 py-2">
                                     <label class="switch">
@@ -273,6 +302,7 @@
                                 <td class="px-4 py-2 text-sm text-gray-700">设计需求</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">装修设计需求</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">设计费</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">零售–零售–SHJ–设计业务</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">设计咨询,方案设计</td>
                                 <td class="px-4 py-2">
                                     <label class="switch">
@@ -292,6 +322,7 @@
                                 <td class="px-4 py-2 text-sm text-gray-700">局部改造</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">局部空间改造需求</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">整装</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">零售–零售–SHJ–局改业务</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">厨房改造,卫生间改造</td>
                                 <td class="px-4 py-2">
                                     <label class="switch">
@@ -361,6 +392,23 @@
                         <option value="整装">整装</option>
                         <option value="软装">软装</option>
                         <option value="设计费">设计费</option>
+                    </select>
+                </div>
+                <div class="req-marker relative" id="req-marker-1">
+                    <span class="req-badge" data-req="1"
+                          data-title="业务线字段"
+                          data-content='<div class="req-section-title">业务线字段</div><div><strong>字段类型：</strong>枚举值，下拉单选</div><div><strong>显示样式：</strong>下拉选择框</div><div><strong>字段清单：</strong></div><div>• 零售–零售–SHJ–整装业务</div><div>• 零售–零售–SHJ–局改业务</div><div>• 零售–零售–SHJ–软装业务</div><div>• 零售–零售–SHJ–定制业务</div><div>• 零售–零售–SHJ–设计业务</div><div>• 零售–零售–SHJ–零售业务</div><div>• 零售–零售–SHJ–服务业务</div><div>• 零售–零售–SHJ–其他业务</div><div><em>业务规则：必填字段，用于标识需求类型所属的业务线分类</em></div>'>1</span>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">业务线</label>
+                    <select id="business-line" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="">请选择</option>
+                        <option value="零售–零售–SHJ–整装业务">零售–零售–SHJ–整装业务</option>
+                        <option value="零售–零售–SHJ–局改业务">零售–零售–SHJ–局改业务</option>
+                        <option value="零售–零售–SHJ–软装业务">零售–零售–SHJ–软装业务</option>
+                        <option value="零售–零售–SHJ–定制业务">零售–零售–SHJ–定制业务</option>
+                        <option value="零售–零售–SHJ–设计业务">零售–零售–SHJ–设计业务</option>
+                        <option value="零售–零售–SHJ–零售业务">零售–零售–SHJ–零售业务</option>
+                        <option value="零售–零售–SHJ–服务业务">零售–零售–SHJ–服务业务</option>
+                        <option value="零售–零售–SHJ–其他业务">零售–零售–SHJ–其他业务</option>
                     </select>
                 </div>
                 <div>
@@ -478,6 +526,10 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">项目类型</label>
                 <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">整装</div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">业务线</label>
+                <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">零售–零售–SHJ–整装业务</div>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">关联订单需求标签</label>
@@ -810,5 +862,7 @@
         // 加载侧边栏
         loadSidebar();
     </script>
+    <div id="req-tooltip-container"></div>
+    <script src="js/req-annotation.js"></script>
 </body>
 </html>
