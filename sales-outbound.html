@@ -352,7 +352,7 @@
                         <div class="mb-6">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-lg font-medium text-gray-800">明细行信息</h3>
-                                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
+                                <button id="add-detail-row" type="button" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
                                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
                                     新增行
                                 </button>
@@ -363,11 +363,13 @@
                                         <tr>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">行号</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">业务类型</th>
-                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">子类型<span class="text-red-500">*</span></th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">子类型</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">销售订单号</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">物料编码<span class="text-red-500">*</span></th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">物料名称</th>
-                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">批号</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">批号<span class="text-red-500">*</span></th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">仓库</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">仓位</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">销售单位<span class="text-red-500">*</span></th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">销售数量<span class="text-red-500">*</span></th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">币别<span class="text-red-500">*</span></th>
@@ -384,11 +386,12 @@
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">出库数量<span class="text-red-500">*</span></th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">成本金额</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">成本单价</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">是否赠品</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">同步EBS标识</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-gray-200">
+                                    <tbody id="detail-rows" class="divide-y divide-gray-200">
                                     </tbody>
                                 </table>
                             </div>
@@ -440,6 +443,78 @@
                 document.getElementById('add-modal').classList.add('hidden');
             });
         });
+
+        // 明细行新增/删除
+        (function initDetailRows() {
+            const addBtn = document.getElementById('add-detail-row');
+            const tbody = document.getElementById('detail-rows');
+            if (!addBtn || !tbody) return;
+
+            const inputCell = (extra = '') => `<td class="px-3 py-2"><input type="text" class="w-28 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-sm" ${extra}></td>`;
+            const selectCell = (options) => `<td class="px-3 py-2"><select class="w-28 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-sm">${options.map(o => `<option value="${o.v}">${o.t}</option>`).join('')}</select></td>`;
+            const lockCell = () => `<td class="px-3 py-2"><input type="text" class="w-28 px-2 py-1 border border-gray-200 bg-gray-100 rounded-md text-sm" readonly></td>`;
+
+            function buildRow(index) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-3 py-2 text-sm text-gray-700 row-no">${index}</td>
+                    ${lockCell()}
+                    ${selectCell([{v:'',t:'请选择'},{v:'normal',t:'普通销售'},{v:'return',t:'销售退货'}])}
+                    ${lockCell()}
+                    ${inputCell()}
+                    ${lockCell()}
+                    ${inputCell()}
+                    ${inputCell()}
+                    ${inputCell()}
+                    ${selectCell([{v:'',t:'请选择'},{v:'pcs',t:'个'},{v:'kg',t:'千克'}])}
+                    ${inputCell('type="number" step="0.0001"')}
+                    ${selectCell([{v:'CNY',t:'CNY'},{v:'USD',t:'USD'}])}
+                    ${inputCell('type="number" step="0.0001"')}
+                    ${inputCell('type="number" step="0.0001"')}
+                    ${inputCell('type="number" step="0.0001"')}
+                    ${inputCell('type="number" step="0.01"')}
+                    ${inputCell('type="number" step="0.01"')}
+                    ${inputCell('type="number" step="0.01"')}
+                    ${inputCell('type="number" step="0.01"')}
+                    ${lockCell()}
+                    ${lockCell()}
+                    ${selectCell([{v:'',t:'请选择'},{v:'pcs',t:'个'},{v:'kg',t:'千克'}])}
+                    ${inputCell('type="number" step="0.0001"')}
+                    ${inputCell('type="number" step="0.01"')}
+                    ${inputCell('type="number" step="0.0001"')}
+                    <td class="px-3 py-2 text-center"><input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary gift-checkbox"></td>
+                    ${selectCell([{v:'no',t:'否'},{v:'yes',t:'是'}])}
+                    <td class="px-3 py-2 text-sm">
+                        <button type="button" class="text-red-500 hover:text-red-700 delete-row" title="删除">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                return tr;
+            }
+
+            function renumber() {
+                tbody.querySelectorAll('tr').forEach((tr, i) => {
+                    const cell = tr.querySelector('.row-no');
+                    if (cell) cell.textContent = i + 1;
+                });
+            }
+
+            addBtn.addEventListener('click', function() {
+                const idx = tbody.querySelectorAll('tr').length + 1;
+                tbody.appendChild(buildRow(idx));
+                if (window.lucide && typeof lucide.createIcons === 'function') {
+                    lucide.createIcons();
+                }
+            });
+
+            tbody.addEventListener('click', function(e) {
+                const btn = e.target.closest('.delete-row');
+                if (!btn) return;
+                btn.closest('tr')?.remove();
+                renumber();
+            });
+        })();
             
             // 筛选条件选择器功能
             const filterSelect = document.getElementById('filter-field-sales-outbound');
@@ -481,5 +556,9 @@
                 lucide.createIcons();
             });
     </script>
+
+    <!-- PRD Viewer -->
+    <link rel="stylesheet" href="common/prd-viewer.css">
+    <script src="common/prd-viewer.js" defer></script>
 </body>
 </html>

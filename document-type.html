@@ -117,6 +117,8 @@
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">单据类型名称</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">单据</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">是否默认</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EBS主场景</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EBS子场景</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">说明</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
@@ -128,6 +130,8 @@
                                     <td class="px-4 py-2 text-sm text-gray-700">标准应收单</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">应收单</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">是</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">AR_INVOICE</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">STANDARD</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">标准应收单类型</td>
                                     <td class="px-4 py-2">
                                         <label class="switch">
@@ -146,6 +150,8 @@
                                     <td class="px-4 py-2 text-sm text-gray-700">定制应收单</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">应收单</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">否</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">AR_INVOICE</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">CUSTOMIZED</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">定制应收单类型</td>
                                     <td class="px-4 py-2">
                                         <label class="switch">
@@ -164,6 +170,8 @@
                                     <td class="px-4 py-2 text-sm text-gray-700">标准销售出库单</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">销售出库单</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">是</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">SALES_ISSUE</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">STANDARD</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">标准销售出库单类型</td>
                                     <td class="px-4 py-2">
                                         <label class="switch">
@@ -182,6 +190,8 @@
                                     <td class="px-4 py-2 text-sm text-gray-700">定制销售出库单</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">销售出库单</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">否</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">SALES_ISSUE</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">CUSTOMIZED</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">定制销售出库单类型</td>
                                     <td class="px-4 py-2">
                                         <label class="switch">
@@ -258,6 +268,14 @@
                                 <span>否</span>
                             </label>
                         </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">EBS主场景</label>
+                        <input type="text" id="document-type-ebs-main" maxlength="64" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">EBS子场景</label>
+                        <input type="text" id="document-type-ebs-sub" maxlength="64" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">说明</label>
@@ -498,5 +516,9 @@
             loadSidebar();
         }
     </script>
+
+    <!-- PRD Viewer -->
+    <link rel="stylesheet" href="common/prd-viewer.css">
+    <script src="common/prd-viewer.js" defer></script>
 </body>
 </html>

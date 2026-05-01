@@ -16,17 +16,19 @@
                         accent: '#ff6b6b',
                         neutral: '#f5f7fa',
                     },
-                    borderRadius: {
-                        'sm': '4px',
-                        'md': '8px',
-                        'lg': '12px',
-                        'xl': '16px',
-                    },
+                    borderRadius: { 'sm': '4px', 'md': '8px', 'lg': '12px', 'xl': '16px' },
                 },
             }
         }
     </script>
     <link rel="stylesheet" href="common/styles.css">
+    <style>
+        .tip-banner { background: #e6f4ff; border: 1px solid #91caff; color: #0050b3; }
+        .toast-item { animation: slideIn .25s ease-out; }
+        @keyframes slideIn { from { opacity:0; transform:translateY(-8px);} to { opacity:1; transform:translateY(0);} }
+        .modal-mask { background: rgba(0,0,0,.4); }
+        .row-selected { background:#e6f4ff !important; }
+    </style>
 </head>
 <body class="bg-neutral">
     <div class="flex h-screen">
@@ -35,293 +37,778 @@
             <div class="space-y-6">
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <h1 class="text-xl font-semibold text-gray-800">期末处理</h1>
+                    <p class="text-sm text-gray-500 mt-1">管理财务组织的核算启用、参数、业务关账、期末结账与顺延单据履历查询</p>
                 </div>
 
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <div class="border-b border-gray-200 mb-6">
-                        <nav class="flex space-x-8">
-                            <button id="tab-enable" class="py-3 px-1 border-b-2 border-primary text-primary font-medium">启用管理</button>
-                            <button id="tab-params" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">参数管理</button>
-                            <button id="tab-stock-close" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">库存关账</button>
-                            <button id="tab-project-close" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">项目关账</button>
-                            <button id="tab-period-close" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">期末结账</button>
+                        <nav class="flex space-x-8" id="tab-nav">
+                            <button data-tab="params" class="tab-btn py-3 px-1 border-b-2 border-primary text-primary font-medium">参数管理</button>
+                            <button data-tab="enable" class="tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">启用管理</button>
+                            <button data-tab="stock-close" class="tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">库存关账</button>
+                            <button data-tab="project-close" class="tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">项目关账</button>
+                            <button data-tab="period-close" class="tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">期末结账</button>
+                            <button data-tab="postpone-query" class="tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">顺延查询</button>
                         </nav>
                     </div>
 
-                    <div id="content-enable" class="tab-content">
+                    <!-- 启用管理 -->
+                    <div id="content-enable" class="tab-content hidden">
                         <h2 class="text-lg font-medium text-gray-800 mb-4">启用管理</h2>
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务组织</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用模块</th>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用期间</th>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">是否生效</th>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200">
-                                    <tr>
-                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">库存管理、项目管理</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">202601</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700"><span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">是</span></td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">-</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体2</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">库存管理</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">
-                                            <select class="px-2 py-1 border border-gray-300 rounded-md text-sm">
-                                                <option value="">请选择</option>
-                                                <option value="202601">202601</option>
-                                                <option value="202602">202602</option>
-                                                <option value="202603">202603</option>
-                                            </select>
-                                        </td>
-                                        <td class="px-4 py-2 text-sm text-gray-700"><span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">否</span></td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">
-                                            <button class="text-blue-600 hover:text-blue-800">启用</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                <tbody class="divide-y divide-gray-200" id="enable-tbody"></tbody>
                             </table>
                         </div>
                     </div>
 
-                    <div id="content-params" class="tab-content hidden">
-                        <h2 class="text-lg font-medium text-gray-800 mb-4">参数管理</h2>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                <div>
-                                    <h3 class="font-medium text-gray-800">软装出库是否校验对账状态</h3>
-                                    <p class="text-sm text-gray-500">勾选后，出库前会校验对账状态</p>
+                    <!-- 参数管理 -->
+                    <div id="content-params" class="tab-content">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-medium text-gray-800">业务参数配置</h2>
+                            <button id="btn-save-params" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm">保存设置</button>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-5">
+                                <h3 class="text-sm font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">出库与核算控制</h3>
+                                <div class="space-y-4">
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" id="param-checkReceipt" checked class="w-4 h-4 accent-primary">
+                                        <span class="text-sm text-gray-700">软装出库是否校验对账状态</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" id="param-forceCheck" checked class="w-4 h-4 accent-primary">
+                                        <span class="text-sm text-gray-700">强制校验当期应核算项目是否全部核算完成</span>
+                                    </label>
                                 </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" checked>
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                                </label>
                             </div>
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                <div>
-                                    <h3 class="font-medium text-gray-800">强制校验当期应核算项目是否全部核算完成</h3>
-                                    <p class="text-sm text-gray-500">勾选后，关账前会校验所有应核算项目是否已完成核算</p>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-5">
+                          <h3 class="text-sm font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">定时任务设定</h3>
+                                <div class="flex items-center space-x-3 flex-wrap">
+                                    <span class="text-sm text-gray-700">每期整装核算开始时间为次月</span>
+                                    <select id="param-startDay" class="border border-gray-300 rounded px-3 py-1.5 text-sm">
+                                    </select>
+                                    <input id="param-startTime" type="time" value="01:00" class="border border-gray-300 rounded px-3 py-1.5 text-sm">
                                 </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" checked>
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                                </label>
                             </div>
                         </div>
                     </div>
 
+                    <!-- 库存关账 -->
                     <div id="content-stock-close" class="tab-content hidden">
+                        <div class="tip-banner px-4 py-3 rounded flex items-start justify-between mb-4">
+                            <div class="flex items-start text-sm">
+                                <i data-lucide="info" class="w-4 h-4 mt-0.5 mr-2"></i>
+                                <span>关账用于冻结当期数据（禁止产生已关账期间的新数据），并检查本期应核算单据是否处理完成。所有业务模块完成关账后，方可执行期末结账。</span>
+                            </div>
+                            <button onclick="openFAQ()" class="text-primary hover:underline text-sm whitespace-nowrap ml-4">查看常见问题解答</button>
+                        </div>
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="text-lg font-medium text-gray-800">库存关账</h2>
                             <div class="flex items-center space-x-3">
-                                <button id="batch-anti-stock-close" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">批量反关账</button>
-                                <button id="batch-stock-close" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700">批量关账</button>
+                                <button onclick="handleStockClose('reverse')" class="px-4 py-2 bg-white border border-red-300 text-red-500 rounded-md hover:bg-red-50 text-sm">批量反关账</button>
+                                <button onclick="handleStockClose('close')" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm">批量关账</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                            <input type="checkbox" class="rounded">
-                                        </th>
+                                        <th class="px-4 py-2 text-left w-10"><input type="checkbox" id="stock-check-all" class="rounded"></th>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务组织</th>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用期间</th>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">当前期间</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200">
-                                    <tr>
-                                        <td class="px-4 py-2">
-                                            <input type="checkbox" class="rounded">
-                                        </td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">202601</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">202604</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-2">
-                                            <input type="checkbox" class="rounded">
-                                        </td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体2</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">202602</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">202603</td>
-                                    </tr>
-                                </tbody>
+                                <tbody class="divide-y divide-gray-200" id="stock-tbody"></tbody>
                             </table>
+                        </div>
+                        <div id="stock-log-section" class="hidden mt-6">
+                            <h3 class="text-sm font-bold text-gray-800 mb-3 border-b border-gray-200 pb-2">执行结果</h3>
+                            <div class="overflow-y-auto max-h-60 border border-gray-200 rounded">
+                                <table class="min-w-full text-sm">
+                                    <thead class="bg-gray-50 sticky top-0"><tr>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">时间</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">财务组织</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">操作类型</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">执行状态</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">结果信息</th>
+                                    </tr></thead>
+                                    <tbody id="stock-log-tbody" class="divide-y divide-gray-100"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- 项目关账 -->
                     <div id="content-project-close" class="tab-content hidden">
+                        <div class="tip-banner px-4 py-3 rounded flex items-start justify-between mb-4">
+                            <div class="flex items-start text-sm">
+                                <i data-lucide="info" class="w-4 h-4 mt-0.5 mr-2"></i>
+                                <span>关账用于冻结当期数据（禁止产生已关账期间的新数据），并检查本期应核算单据是否处理完成。所有业务模块完成关账后，方可执行期末结账。</span>
+                            </div>
+                            <button onclick="openFAQ()" class="text-primary hover:underline text-sm whitespace-nowrap ml-4">查看常见问题解答</button>
+                        </div>
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="text-lg font-medium text-gray-800">项目关账</h2>
                             <div class="flex items-center space-x-3">
-                                <button id="batch-project-close-check" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">批量关账检查</button>
-                                <button id="batch-anti-project-close" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">批量反关账</button>
-                                <button id="batch-project-close" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700">批量关账</button>
+                                <button onclick="handleProjectClose('check')" class="px-4 py-2 bg-white border border-gray-300 text-gray-600 hover:text-primary hover:border-primary rounded-md text-sm">关账检查</button>
+                                <button onclick="handleProjectClose('reverse')" class="px-4 py-2 bg-white border border-red-300 text-red-500 hover:bg-red-50 rounded-md text-sm">批量反关账</button>
+                                <button onclick="handleProjectClose('close')" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm">批量关账</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                            <input type="checkbox" class="rounded">
-                                        </th>
+                                        <th class="px-4 py-2 text-left w-10"><input type="checkbox" id="project-check-all" class="rounded"></th>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务组织</th>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用期间</th>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">当前期间</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">检查结果</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200">
-                                    <tr>
-                                        <td class="px-4 py-2">
-                                            <input type="checkbox" class="rounded">
-                                        </td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">202601</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">202604</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700"><span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">检查通过</span></td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2">检查结果</button>
-                                            <button class="text-blue-600 hover:text-blue-800">启用</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-2">
-                                            <input type="checkbox" class="rounded">
-                                        </td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体2</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">
-                                            <select class="px-2 py-1 border border-gray-300 rounded-md text-sm">
-                                                <option value="">请选择</option>
-                                                <option value="202601">202601</option>
-                                                <option value="202602">202602</option>
-                                            </select>
-                                        </td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">-</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">-</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">
-                                            <button class="text-blue-600 hover:text-blue-800">启用</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                <tbody class="divide-y divide-gray-200" id="project-tbody"></tbody>
                             </table>
+                        </div>
+                        <div id="project-log-section" class="hidden mt-6">
+                            <h3 class="text-sm font-bold text-gray-800 mb-3 border-b border-gray-200 pb-2">执行结果</h3>
+                            <div class="overflow-y-auto max-h-60 border border-gray-200 rounded">
+                                <table class="min-w-full text-sm">
+                                    <thead class="bg-gray-50 sticky top-0"><tr>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">时间</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">财务组织</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">操作类型</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">执行状态</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">结果信息</th>
+                                    </tr></thead>
+                                    <tbody id="project-log-tbody" class="divide-y divide-gray-100"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- 期末结账 -->
                     <div id="content-period-close" class="tab-content hidden">
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="text-lg font-medium text-gray-800">期末结账</h2>
                             <div class="flex items-center space-x-3">
-                                <button id="batch-anti-period-close" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">批量反结账</button>
-                                <button id="batch-period-close" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700">批量结账</button>
+                                <button onclick="handlePeriodClose('reverse')" class="px-4 py-2 bg-white border border-red-300 text-red-500 hover:bg-red-50 rounded-md text-sm">批量反结账</button>
+                                <button onclick="handlePeriodClose('close')" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm">批量结账</button>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded border border-gray-100 mb-4 flex items-center space-x-3">
+                            <span class="text-sm text-gray-600">财务组织:</span>
+                            <input id="period-search" type="text" placeholder="请输入组织名称" class="border border-gray-300 rounded px-3 py-1.5 text-sm focus:border-primary focus:outline-none w-56">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left w-10"><input type="checkbox" id="period-check-all" class="rounded"></th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务组织</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用期间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">当前期间</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200" id="period-tbody"></tbody>
+                            </table>
+                 </div>
+                        <div class="mt-3 text-sm text-gray-500" id="period-count">共查询到 0 条记录</div>
+                        <div id="period-log-section" class="hidden mt-6">
+                            <h3 class="text-sm font-bold text-gray-800 mb-3 border-b border-gray-200 pb-2">执行结果</h3>
+                            <div class="overflow-y-auto max-h-60 border border-gray-200 rounded">
+                                <table class="min-w-full text-sm">
+                                    <thead class="bg-gray-50 sticky top-0"><tr>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">时间</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">财务组织</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">操作类型</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">执行状态</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">结果信息</th>
+                                    </tr></thead>
+                                    <tbody id="period-log-tbody" class="divide-y divide-gray-100"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 顺延查询 -->
+                    <div id="content-postpone-query" class="tab-content hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-medium text-gray-800">单据顺延记录查询</h2>
+                            <div class="flex items-center space-x-2">
+                                <input id="postpone-search" type="text" placeholder="输入批次号/组织查询" class="border border-gray-300 rounded px-3 py-1.5 text-sm w-56 focus:border-primary focus:outline-none">
+                                <button onclick="renderPostponeList()" class="px-4 py-1.5 bg-primary text-white rounded-md text-sm hover:bg-blue-700">查询</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                            <input type="checkbox" class="rounded">
-                                        </th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务组织</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用期间</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">当前期间</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">结账报告</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">关账批次号</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">财务组织</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">来源期间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">目标期间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">顺延单据数</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">顺延原因</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">操作人</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">操作时间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">操作</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200">
-                                    <tr>
-                                        <td class="px-4 py-2">
-                                            <input type="checkbox" class="rounded">
-                                        </td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体1</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">202601</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">202604</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">
-                                            <button class="text-blue-600 hover:text-blue-800">查看</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-2">
-                                            <input type="checkbox" class="rounded">
-                                        </td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">财务主体2</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">202602</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">202603</td>
-                                        <td class="px-4 py-2 text-sm text-gray-700">
-                                            <button class="text-blue-600 hover:text-blue-800">查看</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                <tbody class="divide-y divide-gray-200" id="postpone-tbody"></tbody>
                             </table>
                         </div>
                     </div>
+
                 </div>
             </div>
         </main>
     </div>
 
+    <!-- Toast 容器 -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- 通用确认弹窗 -->
+    <div id="confirm-modal" class="hidden fixed inset-0 modal-mask z-40 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-2xl w-[560px] max-w-[90vw] max-h-[85vh] flex flex-col">
+            <div class="px-5 py-3 border-b flex justify-between items-center">
+                <h3 id="confirm-title" class="font-medium text-gray-900">确认</h3>
+                <button onclick="closeConfirm()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div id="confirm-content" class="px-5 py-4 overflow-y-auto text-sm text-gray-700"></div>
+            <div class="px-5 py-3 border-t flex justify-end space-x-2 bg-gray-50">
+                <button id="confirm-cancel-btn" onclick="closeConfirm()" class="px-4 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-100">取消</button>
+                <button id="confirm-ok-btn" class="px-4 py-1.5 bg-primary text-white rounded text-sm hover:bg-blue-700">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ 弹窗 -->
+    <div id="faq-modal" class="hidden fixed inset-0 modal-mask z-40 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-2xl w-[560px] max-w-[90vw] max-h-[85vh] flex flex-col">
+            <div class="px-5 py-3 border-b flex justify-between items-center">
+                <h3 class="font-medium text-gray-900">关账流程常见问题解答</h3>
+                <button onclick="document.getElementById('faq-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="px-5 py-4 overflow-y-auto space-y-4 text-sm">
+                <div><h4 class="font-bold text-gray-800 mb-1">1. 什么时候可以执行期末结账？</h4>
+                    <p class="text-gray-600">必须在所有上游业务模块（如库存、项目等）都完成"关账"操作后，才可以执行期末的结账。</p></div>
+                <div><h4 class="font-bold text-gray-800 mb-1">2. 关账失败提示"存在未核算完成的数据"怎么办？</h4>
+                    <p class="text-gray-600">系统会拦截存在关键未处理单据的关账请求。您可以执行"关账检查"了解具体是哪些单据，然后视情况选择将这些单据"顺延"到下一会计期间。</p></div>
+                <div><h4 class="font-bold text-gray-800 mb-1">3. 什么是"顺延"？</h4>
+                    <p class="text-gray-600">顺��是指将在当前期间无法完成核算处理的单据，推迟记录到下一个会计期间处理的过程。可以在"顺延查询"页面查看详细记录。</p></div>
+                <div><h4 class="font-bold text-gray-800 mb-1">4. 反关账会影响已经顺延的单据吗？</h4>
+                    <p class="text-gray-600">不会。反关账仅将当前会计期间回退，对于已经产生跨期顺延的单据记录不可撤回。</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 顺延明细弹窗 -->
+    <div id="detail-modal" class="hidden fixed inset-0 modal-mask z-40 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-2xl w-[850px] max-w-[95vw] max-h-[85vh] flex flex-col">
+            <div class="px-5 py-3 border-b flex justify-between items-center">
+                <h3 id="detail-title" class="font-medium text-gray-900">顺延单据明细</h3>
+                <button onclick="document.getElementById('detail-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="px-5 py-3 border-b bg-gray-50 flex items-center">
+                <span class="text-sm text-gray-600 mr-3">单据查询：</span>
+                <input id="detail-search" type="text" placeholder="输入单据编号搜索..." class="border border-gray-300 rounded px-3 py-1.5 text-sm w-64 focus:border-primary focus:outline-none">
+            </div>
+            <div class="p-5 overflow-y-auto flex-1">
+                <table class="min-w-full bg-white border border-gray-200 rounded">
+                    <thead class="bg-gray-50"><tr>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">单据编号</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">单据类型</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">原始期间</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">顺延后期间</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">状态</th>
+                    </tr></thead>
+                    <tbody id="detail-tbody" class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+            <div class="px-5 py-3 border-t bg-gray-50 flex justify-between items-center">
+                <div class="text-sm text-gray-500" id="detail-count">共 0 条记录</div>
+                <div class="flex items-center space-x-2">
+                    <button class="px-3 py-1 text-sm border border-gray-300 rounded text-gray-400 cursor-not-allowed">上一页</button>
+                    <button class="px-3 py-1 text-sm border border-primary rounded text-primary">1</button>
+                    <button class="px-3 py-1 text-sm border border-gray-300 rounded text-gray-400 cursor-not-allowed">下一页</button>
+                </div>
+                <button onclick="document.getElementById('detail-modal').classList.add('hidden')" class="px-4 py-1.5 bg-primary text-white rounded text-sm hover:bg-blue-700">关闭</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        async function loadSidebar() {
-            try {
-                const response = await fetch('common/sidebar.html');
-                const sidebarHtml = await response.text();
-                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
-                
-                const script = document.createElement('script');
-                script.src = 'common/scripts.js';
-                script.onload = function() {
-                    if (typeof initCommonFunctions === 'function') {
-                        initCommonFunctions();
-                    }
-                };
-                document.body.appendChild(script);
-            } catch (error) {
-                console.error('加载侧边栏失败:', error);
-            }
-        }
-        
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadSidebar);
-        } else {
-            loadSidebar();
-        }
+    // ================== 侧边栏加载 ==================
+    async function loadSidebar() {
+        try {
+            const res = await fetch('common/sidebar.html');
+            document.getElementById('sidebar-container').innerHTML = await res.text();
+            const s = document.createElement('script');
+            s.src = 'common/scripts.js';
+            s.onload = () => typeof initCommonFunctions === 'function' && initCommonFunctions();
+            document.body.appendChild(s);
+        } catch (e) { console.error('加载侧边栏失败:', e); }
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadSidebar); else loadSidebar();
 
-        const tabs = {
-            'enable': 'content-enable',
-            'params': 'content-params',
-            'stock-close': 'content-stock-close',
-            'project-close': 'content-project-close',
-            'period-close': 'content-period-close'
-        };
+    // ================== 工具 ==================
+    function showToast(msg, type='info') {
+        const c = document.getElementById('toast-container');
+        const colors = { success:'bg-green-50 border-green-200 text-green-700', error:'bg-red-50 border-red-200 text-red-700', info:'bg-gray-800 text-white border-gray-800' };
+        const el = document.createElement('div');
+        el.className = `toast-item px-4 py-2 rounded-md shadow-md border text-sm ${colors[type]||colors.info}`;
+        el.textContent = msg;
+        c.appendChild(el);
+        setTimeout(() => el.remove(), 3000);
+    }
+    function openConfirm({ title='确认', content='', okText='确定', hideCancel=false, onOk }) {
+        document.getElementById('confirm-title').textContent = title;
+        document.getElementById('confirm-content').innerHTML = content;
+        document.getElementById('confirm-cancel-btn').style.display = hideCancel ? 'none' : '';
+        const okBtn = document.getElementById('confirm-ok-btn');
+        okBtn.textContent = okText;
+        okBtn.onclick = () => { if (typeof onOk === 'function') { if (onOk() === false) return; } closeConfirm(); };
+        document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+    function closeConfirm() { document.getElementById('confirm-modal').classList.add('hidden'); }
+    function openFAQ() { document.getElementById('faq-modal').classList.remove('hidden'); }
 
-        Object.keys(tabs).forEach(tabId => {
-            document.getElementById(`tab-${tabId}`)?.addEventListener('click', function() {
-                Object.keys(tabs).forEach(id => {
-                    const tabBtn = document.getElementById(`tab-${id}`);
-                    const tabContent = document.getElementById(tabs[id]);
-                    if (id === tabId) {
-                        tabBtn?.classList.add('border-primary', 'text-primary', 'font-medium');
-                        tabBtn?.classList.remove('border-transparent', 'text-gray-500');
-                        tabContent?.classList.remove('hidden');
-                    } else {
-                        tabBtn?.classList.remove('border-primary', 'text-primary', 'font-medium');
-                        tabBtn?.classList.add('border-transparent', 'text-gray-500');
-                        tabContent?.classList.add('hidden');
-                    }
-                });
+    // ================== Tab 切换 ==================
+    const TAB_IDS = ['params','enable','stock-close','project-close','period-close','postpone-query'];
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const t = btn.dataset.tab;
+            TAB_IDS.forEach(id => {
+                const b = document.querySelector(`.tab-btn[data-tab="${id}"]`);
+                const c = document.getElementById(`content-${id}`);
+                if (id === t) {
+                    b?.classList.add('border-primary','text-primary','font-medium');
+                    b?.classList.remove('border-transparent','text-gray-500');
+                    c?.classList.remove('hidden');
+                } else {
+                    b?.classList.remove('border-primary','text-primary','font-medium');
+                    b?.classList.add('border-transparent','text-gray-500');
+                    c?.classList.add('hidden');
+                }
             });
         });
+    });
+
+    // ================== 数据 ==================
+    let enableData = [
+        { id:1, org:'北京分公司', period:'',       isEnabled:false, isActive:false },
+        { id:2, org:'上海分公司', period:'202603', isEnabled:true,  isActive:true  },
+    ];
+    let stockData = [
+        { id:1, org:'北京分公司', enablePeriod:'202601', currentPeriod:'202604' },
+        { id:2, org:'上海分公司', enablePeriod:'202602', currentPeriod:'202604' },
+    ];
+    let projectData = [
+        { id:1, org:'北京分公司', enablePeriod:'202601', currentPeriod:'202604' },
+        { id:2, org:'上海分公司', enablePeriod:'202603', currentPeriod:'202604' },
+    ];
+    let periodData = [
+        { id:1, org:'北京分公司', enablePeriod:'202601', currentPeriod:'202604' },
+        { id:2, org:'上海分公司', enablePeriod:'202602', currentPeriod:'202604' },
+        { id:3, org:'广州分公司', enablePeriod:'202601', currentPeriod:'202604' },
+    ];
+    const postponeData = [
+        { id:1, batchNo:'B20260428001', org:'北京分公司', sourcePeriod:'202603', targetPeriod:'202604', docCount:15, operator:'张明', operateTime:'2026-04-28 10:23:11', reason:'月底发票未到齐，延期核算' },
+        { id:2, batchNo:'B20260428002', org:'上海分公司', sourcePeriod:'202603', targetPeriod:'202604', docCount:3,  operator:'李华', operateTime:'2026-04-28 11:05:42', reason:'项目工程未确认完工量' },
+    ];
+    const detailRecords = [
+        { docNo:'DOC-202603-0001', docType:'库存出库单',       originalPeriod:'202603', targetPeriod:'202604', status:'已顺延' },
+        { docNo:'DOC-202603-0002', docType:'项目发票核算单',   originalPeriod:'202603', targetPeriod:'202604', status:'已顺延' },
+        { docNo:'DOC-202603-0005', docType:'暂估入库单',       originalPeriod:'202603', targetPeriod:'202604', status:'已顺延' },
+        { docNo:'DOC-202603-0008', docType:'库存出库单',       originalPeriod:'202603', targetPeriod:'202604', status:'已顺延' },
+        { docNo:'DOC-202603-0012', docType:'库存出库单',       originalPeriod:'202603', targetPeriod:'202604', status:'已顺延' },
+    ];
+    const mockUnfinishedDocs = [
+        { currentPeriod:'202604', contractNo:'HT-202604-001', projectName:'北京一期工程', status:'待核算', targetPeriod:'202605' },
+        { currentPeriod:'202604', contractNo:'HT-202604-002', projectName:'上海二期改造', status:'核算中', targetPeriod:'202605' },
+        { currentPeriod:'202604', contractNo:'HT-202604-005', projectName:'广州展厅装修', status:'待确认', targetPeriod:'202605' },
+    ];
+    const selected = { stock:new Set(), project:new Set(), period:new Set() };
+
+    // ================== 启用管理 ==================
+    function renderEnable() {
+        const tb = document.getElementById('enable-tbody');
+        tb.innerHTML = enableData.map(r => `
+            <tr>
+                <td class="px-4 py-2 text-sm text-gray-700">${r.org}</td>
+                <td class="px-4 py-2">
+                    <input type="month" value="${r.period ? r.period.replace(/(\d{4})(\d{2})/,'$1-$2') : ''}"
+                           ${r.isEnabled ? 'disabled' : ''}
+                           onchange="updateEnablePeriod(${r.id}, this.value)"
+                           class="border border-gray-300 rounded px-2 py-1 text-sm disabled:bg-gray-50 disabled:text-gray-400">
+                </td>
+                <td class="px-4 py-2 text-sm">
+                    <span class="px-2 py-1 text-xs rounded-full ${r.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}">${r.isActive ? '是' : '否'}</span>
+                </td>
+                <td class="px-4 py-2 text-sm">
+                    ${r.isEnabled
+                        ? '<span class="text-gray-400">已启用</span>'
+                        : `<button onclick="enableOrg(${r.id})" class="text-red-500 hover:text-red-600">启用</button>`}
+                </td>
+            </tr>`).join('');
+    }
+    function updateEnablePeriod(id, v) {
+        const p = (v||'').replace('-','');
+        const r = enableData.find(d=>d.id===id);
+        if (r && !r.isEnabled) r.period = p;
+    }
+    function enableOrg(id) {
+        const r = enableData.find(d=>d.id===id);
+        if (!r.period) return showToast('请先选择启用期间', 'error');
+        openConfirm({
+            title:'确认启用',
+            content:`确定要启用【${r.org}】的核算模块吗？启用后启用期间将不可修改。`,
+            onOk: () => { r.isEnabled = true; r.isActive = true; renderEnable(); showToast('启用成功', 'success'); }
+        });
+    }
+
+    // ================== 参数管理 ==================
+    (function initParamDays(){
+        const sel = document.getElementById('param-startDay');
+        let html = '';
+        for (let i=1; i<=28; i++) html += `<option value="${i}" ${i===2?'selected':''}>${i}日</option>`;
+        sel.innerHTML = html;
+    })();
+    document.getElementById('btn-save-params').addEventListener('click', () => showToast('参数保存成功', 'success'));
+
+    // ================== 通用：渲染关账表格 ==================
+    function renderGenericList(tbodyId, data, key) {
+        const tb = document.getElementById(tbodyId);
+        if (!data.length) {
+            tb.innerHTML = `<tr><td colspan="4" class="px-4 py-8 text-center text-gray-400 text-sm">暂无匹配的记录</td></tr>`;
+            return;
+        }
+        tb.innerHTML = data.map(r => `
+            <tr class="${selected[key].has(r.id)?'row-selected':'hover:bg-blue-50'}">
+                <td class="px-4 py-2"><input type="checkbox" ${selected[key].has(r.id)?'checked':''} onchange="toggleRow('${key}', ${r.id})" class="rounded"></td>
+                <td class="px-4 py-2 text-sm text-gray-800">${r.org}</td>
+                <td class="px-4 py-2 text-sm text-gray-600">${r.enablePeriod}</td>
+                <td class="px-4 py-2 text-sm text-primary font-medium">${r.currentPeriod}</td>
+            </tr>`).join('');
+    }
+    function toggleRow(key, id) {
+        const s = selected[key];
+        s.has(id) ? s.delete(id) : s.add(id);
+        if (key==='stock') renderGenericList('stock-tbody', stockData, 'stock');
+        else if (key==='project') renderGenericList('project-tbody', projectData, 'project');
+        else if (key==='period') renderPeriod();
+    }
+    function bindCheckAll(boxId, tbodyId, data, key) {
+        document.getElementById(boxId).addEventListener('change', e => {
+            if (e.target.checked) data.forEach(d => selected[key].add(d.id));
+            else selected[key].clear();
+            if (key==='stock') renderGenericList(tbodyId, stockData, 'stock');
+            else if (key==='project') renderGenericList(tbodyId, projectData, 'project');
+            else if (key==='period') renderPeriod();
+        });
+    }
+
+    // ================== 执行结果日志 ==================
+    function appendLog(sectionId, tbodyId, logs) {
+        document.getElementById(sectionId).classList.remove('hidden');
+        const tb = document.getElementById(tbodyId);
+        const now = new Date().toLocaleTimeString();
+        logs.forEach(log => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-gray-50';
+            const statusBadge = log.status==='成功'
+                ? '<span class="px-2 py-0.5 rounded text-xs bg-green-50 text-green-600 border border-green-200">成功</span>'
+                : '<span class="px-2 py-0.5 rounded text-xs bg-red-50 text-red-500 border border-red-200">失败</span>';
+            let msgCell = `<span class="${log.status==='成功'?'text-gray-600':'text-red-500'}">${log.message}</span>`;
+            if (log.details) {
+                const payload = encodeURIComponent(JSON.stringify({ org: log.org, details: log.details }));
+                msgCell += ` <button onclick="openBlockDetail('${payload}')" class="text-primary hover:underline text-xs ml-2">查看明细</button>`;
+            }
+            tr.innerHTML = `
+                <td class="px-3 py-2 text-xs text-gray-500">${now}</td>
+                <td class="px-3 py-2 text-xs text-gray-800">${log.org}</td>
+                <td class="px-3 py-2 text-xs text-gray-600">${log.action}</td>
+                <td class="px-3 py-2 text-xs">${statusBadge}</td>
+                <td class="px-3 py-2 text-xs">${msgCell}</td>`;
+            tb.insertBefore(tr, tb.firstChild);
+        });
+    }
+    function openBlockDetail(payload) {
+        const { org, details } = JSON.parse(decodeURIComponent(payload));
+        openConfirm({
+            title:`未核算完成项目明细 - ${org}`,
+            hideCancel:true,
+            okText:'关闭',
+            content: `<div class="overflow-x-auto border rounded"><table class="min-w-full text-sm"><thead class="bg-gray-50"><tr>
+                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">合同号</th>
+                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">项目名称</th>
+                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">当前状态</th>
+                      </tr></thead><tbody>${
+                        details.map(d => `<tr class="border-t"><td class="px-3 py-2 text-gray-800">${d.contractNo}</td><td class="px-3 py-2 text-gray-600">${d.projectName}</td><td class="px-3 py-2 text-red-500">${d.status}</td></tr>`).join('')
+                      }</tbody></table></div>`
+        });
+    }
+
+    // ================== 库存关账 ==================
+    function handleStockClose(type) {
+        if (!selected.stock.size) return showToast('请至少选择一条记录', 'error');
+        if (type === 'close') {
+            openConfirm({
+                title:'确认关账',
+                content:`
+                    <p class="mb-3">确定对选中的 ${selected.stock.size} 个组织执行关账操作吗？未完成单据将顺延至下一期间。</p>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">顺延原因 <span class="text-red-500">*</span></label>
+                    <textarea id="stock-reason" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" rows="3" placeholder="请输入顺延原因..."></textarea>
+                `,
+                onOk: () => {
+                    const r = document.getElementById('stock-reason').value.trim();
+                    if (!r) { showToast('请填写顺延原因', 'error'); return false; }
+                    const logs = [];
+                    selected.stock.forEach(id => {
+                        const row = stockData.find(d=>d.id===id);
+                        const ok = Math.random() > 0.3;
+                        logs.push({ org: row.org, action:'关账', status: ok?'成功':'失败',
+                            message: ok ? '关账操作已完成' : '阻断原因：发现未核算单据 采购入库单 [PIN-2026-001]，当前状态：待处理' });
+                        if (ok) {
+                            let y = parseInt(row.currentPeriod.slice(0,4));
+                            let m = parseInt(row.currentPeriod.slice(4,6))+1;
+                            if (m>12) { y++; m=1; }
+                            row.currentPeriod = `${y}${String(m).padStart(2,'0')}`;
+                        }
+                    });
+                    appendLog('stock-log-section','stock-log-tbody', logs);
+                    selected.stock.clear();
+                    renderGenericList('stock-tbody', stockData, 'stock');
+                    showToast('关账成功，已记录顺延履历', 'success');
+                }
+            });
+        } else {
+            openConfirm({
+                title:'确认反关账',
+                content:`<p class="mb-2">确定要执行反关账操作吗？</p>
+                         <p class="text-red-500 font-medium">⚠️ 注意：反关账不会退回顺延期间的单据，顺延记录予以保留不可撤销。</p>`,
+                onOk: () => {
+                    const logs = [];
+                    selected.stock.forEach(id => {
+                        const row = stockData.find(d=>d.id===id);
+                        const ok = Math.random() > 0.3;
+                        logs.push({ org: row.org, action:'反关账', status: ok?'成功':'失败',
+                            message: ok ? '反关账操作已完成' : '阻断原因：存在后置关联单据，不允许反关账' });
+                    });
+                    appendLog('stock-log-section','stock-log-tbody', logs);
+                    selected.stock.clear();
+                    renderGenericList('stock-tbody', stockData, 'stock');
+                    showToast('反关账操作已执行', 'success');
+                }
+            });
+        }
+    }
+
+    // ================== 项目关账 ==================
+    function handleProjectClose(type) {
+        if (!selected.project.size) return showToast('请至少选择一条记录', 'error');
+        if (type === 'check') {
+            const logs = [];
+            selected.project.forEach(id => {
+                const row = projectData.find(d=>d.id===id);
+                const ok = Math.random() > 0.4;
+                const details = ok ? null : mockUnfinishedDocs.slice(0, 2+Math.floor(Math.random()*2));
+                logs.push({ org: row.org, action:'检查', status: ok?'成功':'失败',
+                    message: ok ? '检查操作已完成' : `阻断原因：当期存在 ${details.length} 个未核算完成或未确认的项目`, details });
+            });
+            appendLog('project-log-section','project-log-tbody', logs);
+            selected.project.clear();
+            renderGenericList('project-tbody', projectData, 'project');
+            showToast('关账检查请求已发出');
+        } else if (type === 'close') {
+            openConfirm({
+                title:'确认关账并顺延单据',
+                content:`
+                    <p class="mb-3">检测到以下项目未完成核算确认，继续关账将自动顺延至下一会计期间，确定要继续吗？</p>
+                    <div class="overflow-x-auto border rounded mb-3"><table class="min-w-full text-sm">
+                        <thead class="bg-gray-50"><tr>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">当前期间</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">合同号</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">项目名称</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">当前状态</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">顺延至期间</th>
+                        </tr></thead>
+                        <tbody>${mockUnfinishedDocs.map(d=>`<tr class="border-t">
+                            <td class="px-3 py-2 text-gray-800">${d.currentPeriod}</td>
+                            <td class="px-3 py-2 text-gray-600">${d.contractNo}</td>
+                            <td class="px-3 py-2 text-gray-600">${d.projectName}</td>
+                            <td class="px-3 py-2 text-gray-600">${d.status}</td>
+                            <td class="px-3 py-2 text-primary font-medium">${d.targetPeriod}</td>
+                        </tr>`).join('')}</tbody>
+                    </table></div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">顺延原因 <span class="text-red-500">*</span></label>
+                    <textarea id="project-reason" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" rows="2" placeholder="请输入顺延原因..."></textarea>
+                `,
+                onOk: () => {
+                    const r = document.getElementById('project-reason').value.trim();
+                    if (!r) { showToast('请填写顺延原因', 'error'); return false; }
+                    const logs = [];
+                    selected.project.forEach(id => {
+                        const row = projectData.find(d=>d.id===id);
+                        logs.push({ org: row.org, action:'关账', status:'成功', message:'关账操作已完成' });
+                    });
+                    appendLog('project-log-section','project-log-tbody', logs);
+                    selected.project.clear();
+                    renderGenericList('project-tbody', projectData, 'project');
+                    showToast('关账申请已提交，顺延履历已生成', 'success');
+                }
+            });
+        } else {
+            openConfirm({
+                title:'确认反关账',
+                content:`<p class="mb-2">确定要执行项目反关账操作吗？</p>
+                         <p class="text-red-500 font-medium">⚠️ 注意：反关账不会退回已顺延的项目记录。</p>`,
+                onOk: () => {
+                    const logs = [];
+                    selected.project.forEach(id => {
+                        const row = projectData.find(d=>d.id===id);
+                        logs.push({ org: row.org, action:'反关账', status:'成功', message:'反关账操作已完成' });
+                    });
+                    appendLog('project-log-section','project-log-tbody', logs);
+                    selected.project.clear();
+                    renderGenericList('project-tbody', projectData, 'project');
+                    showToast('反关账已执行', 'success');
+                }
+            });
+        }
+    }
+
+    // ================== 期末结账 ==================
+    function renderPeriod() {
+        const kw = (document.getElementById('period-search').value || '').trim();
+        const list = periodData.filter(d => !kw || d.org.includes(kw));
+        const tb = document.getElementById('period-tbody');
+        if (!list.length) {
+            tb.innerHTML = `<tr><td colspan="4" class="px-4 py-8 text-center text-gray-400 text-sm">暂无匹配的记录</td></tr>`;
+        } else {
+            tb.innerHTML = list.map(r => `
+                <tr class="${selected.period.has(r.id)?'row-selected':'hover:bg-blue-50'}">
+                    <td class="px-4 py-2"><input type="checkbox" ${selected.period.has(r.id)?'checked':''} onchange="toggleRow('period', ${r.id})" class="rounded"></td>
+                    <td class="px-4 py-2 text-sm text-gray-800">${r.org}</td>
+                    <td class="px-4 py-2 text-sm text-gray-600">${r.enablePeriod}</td>
+                    <td class="px-4 py-2 text-sm text-primary font-medium">${r.currentPeriod}</td>
+                </tr>`).join('');
+        }
+        document.getElementById('period-count').textContent = `共查询到 ${list.length} 条记录`;
+    }
+    document.getElementById('period-search').addEventListener('input', renderPeriod);
+
+    function handlePeriodClose(type) {
+        if (!selected.period.size) return showToast('请至少选择一条记录', 'error');
+        if (type === 'close') {
+            const logs = [];
+            selected.period.forEach(id => {
+                const row = periodData.find(d=>d.id===id);
+                const ok = Math.random() > 0.3;
+                logs.push({ org: row.org, action:'结账', status: ok?'成功':'失败',
+                    message: ok ? '结账成功' : '存在未核算完成的数据，不允许结账' });
+            });
+            appendLog('period-log-section','period-log-tbody', logs);
+            selected.period.clear();
+            renderPeriod();
+            showToast('结账处理完成', 'success');
+        } else {
+            openConfirm({
+                title:'确认反结账',
+                content:`<p class="mb-2">确定要执行反结账操作吗？</p>
+                         <p class="text-red-500 font-medium">⚠️ 注意：反结账不会退回跨期顺延的单据。</p>`,
+                onOk: () => {
+                    const logs = [];
+                    selected.period.forEach(id => {
+                        const row = periodData.find(d=>d.id===id);
+                        logs.push({ org: row.org, action:'反结账', status:'成功', message:'反结账已触发' });
+                    });
+                    appendLog('period-log-section','period-log-tbody', logs);
+                    selected.period.clear();
+                    renderPeriod();
+                    showToast('反结账已触发', 'success');
+                }
+            });
+        }
+    }
+
+    // ================== 顺延查询 ==================
+    function renderPostponeList() {
+        const kw = (document.getElementById('postpone-search').value || '').trim().toLowerCase();
+        const list = postponeData.filter(r => !kw || r.batchNo.toLowerCase().includes(kw) || r.org.includes(kw));
+        const tb = document.getElementById('postpone-tbody');
+        if (!list.length) {
+            tb.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-gray-400 text-sm">暂无数据</td></tr>`;
+            return;
+        }
+        tb.innerHTML = list.map(r => `
+            <tr class="hover:bg-blue-50">
+                <td class="px-4 py-2 text-sm text-gray-800 font-medium whitespace-nowrap">${r.batchNo}</td>
+                <td class="px-4 py-2 text-sm text-gray-800 whitespace-nowrap">${r.org}</td>
+                <td class="px-4 py-2 text-sm text-gray-600 whitespace-nowrap">${r.sourcePeriod}</td>
+                <td class="px-4 py-2 text-sm text-primary whitespace-nowrap">${r.targetPeriod}</td>
+                <td class="px-4 py-2 text-sm text-gray-800 whitespace-nowrap">${r.docCount}</td>
+                <td class="px-4 py-2 text-sm text-gray-600 truncate max-w-[200px]" title="${r.reason}">${r.reason}</td>
+                <td class="px-4 py-2 text-sm text-gray-800 whitespace-nowrap">${r.operator}</td>
+                <td class="px-4 py-2 text-sm text-gray-500 whitespace-nowrap">${r.operateTime}</td>
+                <td class="px-4 py-2 whitespace-nowrap"><button onclick="openDetail('${r.batchNo}')" class="text-primary text-sm hover:underline">查看明细</button></td>
+            </tr>`).join('');
+    }
+    function openDetail(batchNo) {
+        document.getElementById('detail-title').textContent = `顺延单据明细 - ${batchNo}`;
+        document.getElementById('detail-search').value = '';
+        renderDetailList();
+        document.getElementById('detail-modal').classList.remove('hidden');
+    }
+    function renderDetailList() {
+        const kw = (document.getElementById('detail-search').value || '').trim().toLowerCase();
+        const list = detailRecords.filter(r => !kw || r.docNo.toLowerCase().includes(kw));
+        const tb = document.getElementById('detail-tbody');
+        if (!list.length) {
+            tb.innerHTML = `<tr><td colspan="5" class="px-3 py-8 text-center text-gray-400 text-sm">暂无匹配的单据数据</td></tr>`;
+        } else {
+            tb.innerHTML = list.map(r => `
+                <tr class="hover:bg-blue-50">
+                    <td class="px-3 py-2 text-sm text-gray-800">${r.docNo}</td>
+                    <td class="px-3 py-2 text-sm text-gray-600">${r.docType}</td>
+                    <td class="px-3 py-2 text-sm text-gray-600">${r.originalPeriod}</td>
+                    <td class="px-3 py-2 text-sm text-primary">${r.targetPeriod}</td>
+                    <td class="px-3 py-2 text-sm"><span class="px-2 py-0.5 rounded text-xs bg-gray-100 border border-gray-200 text-gray-600">${r.status}</span></td>
+                </tr>`).join('');
+        }
+        document.getElementById('detail-count').textContent = `共 ${list.length} 条记录`;
+    }
+    document.getElementById('detail-search').addEventListener('input', renderDetailList);
+
+    // ================== 初始化 ==================
+    renderEnable();
+    renderGenericList('stock-tbody', stockData, 'stock');
+    renderGenericList('project-tbody', projectData, 'project');
+    renderPeriod();
+    renderPostponeList();
+    bindCheckAll('stock-check-all','stock-tbody', stockData, 'stock');
+    bindCheckAll('project-check-all','project-tbody', projectData, 'project');
+    bindCheckAll('period-check-all','period-tbody', periodData, 'period');
+    if (window.lucide) lucide.createIcons();
     </script>
+
+    <!-- PRD Viewer -->
+    <link rel="stylesheet" href="common/prd-viewer.css">
+    <script src="common/prd-viewer.js" defer></script>
 </body>
 </html>
