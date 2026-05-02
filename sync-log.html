@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>同步日志 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: { 'sm': '4px', 'md': '8px', 'lg': '12px', 'xl': '16px' },
+                },
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="common/styles.css">
+</head>
+<body class="bg-neutral">
+    <div class="flex h-screen">
+        <div id="sidebar-container"></div>
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="space-y-6">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h1 class="text-xl font-semibold text-gray-800">同步日志</h1>
+                    <p class="text-sm text-gray-500 mt-1">记录中台单据向外部系统（EBS、金蝶）同步的执行情况，支持按条件查询并对失败记录进行重试。</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <!-- 筛选条件 -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">来源单号</label>
+                            <input type="text" placeholder="精确搜索" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">主合同号</label>
+                            <input type="text" placeholder="精确搜索" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">接口类型</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                <option value="">全部</option>
+                                <option value="sales-ebs">销售出库同步EBS</option>
+                                <option value="sales-kingdee">销售出库同步金蝶</option>
+                                <option value="ar-ebs">应收单同步EBS</option>
+                                <option value="ar-kingdee">应收单同步金蝶</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">状态</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                <option value="">全部</option>
+                                <option value="success">成功</option>
+                                <option value="fail">失败</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mb-4 space-x-3">
+                        <button class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm">重置</button>
+                        <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm">查询</button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">来源单号</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">主合同号</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">接口类型</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">同步时间</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">最后同步时间</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">请求参数</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">反馈信息</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">XSCK202604001</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">HT2026040001</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">销售出库同步EBS</td>
+                                    <td class="px-4 py-2 text-sm"><span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">成功</span></td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-20 10:15</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-20 10:15</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700"><button class="text-blue-600 hover:text-blue-800 view-params-btn" data-source="XSCK202604001" data-type="销售出库同步EBS" data-params='{"docNo":"XSCK202604001","contractNo":"HT2026040001","orgCode":"EBS001","orgId":"100001","items":[{"materialCode":"M001","qty":10,"amount":12000}]}'>查看</button></td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">同步成功</td>
+                                    <td class="px-4 py-2 text-sm text-gray-400">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">XSCK202604002</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">HT2026040002</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">销售出库同步金蝶</td>
+                                    <td class="px-4 py-2 text-sm"><span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">失败</span></td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-20 11:02</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-20 14:30</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700"><button class="text-blue-600 hover:text-blue-800 view-params-btn" data-source="XSCK202604002" data-type="销售出库同步金蝶" data-params='{"docNo":"XSCK202604002","contractNo":"HT2026040002","customerCode":"KS100","customerName":"客商A","items":[{"materialCode":"M002","qty":5,"amount":4500}]}'>查看</button></td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">客商映射不存在</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">
+                                        <button class="text-blue-600 hover:text-blue-800 retry-btn">重试</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">YS202604010</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">HT2026030015</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">应收单同步EBS</td>
+                                    <td class="px-4 py-2 text-sm"><span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">成功</span></td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-21 09:30</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-21 09:30</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700"><button class="text-blue-600 hover:text-blue-800 view-params-btn" data-source="YS202604010" data-type="应收单同步EBS" data-params='{"docNo":"YS202604010","contractNo":"HT2026030015","orgCode":"EBS001","amount":58000,"currency":"CNY"}'>查看</button></td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">同步成功</td>
+                                    <td class="px-4 py-2 text-sm text-gray-400">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-700">YS202604011</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">HT2026030016</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">应收单同步金蝶</td>
+                                    <td class="px-4 py-2 text-sm"><span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">失败</span></td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-21 10:00</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">2026-04-21 15:12</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700"><button class="text-blue-600 hover:text-blue-800 view-params-btn" data-source="YS202604011" data-type="应收单同步金蝶" data-params='{"docNo":"YS202604011","contractNo":"HT2026030016","orgCode":"JD002","amount":12800,"currency":"CNY"}'>查看</button></td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">财务主体映射不存在</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">
+                                        <button class="text-blue-600 hover:text-blue-800 retry-btn">重试</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页 -->
+                    <div class="flex items-center justify-between mt-4 text-sm text-gray-600">
+                        <div>共 4 条</div>
+                        <div class="flex items-center space-x-2">
+                            <button class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50">上一页</button>
+                            <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md">1</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50">下一页</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 请求参数查看弹窗 -->
+    <div id="params-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+        <div class="bg-white rounded-lg shadow-lg w-[600px] max-w-[90vw] max-h-[80vh] flex flex-col">
+            <div class="flex items-center justify-between px-5 py-3 border-b border-gray-200">
+                <h3 class="text-base font-medium text-gray-800">请求参数</h3>
+                <button id="params-modal-close" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="px-5 py-4 overflow-y-auto flex-1">
+                <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+                    <div>
+                        <span class="text-gray-500">来源单号：</span>
+                        <span id="modal-source" class="text-gray-800 font-medium">-</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">接口类型：</span>
+                        <span id="modal-type" class="text-gray-800 font-medium">-</span>
+                    </div>
+                </div>
+                <div class="text-xs text-gray-500 mb-1">参数内容（JSON）</div>
+                <pre id="modal-params" class="bg-gray-50 border border-gray-200 rounded-md p-3 text-xs text-gray-800 whitespace-pre-wrap break-all font-mono"></pre>
+            </div>
+            <div class="flex items-center justify-end space-x-3 px-5 py-3 border-t border-gray-200">
+                <button id="params-modal-copy" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm">复制</button>
+                <button id="params-modal-ok" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html');
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+                const script = document.createElement('script');
+                script.src = 'common/scripts.js';
+                script.onload = function() { if (typeof initCommonFunctions === 'function') initCommonFunctions(); };
+                document.body.appendChild(script);
+            } catch (error) { console.error('加载侧边栏失败:', error); }
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadSidebar);
+        else loadSidebar();
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('retry-btn')) {
+                alert('已发起重试');
+            }
+        });
+
+        // 请求参数查看弹窗
+        const paramsModal = document.getElementById('params-modal');
+        function openParamsModal(btn) {
+            const source = btn.getAttribute('data-source') || '-';
+            const type = btn.getAttribute('data-type') || '-';
+            const raw = btn.getAttribute('data-params') || '{}';
+            let formatted = raw;
+            try { formatted = JSON.stringify(JSON.parse(raw), null, 2); } catch (err) {}
+            document.getElementById('modal-source').textContent = source;
+            document.getElementById('modal-type').textContent = type;
+            document.getElementById('modal-params').textContent = formatted;
+            paramsModal.classList.remove('hidden');
+            paramsModal.classList.add('flex');
+            if (window.lucide) lucide.createIcons();
+        }
+        function closeParamsModal() {
+            paramsModal.classList.add('hidden');
+            paramsModal.classList.remove('flex');
+        }
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.view-params-btn');
+            if (btn) { openParamsModal(btn); return; }
+            if (e.target.id === 'params-modal-close' || e.target.closest('#params-modal-close')) { closeParamsModal(); return; }
+            if (e.target.id === 'params-modal-ok') { closeParamsModal(); return; }
+            if (e.target.id === 'params-modal-copy') {
+                const text = document.getElementById('modal-params').textContent;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => alert('已复制到剪贴板')).catch(() => alert('复制失败'));
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = text; document.body.appendChild(ta); ta.select();
+                    try { document.execCommand('copy'); alert('已复制到剪贴板'); } catch (_) { alert('复制失败'); }
+                    document.body.removeChild(ta);
+                }
+                return;
+            }
+            if (e.target === paramsModal) { closeParamsModal(); }
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !paramsModal.classList.contains('hidden')) closeParamsModal();
+        });
+    </script>
+
+    <!-- PRD Viewer -->
+    <link rel="stylesheet" href="common/prd-viewer.css">
+    <script src="common/prd-viewer.js" defer></script>
+</body>
+</html>
