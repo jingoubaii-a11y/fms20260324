@@ -219,7 +219,7 @@
                                 <div class="req-marker inline-flex" id="req-marker-23">
                                     <span class="req-badge" data-req="23"
                                           data-title="需求描述：操作按钮"
-                                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[23] 需求描述：操作按钮</h3><div class="req-section-title">按钮清单（3个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>新增</strong>：打开新增调整单抽屉<br/>抽屉字段：财务主体、单据编号（自动生成TZD+8位）、会计期间、合同号、收入调整金额、成本调整金额、调整原因、单据状态、是否参与核算、核算单号</li><li><strong>导入</strong>：弹框，可下载导入模板，批量导入调整单数据</li><li><strong>导出</strong>：根据筛选条件返回数据导出为Excel格式</li></ol></div>'>23</span>
+                                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[23] 需求描述：操作按钮</h3><div class="req-section-title">按钮清单（3个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>新增</strong>：打开新增调整单抽屉<br/>抽屉字段：财务主体、单据编号（自动生成TZD+8位）、会计期间、合同号、收入调整金额、成本调整金额（汇总=成本调整明细之和）、成本调整明细（子表：明细科目+调整金额）、调整原因、单据状态、是否参与核算、核算单号</li><li><strong>导入</strong>：弹框，可下载导入模板，批量导入调整单数据</li><li><strong>导出</strong>：根据筛选条件返回数据导出为Excel格式</li></ol></div>'>23</span>
                                     <button id="add-adjustment-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center whitespace-nowrap">
                                         <i data-lucide="plus" class="w-4 h-4 mr-1"></i>
                                         新增
@@ -272,7 +272,7 @@
                     <div class="overflow-x-auto req-marker relative inline-block" id="req-marker-25">
                         <span class="req-badge" data-req="25"
                               data-title="需求描述：调整单列表"
-                              data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[25] 需求描述：调整单列表</h3><div class="req-section-title">字段清单（14个字段+操作）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>财务主体</strong></li><li><strong>会计期间</strong></li><li><strong>单据编号</strong>：自动生成TZD+8位流水</li><li><strong>合同号</strong></li><li><strong>收入调整金额</strong></li><li><strong>成本调整金额</strong></li><li><strong>调整原因</strong></li><li><strong>创建人</strong></li><li><strong>创建时间</strong></li><li><strong>修改人</strong></li><li><strong>修改时间</strong></li><li><strong>单据状态</strong>：枚举：草稿/生效</li><li><strong>是否参与核算</strong>：枚举：是/否<br/><em>业务规则：核算单据采集保存后反写为是，核算单据删除后反写为否</em></li><li><strong>核算单号</strong>：<br/><em>业务规则：锁定字段，核算单据采集保存后反写核算单号，项目收入核算单据删除后清空核算单号</em></li></ol><div class="req-section-title">操作</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>编辑</strong>：界面同新增界面（打开编辑抽屉）</li><li><strong>删除</strong>：<em>是否参与核算=是时，不允许删除</em></li></ol></div>'>25</span>
+                              data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[25] 需求描述：调整单列表</h3><div class="req-section-title">字段清单（14个字段+操作）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>财务主体</strong></li><li><strong>会计期间</strong></li><li><strong>单据编号</strong>：自动生成TZD+8位流水</li><li><strong>合同号</strong></li><li><strong>收入调整金额</strong></li><li><strong>成本调整金额</strong>：汇总值，= 成本调整明细金额之和</li><li><strong>调整原因</strong></li><li><strong>创建人</strong></li><li><strong>创建时间</strong></li><li><strong>修改人</strong></li><li><strong>修改时间</strong></li><li><strong>单据状态</strong>：枚举：草稿/生效</li><li><strong>是否参与核算</strong>：枚举：是/否<br/><em>业务规则：核算单据采集保存后反写为是，核算单据删除后反写为否</em></li><li><strong>核算单号</strong>：<br/><em>业务规则：锁定字段，核算单据采集保存后反写核算单号，项目收入核算单据删除后清空核算单号</em></li></ol><div class="req-section-title">操作</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>编辑</strong>：界面同新增界面（打开编辑抽屉）</li><li><strong>删除</strong>：<em>是否参与核算=是时，不允许删除</em></li></ol></div>'>25</span>
                         <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -373,7 +373,7 @@
         <div class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl overflow-y-auto req-marker drawer transform translate-x-full transition-transform duration-300 ease-in-out z-50" id="req-marker-26" style="left: auto;">
             <span class="req-badge" data-req="26"
                   data-title="需求描述：新增/编辑调整单抽屉"
-                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[26] 需求描述：新增/编辑调整单抽屉</h3><div class="req-section-title">打开方式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击"新增"按钮打开此抽屉（新增模式）</li><li>点击列表的"编辑"按钮打开此抽屉（编辑模式）</li></ul><div class="req-section-title">表单字段清单（10个字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>财务主体</strong>：下拉选择财务主体</li><li><strong>单据编号</strong>：<em>锁定</em>，自动生成规则：TZD+8位流水号</li><li><strong>会计期间</strong>：选择会计期间</li><li><strong>合同号</strong>：过滤财务主体对应的合同，下拉选择</li><li><strong>收入调整金额</strong>：数字输入，可正负数</li><li><strong>成本调整金额</strong>：数字输入，可正负数</li><li><strong>调整原因</strong>：文本输入，必填</li><li><strong>单据状态</strong>：枚举：草稿、生效</li><li><strong>是否参与核算</strong>：枚举：是、否<br/><em>业务规则：核算单据采集保存后反写为是，核算单据删除后反写为否</em></li><li><strong>核算单号</strong>：<em>锁定</em>，核算单据采集保存后反写核算单号，项目收入核算单据删除后清空核算单号</li></ol><div class="req-section-title">操作按钮</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>保存</strong>：保存当前表单数据</li><li><strong>生效</strong>：将单据状态更新为"生效"</li></ol></div>'>26</span>
+                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[26] 需求描述：新增/编辑调整单抽屉</h3><div class="req-section-title">打开方式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击"新增"按钮打开此抽屉（新增模式）</li><li>点击列表的"编辑"按钮打开此抽屉（编辑模式）</li></ul><div class="req-section-title">表单字段清单（10个字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>财务主体</strong>：下拉选择财务主体</li><li><strong>单据编号</strong>：<em>锁定</em>，自动生成规则：TZD+8位流水号</li><li><strong>会计期间</strong>：选择会计期间</li><li><strong>合同号</strong>：过滤财务主体对应的合同，下拉选择</li><li><strong>收入调整金额</strong>：数字输入，可正负数</li><li><strong>成本调整金额</strong>：<em>汇总值</em>，= 成本调整明细金额之和，自动计算</li><li><strong>成本调整明细</strong>：子表，一个调整单可对应多条成本明细<br/>- 明细科目：选择成本调整的明细科目<br/>- 调整金额：输入金额</li><li><strong>调整原因</strong>：文本输入，必填</li><li><strong>单据状态</strong>：枚举：草稿、生效</li><li><strong>是否参与核算</strong>：枚举：是、否<br/><em>业务规则：核算单据采集保存后反写为是，核算单据删除后反写为否</em></li><li><strong>核算单号</strong>：<em>锁定</em>，核算单据采集保存后反写核算单号，项目收入核算单据删除后清空核算单号</li></ol><div class="req-section-title">操作按钮</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>保存</strong>：保存当前表单数据</li><li><strong>生效</strong>：将单据状态更新为"生效"</li></ol></div>'>26</span>
 
             <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
                 <h3 class="text-lg font-semibold text-gray-900" id="drawer-title">新增调整单</h3>
@@ -422,9 +422,50 @@
                             <input type="number" step="0.01" placeholder="请输入金额" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="adjustment-revenue-amount">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">成本调整金额 <span class="text-red-500">*</span></label>
-                            <input type="number" step="0.01" placeholder="请输入金额" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="adjustment-cost-amount">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">成本调整金额</label>
+                            <input type="number" step="0.01" placeholder="自动汇总" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" id="adjustment-cost-amount" readonly>
+                            <p class="text-xs text-gray-500 mt-1">= 成本调整明细金额之和</p>
                         </div>
+                    </div>
+
+                    <!-- 成本调整明细子表 -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-sm font-medium text-gray-700">成本调整明细</label>
+                            <button type="button" class="px-2 py-1 text-xs text-primary border border-primary rounded hover:bg-secondary transition-colors" id="add-cost-detail-btn">
+                                <i data-lucide="plus" class="w-3 h-3 inline-block mr-1"></i>新增行
+                            </button>
+                        </div>
+                        <table class="w-full border border-gray-200 rounded-md text-sm" id="cost-detail-table">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 w-1/2">明细科目</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 w-1/3">调整金额</th>
+                                    <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 w-16">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr class="cost-detail-row">
+                                    <td class="px-3 py-2">
+                                        <select class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-primary cost-subject">
+                                            <option value="">请选择明细科目</option>
+                                            <option value="148102050101">148102050101 材料成本-其中材料</option>
+                                            <option value="148102050102">148102050102 材料成本-其中：材料进项税额转出</option>
+                                            <option value="148102030102">148102030102 人工成本（工人及员工）</option>
+                                            <option value="148102030106">148102030106 劳务分包差额抵税</option>
+                                            <option value="148102060101">148102060101 计运输成本</option>
+                                            <option value="148102030101">148102030101 其他成本</option>
+                                        </select>
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <input type="number" step="0.01" placeholder="0.00" class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-primary cost-amount">
+                                    </td>
+                                    <td class="px-3 py-2 text-center">
+                                        <button type="button" class="text-red-500 hover:text-red-700 text-xs remove-cost-detail-btn">删除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <div>
@@ -608,6 +649,41 @@
                     alert('导出调整单列表');
                 });
             }
+
+            // === 成本调整明细子表交互 ===
+            function calcCostTotal() {
+                var total = 0;
+                document.querySelectorAll('#cost-detail-table .cost-amount').forEach(function(input) {
+                    total += parseFloat(input.value) || 0;
+                });
+                document.getElementById('adjustment-cost-amount').value = total.toFixed(2);
+            }
+
+            document.getElementById('add-cost-detail-btn').addEventListener('click', function() {
+                var tbody = document.querySelector('#cost-detail-table tbody');
+                var row = document.createElement('tr');
+                row.className = 'cost-detail-row';
+                row.innerHTML = '<td class="px-3 py-2"><select class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-primary cost-subject"><option value="">请选择明细科目</option><option value="148102050101">148102050101 材料成本-其中材料</option><option value="148102050102">148102050102 材料成本-其中：材料进项税额转出</option><option value="148102030102">148102030102 人工成本（工人及员工）</option><option value="148102030106">148102030106 劳务分包差额抵税</option><option value="148102060101">148102060101 计运输成本</option><option value="148102030101">148102030101 其他成本</option></select></td><td class="px-3 py-2"><input type="number" step="0.01" placeholder="0.00" class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-primary cost-amount"></td><td class="px-3 py-2 text-center"><button type="button" class="text-red-500 hover:text-red-700 text-xs remove-cost-detail-btn">删除</button></td>';
+                tbody.appendChild(row);
+                row.querySelector('.cost-amount').addEventListener('input', calcCostTotal);
+                row.querySelector('.remove-cost-detail-btn').addEventListener('click', function() {
+                    row.remove();
+                    calcCostTotal();
+                });
+            });
+
+            document.querySelectorAll('#cost-detail-table .cost-amount').forEach(function(input) {
+                input.addEventListener('input', calcCostTotal);
+            });
+            document.querySelectorAll('#cost-detail-table .remove-cost-detail-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var rows = document.querySelectorAll('#cost-detail-table .cost-detail-row');
+                    if (rows.length > 1) {
+                        btn.closest('tr').remove();
+                        calcCostTotal();
+                    }
+                });
+            });
         }
 
         if (document.readyState === 'loading') {

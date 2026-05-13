@@ -302,7 +302,7 @@
                 <div class="bg-white rounded shadow-sm p-6 space-y-6 req-marker relative block" id="req-marker-4">
                     <span class="req-badge" data-req="4"
                           data-title="需求描述：业务全局监控"
-                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[4] 需求描述：业务全局监控</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>采用4列网格布局展示核心统计卡片</li><li>使用浅蓝色背景卡片区分不同指标</li><li>下方展示各类型核算进度条</li></ul><div class="req-section-title">字段清单（4个统计卡片）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目总计</strong>：1250个</li><li><strong>整装项目</strong>：800个（占比64%），在建600，竣工200</li><li><strong>软装项目</strong>：350个（占比28%），在建300，竣工50</li><li><strong>设计费项目</strong>：100个（占比8%），在建80，竣工20</li></ol><div class="req-section-title">进度条说明</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>已完成</strong>（绿色）：核算完成的合同数量</li><li><strong>核算中</strong>（蓝色）：正在核算的合同数量</li><li><strong>未开始</strong>（灰色）：尚未开始核算的合同数量</li></ul><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>完工百分比法条件</em>：开工日期不为空且&lt;=当期会计期结束日期 and 合同状态=打开 and 项目类型=整装</li><li><em>完成合同法条件</em>：财务确认竣工日期不为空且&lt;=当期会计期结束日期 and 合同状态=打开 and 项目类型=软装</li><li><em>收款确收法条件</em>：合同状态=打开 and 项目类型=设计费 and 收款净额 ≠ 0</li></ul></div>'>4</span>
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[4] 需求描述：业务全局监控</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>采用4列网格布局展示核心统计卡片</li><li>使用浅蓝色背景卡片区分不同指标</li><li>下方展示各类型核算进度条</li></ul><div class="req-section-title">字段清单（4个统计卡片）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目总计</strong>：1250个</li><li><strong>整装项目</strong>：800个（占比64%），在建600，竣工200</li><li><strong>软装项目</strong>：350个（占比28%），在建300，竣工50</li><li><strong>设计费项目</strong>：100个（占比8%），在建80，竣工20</li></ol><div class="req-section-title">进度条说明</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>已完成</strong>（绿色）：核算完成的合同数量</li><li><strong>核算中</strong>（蓝色）：正在核算的合同数量</li><li><strong>未开始</strong>（灰色）：尚未开始核算的合同数量</li></ul><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>完工百分比法条件</em>：开工日期不为空且&lt;=当期会计期结束日期 and 合同状态=打开 and 项目类型=整装</li><li><em>完成合同法条件</em>：财务确认竣工日期不为空且&lt;=当期会计期结束日期 and 合同状态=打开 and 项目类型=软装</li><li><em>开工确收法条件</em>：合同状态=打开 and 项目类型=设计费 and 收款净额 ≠ 0</li></ul></div>'>4</span>
 
                     <h2 class="text-lg font-bold text-[#003366] border-l-4 border-[#0055ff] pl-3">业务全局监控</h2>
 
@@ -400,6 +400,50 @@
                                     <span class="text-[#1890ff]">核算中: 10</span>
                                     <span>未开始: 10</span>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 任务消息区域 -->
+                <div class="bg-white rounded shadow-sm p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-[16px] font-bold text-[#003366] border-l-4 border-[#0055ff] pl-3">任务消息</h2>
+                        <span class="text-[12px] text-[#999] cursor-pointer hover:text-[#0055ff]">查看全部</span>
+                    </div>
+                    <div id="task-message-area" class="space-y-2">
+                        <!-- 消息1：软装收入分摊计算完成（含下游联动） -->
+                        <div class="flex items-start p-3 bg-[#f6ffed] border border-[#b7eb8f] rounded cursor-pointer hover:shadow-sm transition-shadow" onclick="showRevenueAllocationResultModal()">
+                            <svg class="w-5 h-5 text-[#52c41a] mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[13px] font-medium text-[#333]">软装收入分摊计算完成</span>
+                                    <span class="text-[11px] text-[#999] ml-2 flex-shrink-0">2分钟前</span>
+                                </div>
+                                <p class="text-[12px] text-[#666] mt-1 truncate">你有软装收入计算任务已经计算完成，请查看详情！同时已为 12 个合同联动重算软装项目核算单（成功 10 / 失败 2），请及时重新确认</p>
+                            </div>
+                            <span class="ml-2 bg-[#ff4d4f] text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">1</span>
+                        </div>
+                        <!-- 消息2：整装项目收入核算计算完成 -->
+                        <div class="flex items-start p-3 bg-[#f8faff] border border-[#e0e8f5] rounded hover:shadow-sm transition-shadow cursor-pointer">
+                            <svg class="w-5 h-5 text-[#1890ff] mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[13px] font-medium text-[#333]">整装项目收入核算计算完成</span>
+                                    <span class="text-[11px] text-[#999] ml-2 flex-shrink-0">15分钟前</span>
+                                </div>
+                                <p class="text-[12px] text-[#666] mt-1 truncate">你有整装项目收入核算任务已经计算完成，请查看详情！</p>
+                            </div>
+                        </div>
+                        <!-- 消息3：三方对账完成 -->
+                        <div class="flex items-start p-3 bg-[#f8faff] border border-[#e0e8f5] rounded hover:shadow-sm transition-shadow cursor-pointer">
+                            <svg class="w-5 h-5 text-[#1890ff] mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[13px] font-medium text-[#333]">三方对账完成</span>
+                                    <span class="text-[11px] text-[#999] ml-2 flex-shrink-0">30分钟前</span>
+                                </div>
+                                <p class="text-[12px] text-[#666] mt-1 truncate">合同 RZ901000005 三方对账成功，即将执行出库</p>
                             </div>
                         </div>
                     </div>
@@ -927,7 +971,7 @@
                         <div class="space-y-6 req-marker relative w-full" id="req-marker-8">
                             <span class="req-badge" data-req="8"
                                   data-title="需求描述：设计费核算"
-                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[8] 需求描述：设计费核算</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>分为三个区域：指标概览、快捷步骤、明细表格</li><li>使用浅蓝色背景卡片统一风格</li></ul><div class="req-section-title">指标概览（2个指标卡片）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目</strong>：100个</li><li><strong>设计费项目确认</strong>：80个，进度80.0%</li></ol><div class="req-section-title">整体核算进度</div><p style="line-height: 1.8;"><em>进度 = 已确认/本期应核算 = 80/100 = 80.0%</em></p><div class="req-section-title">快捷步骤（1个按钮）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>设计费项目收入核算</strong>：跳转到设计费项目核算任务页面</li></ol><div class="req-section-title">明细页签</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期单据生成详情</strong>：6列表格，含筛选功能</li><li><strong>本期单据同步详情</strong>：7列表格，展示EBS/KD同步状态</li></ol><div class="req-section-title">取数逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>核算方法</strong>：收款确收法</li><li><strong>条件</strong>：合同状态=打开 and 项目类型=设计费 and 收款净额 ≠ 0</li></ul></div>'>8</span>
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[8] 需求描述：设计费核算</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>分为三个区域：指标概览、快捷步骤、明细表格</li><li>使用浅蓝色背景卡片统一风格</li></ul><div class="req-section-title">指标概览（2个指标卡片）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期应核算项目</strong>：100个</li><li><strong>设计费项目确认</strong>：80个，进度80.0%</li></ol><div class="req-section-title">整体核算进度</div><p style="line-height: 1.8;"><em>进度 = 已确认/本期应核算 = 80/100 = 80.0%</em></p><div class="req-section-title">快捷步骤（1个按钮）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>设计费项目收入核算</strong>：跳转到设计费项目核算任务页面</li></ol><div class="req-section-title">明细页签</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本期单据生成详情</strong>：6列表格，含筛选功能</li><li><strong>本期单据同步详情</strong>：7列表格，展示EBS/KD同步状态</li></ol><div class="req-section-title">取数逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>核算方法</strong>：开工确收法</li><li><strong>条件</strong>：合同状态=打开 and 项目类型=设计费 and 收款净额 ≠ 0</li></ul></div>'>8</span>
 
                             <!-- 设计费指标概览 [13] -->
                             <div class="progress-section req-marker relative inline-block w-full" id="req-marker-13">
@@ -1235,18 +1279,529 @@
 
         if (btnRevenueAllocation) {
             btnRevenueAllocation.addEventListener('click', function() {
-                window.location.href = 'soft-accounting.html?tab=revenue-task-tab';
+                openRevenueAllocationDrawer();
             });
+        }
+
+        // 软装收入分摊新增抽屉弹窗
+        function openRevenueAllocationDrawer() {
+            var drawer = document.getElementById('revenue-allocation-drawer');
+            var overlay = document.getElementById('drawer-overlay');
+            if (drawer) drawer.classList.remove('translate-x-full');
+            if (overlay) overlay.classList.remove('hidden');
+        }
+
+        function closeRevenueAllocationDrawer() {
+            var drawer = document.getElementById('revenue-allocation-drawer');
+            var overlay = document.getElementById('drawer-overlay');
+            if (drawer) drawer.classList.add('translate-x-full');
+            if (overlay) overlay.classList.add('hidden');
+        }
+
+        function submitRevenueAllocation() {
+            closeRevenueAllocationDrawer();
+            // 模拟提交后显示任务消息通知
+            var msgArea = document.querySelector('#task-message-area .space-y-2');
+            if (msgArea) {
+                var newMsg = document.createElement('div');
+                newMsg.className = 'flex items-start p-3 bg-[#fffbe6] border border-[#ffe58f] rounded hover:shadow-sm transition-shadow cursor-pointer';
+                newMsg.innerHTML = '<svg class="w-5 h-5 text-[#faad14] mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg><div class="flex-1 min-w-0"><div class="flex items-center justify-between"><span class="text-[13px] font-medium text-[#333]">软装收入分摊计算中</span><span class="text-[11px] text-[#999] ml-2 flex-shrink-0">刚刚</span></div><p class="text-[12px] text-[#666] mt-1 truncate">软装收入分摊计算任务已提交，正在后台计算中...</p></div>';
+                msgArea.insertBefore(newMsg, msgArea.firstChild);
+            }
+        }
+
+        // 软装收入分摊计算任务报告查询弹框
+        function showRevenueAllocationResultModal() {
+            var modal = document.getElementById('revenue-allocation-result-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeRevenueAllocationResultModal() {
+            var modal = document.getElementById('revenue-allocation-result-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function toggleLinkageGroup(group) {
+            var body = document.getElementById(group + '-body');
+            var arrow = document.getElementById(group + '-arrow');
+            if (body) {
+                if (body.classList.contains('hidden')) {
+                    body.classList.remove('hidden');
+                    if (arrow) arrow.style.transform = 'rotate(180deg)';
+                } else {
+                    body.classList.add('hidden');
+                    if (arrow) arrow.style.transform = 'rotate(0deg)';
+                }
+            }
+        }
+
+        // 成功详情列表折叠/展开（收入分摊报告）
+        function toggleRevenueReportSuccessList() {
+            var body = document.getElementById('revenue-success-list-body');
+            var arrow = document.getElementById('revenue-success-list-arrow');
+            var toggleText = document.getElementById('revenue-success-list-toggle-text');
+            if (body) {
+                if (body.classList.contains('hidden')) {
+                    body.classList.remove('hidden');
+                    if (arrow) arrow.style.transform = 'rotate(180deg)';
+                    if (toggleText) toggleText.textContent = '收起';
+                } else {
+                    body.classList.add('hidden');
+                    if (arrow) arrow.style.transform = 'rotate(0deg)';
+                    if (toggleText) toggleText.textContent = '展开';
+                }
+            }
+        }
+
+        // 软装项目核算新增抽屉弹窗
+        function openProjectAccountingDrawer() {
+            var drawer = document.getElementById('project-accounting-drawer');
+            var overlay = document.getElementById('project-drawer-overlay');
+            if (drawer) drawer.classList.remove('translate-x-full');
+            if (overlay) overlay.classList.remove('hidden');
+        }
+
+        function closeProjectAccountingDrawer() {
+            var drawer = document.getElementById('project-accounting-drawer');
+            var overlay = document.getElementById('project-drawer-overlay');
+            if (drawer) drawer.classList.add('translate-x-full');
+            if (overlay) overlay.classList.add('hidden');
+        }
+
+        function submitProjectAccounting() {
+            closeProjectAccountingDrawer();
+            // 模拟提交后显示任务消息通知
+            var msgArea = document.querySelector('#task-message-area .space-y-2');
+            if (msgArea) {
+                var newMsg = document.createElement('div');
+                newMsg.className = 'flex items-start p-3 bg-[#fffbe6] border border-[#ffe58f] rounded hover:shadow-sm transition-shadow cursor-pointer';
+                newMsg.innerHTML = '<svg class="w-5 h-5 text-[#faad14] mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg><div class="flex-1 min-w-0"><div class="flex items-center justify-between"><span class="text-[13px] font-medium text-[#333]">软装项目核算计算中</span><span class="text-[11px] text-[#999] ml-2 flex-shrink-0">刚刚</span></div><p class="text-[12px] text-[#666] mt-1 truncate">软装项目核算计算任务已提交，正在后台计算中...</p></div>';
+                msgArea.insertBefore(newMsg, msgArea.firstChild);
+            }
+        }
+
+        function jumpToProjectAccountingTab() {
+            closeRevenueAllocationResultModal();
+            window.location.href = 'soft-accounting.html?tab=project-task-tab';
         }
 
         if (btnProjectAccounting) {
             btnProjectAccounting.addEventListener('click', function() {
-                window.location.href = 'soft-accounting.html?tab=project-task-tab';
+                openProjectAccountingDrawer();
             });
         }
 
     </script>
 
+
+    <!-- 抽屉遮罩层 -->
+    <div id="drawer-overlay" class="hidden fixed inset-0 z-40 bg-black/30" onclick="closeRevenueAllocationDrawer()"></div>
+
+    <!-- 软装收入分摊新增任务抽屉弹窗 -->
+    <div id="revenue-allocation-drawer" class="fixed top-0 right-0 h-full w-[480px] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+        <!-- 抽屉头部 -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-[#e8e8e8] bg-[#fafafa]">
+            <h3 class="text-[16px] font-bold text-[#003366]">新增软装收入分摊计算任务</h3>
+            <button onclick="closeRevenueAllocationDrawer()" class="text-[#999] hover:text-[#333] text-[20px] leading-none cursor-pointer">&times;</button>
+        </div>
+        <!-- 抽屉内容 -->
+        <div class="px-6 py-5 space-y-5">
+            <!-- 财务组织 -->
+            <div>
+                <label class="text-[13px] text-[#333] font-medium mb-2 block">财务组织 <span class="text-[#ff4d4f]">*</span></label>
+                <div class="border border-[#d9d9d9] rounded p-2 text-[13px] min-h-[36px] flex items-center flex-wrap gap-1 bg-white">
+                    <span class="px-2 py-0.5 bg-[#e6f0ff] text-[#0055ff] border border-[#b3d4ff] rounded text-[12px]">成都分公司</span>
+                    <span class="px-2 py-0.5 bg-[#e6f0ff] text-[#0055ff] border border-[#b3d4ff] rounded text-[12px]">北京分公司</span>
+                    <span class="text-[#999] text-[12px] ml-1">▼</span>
+                </div>
+            </div>
+            <!-- 核算期间 -->
+            <div>
+                <label class="text-[13px] text-[#333] font-medium mb-2 block">核算期间 <span class="text-[#ff4d4f]">*</span></label>
+                <div class="flex items-center space-x-2">
+                    <input type="text" value="2026-03" readonly class="flex-1 border border-[#d9d9d9] rounded px-3 py-2 text-[13px] bg-[#f5f5f5] text-[#333] cursor-not-allowed" />
+                    <span class="text-[12px] text-[#999]">锁定</span>
+                </div>
+            </div>
+            <!-- 合同号 -->
+            <div>
+                <label class="text-[13px] text-[#333] font-medium mb-2 block">合同号</label>
+                <input type="text" placeholder="输入后下拉多选，不填默认无合同过滤" class="w-full border border-[#d9d9d9] rounded px-3 py-2 text-[13px] outline-none focus:border-[#0055ff]" />
+            </div>
+            <!-- 重算选项 -->
+            <div class="border border-[#e8e8e8] rounded p-4 space-y-3 bg-[#fafafa]">
+                <div class="text-[13px] font-medium text-[#333] mb-1">重算选项</div>
+                <!-- 是否重算收入分摊已计算的合同 -->
+                <label class="flex items-start space-x-2 cursor-pointer">
+                    <input type="checkbox" class="mt-1 cursor-pointer" />
+                    <span class="text-[12px] text-[#333] leading-5">是否重算收入分摊已计算的合同</span>
+                </label>
+                <!-- 是否重算项目收入已计算且未确认的合同 -->
+                <label class="flex items-start space-x-2 cursor-pointer">
+                    <input type="checkbox" class="mt-1 cursor-pointer" />
+                    <span class="text-[12px] text-[#333] leading-5">是否重算项目收入已计算且未确认的合同</span>
+                </label>
+                <!-- 是否重算项目收入已计算且已确认的合同 -->
+                <label class="flex items-start space-x-2 cursor-pointer">
+                    <input type="checkbox" class="mt-1 cursor-pointer" />
+                    <span class="text-[12px] text-[#333] leading-5">是否重算项目收入已计算且已确认的合同</span>
+                </label>
+                <div class="text-[11px] text-[#999] mt-2 leading-4">以上选项均未勾选时，仅核算满足条件的增量合同；勾选后取对应条件的并集</div>
+            </div>
+        </div>
+        <!-- 抽屉底部 -->
+        <div class="flex justify-end space-x-3 px-6 py-4 border-t border-[#e8e8e8] bg-[#fafafa] sticky bottom-0">
+            <button onclick="closeRevenueAllocationDrawer()" class="px-4 py-2 border border-[#d9d9d9] rounded text-[14px] text-[#666] hover:border-[#0055ff] hover:text-[#0055ff] cursor-pointer transition-colors">取消</button>
+            <button onclick="submitRevenueAllocation()" class="px-4 py-2 bg-[#0055ff] text-white rounded text-[14px] hover:bg-[#003399] cursor-pointer transition-colors">确认</button>
+        </div>
+    </div>
+
+    <!-- 软装项目核算新增任务抽屉遮罩层 -->
+    <div id="project-drawer-overlay" class="hidden fixed inset-0 z-40 bg-black/30" onclick="closeProjectAccountingDrawer()"></div>
+
+    <!-- 软装项目核算新增任务抽屉弹窗 -->
+    <div id="project-accounting-drawer" class="fixed top-0 right-0 h-full w-[480px] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+        <!-- 抽屉头部 -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-[#e8e8e8] bg-[#fafafa]">
+            <h3 class="text-[16px] font-bold text-[#003366]">新增软装项目核算任务</h3>
+            <button onclick="closeProjectAccountingDrawer()" class="text-[#999] hover:text-[#333] text-[20px] leading-none cursor-pointer">&times;</button>
+        </div>
+        <!-- 抽屉内容 -->
+        <div class="px-6 py-5 space-y-5">
+            <!-- 项目类型 -->
+            <div>
+                <label class="text-[13px] text-[#333] font-medium mb-2 block">项目类型 <span class="text-[#ff4d4f]">*</span></label>
+                <div class="flex items-center space-x-2">
+                    <input type="text" value="软装" readonly class="flex-1 border border-[#d9d9d9] rounded px-3 py-2 text-[13px] bg-[#f5f5f5] text-[#333] cursor-not-allowed" />
+                    <span class="text-[12px] text-[#999]">锁定</span>
+                </div>
+            </div>
+            <!-- 核算方法 -->
+            <div>
+                <label class="text-[13px] text-[#333] font-medium mb-2 block">核算方法 <span class="text-[#ff4d4f]">*</span></label>
+                <div class="flex items-center space-x-2">
+                    <input type="text" value="完成合同法" readonly class="flex-1 border border-[#d9d9d9] rounded px-3 py-2 text-[13px] bg-[#f5f5f5] text-[#333] cursor-not-allowed" />
+                    <span class="text-[12px] text-[#999]">锁定</span>
+                </div>
+            </div>
+            <!-- 财务组织 -->
+            <div>
+                <label class="text-[13px] text-[#333] font-medium mb-2 block">财务组织 <span class="text-[#ff4d4f]">*</span></label>
+                <div class="border border-[#d9d9d9] rounded p-2 text-[13px] min-h-[36px] flex items-center flex-wrap gap-1 bg-white">
+                    <span class="px-2 py-0.5 bg-[#e6f0ff] text-[#0055ff] border border-[#b3d4ff] rounded text-[12px]">成都分公司</span>
+                    <span class="px-2 py-0.5 bg-[#e6f0ff] text-[#0055ff] border border-[#b3d4ff] rounded text-[12px]">北京分公司</span>
+                    <span class="text-[#999] text-[12px] ml-1">▼</span>
+                </div>
+            </div>
+            <!-- 核算期间 -->
+            <div>
+                <label class="text-[13px] text-[#333] font-medium mb-2 block">核算期间 <span class="text-[#ff4d4f]">*</span></label>
+                <div class="flex items-center space-x-2">
+                    <input type="text" value="2026-03" readonly class="flex-1 border border-[#d9d9d9] rounded px-3 py-2 text-[13px] bg-[#f5f5f5] text-[#333] cursor-not-allowed" />
+                    <span class="text-[12px] text-[#999]">锁定</span>
+                </div>
+            </div>
+            <!-- 合同号 -->
+            <div>
+                <label class="text-[13px] text-[#333] font-medium mb-2 block">合同号</label>
+                <input type="text" placeholder="输入后下拉多选，不填默认无合同过滤" class="w-full border border-[#d9d9d9] rounded px-3 py-2 text-[13px] outline-none focus:border-[#0055ff]" />
+            </div>
+            <!-- 重算选项 -->
+            <div class="border border-[#e8e8e8] rounded p-4 space-y-3 bg-[#fafafa]">
+                <div class="text-[13px] font-medium text-[#333] mb-1">重算选项</div>
+                <!-- 是否重算项目收入已计算且未确认的合同 -->
+                <label class="flex items-start space-x-2 cursor-pointer">
+                    <input type="checkbox" class="mt-1 cursor-pointer" />
+                    <span class="text-[12px] text-[#333] leading-5">是否重算项目收入已计算且未确认的合同</span>
+                </label>
+                <!-- 是否重算项目收入已计算且已确认的合同 -->
+                <label class="flex items-start space-x-2 cursor-pointer">
+                    <input type="checkbox" class="mt-1 cursor-pointer" />
+                    <span class="text-[12px] text-[#333] leading-5">是否重算项目收入已计算且已确认的合同</span>
+                </label>
+                <div class="text-[11px] text-[#999] mt-2 leading-4">以上选项均未勾选时，仅核算满足条件的增量合同；勾选后取对应条件的并集</div>
+            </div>
+        </div>
+        <!-- 抽屉底部 -->
+        <div class="flex justify-end space-x-3 px-6 py-4 border-t border-[#e8e8e8] bg-[#fafafa] sticky bottom-0">
+            <button onclick="closeProjectAccountingDrawer()" class="px-4 py-2 border border-[#d9d9d9] rounded text-[14px] text-[#666] hover:border-[#0055ff] hover:text-[#0055ff] cursor-pointer transition-colors">取消</button>
+            <button onclick="submitProjectAccounting()" class="px-4 py-2 bg-[#0055ff] text-white rounded text-[14px] hover:bg-[#003399] cursor-pointer transition-colors">确认</button>
+        </div>
+    </div>
+
+    <!-- 软装收入分摊计算任务报告查询弹框（PRD 2014-2015行+2034-2050行） -->
+    <div id="revenue-allocation-result-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/40">
+        <div class="bg-white rounded-lg shadow-xl w-[720px] max-h-[85vh] overflow-y-auto">
+            <!-- 弹框头部 -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-[#e8e8e8]">
+                <h3 id="revenue-modal-title" class="text-[16px] font-bold text-[#003366]">软装收入分摊计算任务报告查询</h3>
+                <button onclick="closeRevenueAllocationResultModal()" class="text-[#999] hover:text-[#333] text-[20px] leading-none cursor-pointer">&times;</button>
+            </div>
+            <!-- 弹框内容 - 报告查询面板（点击消息直接显示） -->
+            <div id="revenue-report-content" class="px-6 py-5 space-y-4">
+                <!-- 下游联动提示（PRD 2014行：场景B/C联动重算提示） -->
+                <div class="bg-[#fffbe6] border border-[#ffe58f] rounded p-4">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-[#faad14] mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                        <div class="flex-1">
+                            <div class="text-[14px] font-medium text-[#333] mb-2">下游联动重算通知</div>
+                            <p class="text-[13px] text-[#666] leading-5 mb-3">
+                                同时已为 <span class="text-[#0055ff] font-bold">12</span> 个合同联动重算软装项目核算单（成功 <span class="text-[#52c41a] font-bold">10</span> / 失败 <span class="text-[#ff4d4f] font-bold">2</span>），请及时重新确认
+                            </p>
+                            <div class="flex items-center space-x-3">
+                                <button onclick="jumpToProjectAccountingTab()" class="text-[13px] text-[#0055ff] hover:text-[#003399] font-medium cursor-pointer underline">
+                                    跳转软装项目核算任务tab
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 核算结果概要 -->
+                <div class="bg-[#f8faff] rounded p-4 border border-[#e0e8f5]">
+                    <div class="text-[14px] font-bold text-[#003366] mb-3">核算结果</div>
+                    <div class="grid grid-cols-4 gap-3">
+                        <div class="text-center">
+                            <div class="text-[#666] text-[12px] mb-1">计算批次号</div>
+                            <div class="text-[#333] text-[14px] font-bold">RZFT20260301</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-[#666] text-[12px] mb-1">本次核算项目总数量</div>
+                            <div class="text-[#333] text-[20px] font-bold">48</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-[#666] text-[12px] mb-1">核算成功数量</div>
+                            <div class="text-[#52c41a] text-[20px] font-bold">45</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-[#666] text-[12px] mb-1">核算失败数量</div>
+                            <div class="text-[#ff4d4f] text-[20px] font-bold">3</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 失败详情列表 -->
+                <div>
+                    <div class="text-[14px] font-bold text-[#003366] mb-3">失败详情列表</div>
+                    <div class="overflow-x-auto" style="max-height:240px;overflow-y:auto;">
+                        <table class="w-full text-left border-collapse text-[12px]">
+                            <thead>
+                                <tr class="bg-[#f0f2f5] text-[#333] sticky top-0">
+                                    <th class="p-2 border border-[#e8e8e8]">财务主体</th>
+                                    <th class="p-2 border border-[#e8e8e8]">合同号</th>
+                                    <th class="p-2 border border-[#e8e8e8]">失败原因</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="hover:bg-[#f9fafc]">
+                                    <td class="p-2 border border-[#e8e8e8]">财务主体1</td>
+                                    <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">HT202603001</td>
+                                    <td class="p-2 border border-[#e8e8e8] text-[#ff4d4f]">被分摊的物料数量均等于0（无可分摊的物料）</td>
+                                </tr>
+                                <tr class="hover:bg-[#f9fafc]">
+                                    <td class="p-2 border border-[#e8e8e8]">财务主体2</td>
+                                    <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">HT202603005</td>
+                                    <td class="p-2 border border-[#e8e8e8] text-[#ff4d4f]">应收总额&lt;0</td>
+                                </tr>
+                                <tr class="hover:bg-[#f9fafc]">
+                                    <td class="p-2 border border-[#e8e8e8]">财务主体3</td>
+                                    <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">HT202603008</td>
+                                    <td class="p-2 border border-[#e8e8e8] text-[#ff4d4f]">对账状态不等于对账成功</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 成功详情列表 -->
+                <div>
+                    <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleRevenueReportSuccessList()">
+                        <div class="flex items-center space-x-2">
+                            <div class="text-[14px] font-bold text-[#003366]">成功详情列表</div>
+                            <span class="text-[11px] text-[#52c41a] font-medium bg-[#f6ffed] px-2 py-0.5 rounded border border-[#b7eb8f]">45个合同</span>
+                        </div>
+                        <div class="flex items-center space-x-1 text-[#999]">
+                            <span class="text-[12px]" id="revenue-success-list-toggle-text">展开</span>
+                            <svg id="revenue-success-list-arrow" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </div>
+                    <div id="revenue-success-list-body" class="hidden mt-3">
+                        <div class="overflow-x-auto" style="max-height:300px;overflow-y:auto;">
+                            <table class="w-full text-left border-collapse text-[12px]">
+                                <thead>
+                                    <tr class="bg-[#f0f2f5] text-[#333] sticky top-0">
+                                        <th class="p-2 border border-[#e8e8e8]">序号</th>
+                                        <th class="p-2 border border-[#e8e8e8]">财务主体</th>
+                                        <th class="p-2 border border-[#e8e8e8]">合同号</th>
+                                        <th class="p-2 border border-[#e8e8e8]">合同名称</th>
+                                        <th class="p-2 border border-[#e8e8e8]">核算状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="hover:bg-[#f9fafc]"><td class="p-2 border border-[#e8e8e8] text-[#999]">1</td><td class="p-2 border border-[#e8e8e8]">成都分公司</td><td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000002</td><td class="p-2 border border-[#e8e8e8]">万科公园5号A栋302</td><td class="p-2 border border-[#e8e8e8] text-[#52c41a]">已计算</td></tr>
+                                    <tr class="hover:bg-[#f9fafc]"><td class="p-2 border border-[#e8e8e8] text-[#999]">2</td><td class="p-2 border border-[#e8e8e8]">成都分公司</td><td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000003</td><td class="p-2 border border-[#e8e8e8]">保利国际广场B座1501</td><td class="p-2 border border-[#e8e8e8] text-[#52c41a]">已计算</td></tr>
+                                    <tr class="hover:bg-[#f9fafc]"><td class="p-2 border border-[#e8e8e8] text-[#999]">3</td><td class="p-2 border border-[#e8e8e8]">成都分公司</td><td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000004</td><td class="p-2 border border-[#e8e8e8]">中海锦城3期6栋802</td><td class="p-2 border border-[#e8e8e8] text-[#52c41a]">已计算</td></tr>
+                                    <tr class="hover:bg-[#f9fafc]"><td class="p-2 border border-[#e8e8e8] text-[#999]">4</td><td class="p-2 border border-[#e8e8e8]">北京分公司</td><td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000006</td><td class="p-2 border border-[#e8e8e8]">融创壹号院C栋2201</td><td class="p-2 border border-[#e8e8e8] text-[#52c41a]">已计算</td></tr>
+                                    <tr class="hover:bg-[#f9fafc]"><td class="p-2 border border-[#e8e8e8] text-[#999]">5</td><td class="p-2 border border-[#e8e8e8]">北京分公司</td><td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000007</td><td class="p-2 border border-[#e8e8e8]">远洋天著春秋D栋903</td><td class="p-2 border border-[#e8e8e8] text-[#52c41a]">已计算</td></tr>
+                                </tbody>
+                            </table>
+                            <div class="text-center py-2 text-[12px] text-[#999]">仅展示前5条，共45个成功合同</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 联动任务详情 - 按联动原因分组折叠展示 -->
+                <div>
+                    <div class="text-[14px] font-bold text-[#003366] mb-3">联动重算任务详情</div>
+                    <!-- 统计概览 -->
+                    <div class="flex items-center space-x-4 mb-3 text-[12px]">
+                        <span class="text-[#666]">共 <span class="text-[#333] font-bold">12</span> 个合同联动重算</span>
+                        <span class="text-[#52c41a]">成功 10</span>
+                        <span class="text-[#ff4d4f]">失败 2</span>
+                    </div>
+                    <!-- 分组：重算未确认 -->
+                    <div class="mb-3 border border-[#e8e8e8] rounded overflow-hidden">
+                        <div class="flex items-center justify-between px-3 py-2 bg-[#e6f0ff] cursor-pointer" onclick="toggleLinkageGroup('unconfirmed')">
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-[#0055ff] text-white text-[11px] font-bold px-1.5 py-0.5 rounded">重算未确认</span>
+                                <span class="text-[12px] text-[#333]">项目收入已计算且未确认的合同</span>
+                                <span class="text-[11px] text-[#999]">8个合同</span>
+                            </div>
+                            <div class="flex items-center space-x-3 text-[12px]">
+                                <span class="text-[#52c41a]">成功 8</span>
+                                <span class="text-[#ff4d4f]">失败 0</span>
+                                <svg id="unconfirmed-arrow" class="w-4 h-4 text-[#999] transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+                        <div id="unconfirmed-body" class="hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse text-[12px]">
+                                    <thead>
+                                        <tr class="bg-[#f0f2f5] text-[#333]">
+                                            <th class="p-2 border border-[#e8e8e8]">合同号</th>
+                                            <th class="p-2 border border-[#e8e8e8]">联动任务批次号</th>
+                                            <th class="p-2 border border-[#e8e8e8]">项目核算单据类型</th>
+                                            <th class="p-2 border border-[#e8e8e8]">重算状态</th>
+                                            <th class="p-2 border border-[#e8e8e8]">失败原因</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="hover:bg-[#f9fafc]">
+                                            <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000001</td>
+                                            <td class="p-2 border border-[#e8e8e8]">RZFT20260301</td>
+                                            <td class="p-2 border border-[#e8e8e8]">标准项目核算单</td>
+                                            <td class="p-2 border border-[#e8e8e8]"><span class="text-[#52c41a]">已计算</span></td>
+                                            <td class="p-2 border border-[#e8e8e8] text-[#999]">—</td>
+                                        </tr>
+                                        <tr class="hover:bg-[#f9fafc]">
+                                            <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000003</td>
+                                            <td class="p-2 border border-[#e8e8e8]">RZFT20260301</td>
+                                            <td class="p-2 border border-[#e8e8e8]">标准项目核算单</td>
+                                            <td class="p-2 border border-[#e8e8e8]"><span class="text-[#52c41a]">已计算</span></td>
+                                            <td class="p-2 border border-[#e8e8e8] text-[#999]">—</td>
+                                        </tr>
+                                        <tr class="hover:bg-[#f9fafc]">
+                                            <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000006</td>
+                                            <td class="p-2 border border-[#e8e8e8]">RZFT20260301</td>
+                                            <td class="p-2 border border-[#e8e8e8]">标准项目核算单</td>
+                                            <td class="p-2 border border-[#e8e8e8]"><span class="text-[#52c41a]">已计算</span></td>
+                                            <td class="p-2 border border-[#e8e8e8] text-[#999]">—</td>
+                                        </tr>
+                                        <tr class="hover:bg-[#f9fafc]">
+                                            <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000009</td>
+                                            <td class="p-2 border border-[#e8e8e8]">RZFT20260301</td>
+                                            <td class="p-2 border border-[#e8e8e8]">标准项目核算单</td>
+                                            <td class="p-2 border border-[#e8e8e8]"><span class="text-[#52c41a]">已计算</span></td>
+                                            <td class="p-2 border border-[#e8e8e8] text-[#999]">—</td>
+                                        </tr>
+                                        <tr class="hover:bg-[#f9fafc]">
+                                            <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000011</td>
+                                            <td class="p-2 border border-[#e8e8e8]">RZFT20260301</td>
+                                            <td class="p-2 border border-[#e8e8e8]">标准项目核算单</td>
+                                            <td class="p-2 border border-[#e8e8e8]"><span class="text-[#52c41a]">已计算</span></td>
+                                            <td class="p-2 border border-[#e8e8e8] text-[#999]">—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 分组：重算已确认 -->
+                    <div class="mb-3 border border-[#e8e8e8] rounded overflow-hidden">
+                        <div class="flex items-center justify-between px-3 py-2 bg-[#fff0e6] cursor-pointer" onclick="toggleLinkageGroup('confirmed')">
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-[#fa8c16] text-white text-[11px] font-bold px-1.5 py-0.5 rounded">重算已确认</span>
+                                <span class="text-[12px] text-[#333]">项目收入已计算且已确认的合同</span>
+                                <span class="text-[11px] text-[#999]">4个合同</span>
+                            </div>
+                            <div class="flex items-center space-x-3 text-[12px]">
+                                <span class="text-[#52c41a]">成功 2</span>
+                                <span class="text-[#ff4d4f]">失败 2</span>
+                                <svg id="confirmed-arrow" class="w-4 h-4 text-[#999] transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+                        <div id="confirmed-body" class="hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse text-[12px]">
+                                    <thead>
+                                        <tr class="bg-[#f0f2f5] text-[#333]">
+                                            <th class="p-2 border border-[#e8e8e8]">合同号</th>
+                                            <th class="p-2 border border-[#e8e8e8]">联动任务批次号</th>
+                                            <th class="p-2 border border-[#e8e8e8]">项目核算单据类型</th>
+                                            <th class="p-2 border border-[#e8e8e8]">重算状态</th>
+                                            <th class="p-2 border border-[#e8e8e8]">失败原因</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="hover:bg-[#f9fafc]">
+                                            <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000005</td>
+                                            <td class="p-2 border border-[#e8e8e8]">RZFT20260301</td>
+                                            <td class="p-2 border border-[#e8e8e8]">项目核算调整单</td>
+                                            <td class="p-2 border border-[#e8e8e8]"><span class="text-[#ff4d4f]">计算失败</span></td>
+                                            <td class="p-2 border border-[#e8e8e8] text-[#ff4d4f]">项目核算单存在未确认的收入确认记录</td>
+                                        </tr>
+                                        <tr class="hover:bg-[#f9fafc]">
+                                            <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000008</td>
+                                            <td class="p-2 border border-[#e8e8e8]">RZFT20260301</td>
+                                            <td class="p-2 border border-[#e8e8e8]">项目核算调整单</td>
+                                            <td class="p-2 border border-[#e8e8e8]"><span class="text-[#ff4d4f]">计算失败</span></td>
+                                            <td class="p-2 border border-[#e8e8e8] text-[#ff4d4f]">合同下无有效的竣工销售出库单</td>
+                                        </tr>
+                                        <tr class="hover:bg-[#f9fafc]">
+                                            <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000010</td>
+                                            <td class="p-2 border border-[#e8e8e8]">RZFT20260301</td>
+                                            <td class="p-2 border border-[#e8e8e8]">项目核算调整单</td>
+                                            <td class="p-2 border border-[#e8e8e8]"><span class="text-[#52c41a]">已计算</span></td>
+                                            <td class="p-2 border border-[#e8e8e8] text-[#999]">—</td>
+                                        </tr>
+                                        <tr class="hover:bg-[#f9fafc]">
+                                            <td class="p-2 border border-[#e8e8e8] text-[#1890ff] cursor-pointer">RZ901000012</td>
+                                            <td class="p-2 border border-[#e8e8e8]">RZFT20260301</td>
+                                            <td class="p-2 border border-[#e8e8e8]">项目核算调整单</td>
+                                            <td class="p-2 border border-[#e8e8e8]"><span class="text-[#52c41a]">已计算</span></td>
+                                            <td class="p-2 border border-[#e8e8e8] text-[#999]">—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 弹框底部 -->
+            <div class="flex justify-end space-x-3 px-6 py-4 border-t border-[#e8e8e8] bg-[#fafafa] rounded-b-lg">
+                <button onclick="closeRevenueAllocationResultModal()" class="px-4 py-2 border border-[#d9d9d9] rounded text-[14px] text-[#666] hover:border-[#0055ff] hover:text-[#0055ff] cursor-pointer transition-colors">关闭</button>
+                <button onclick="jumpToProjectAccountingTab()" class="px-4 py-2 bg-[#0055ff] text-white rounded text-[14px] hover:bg-[#003399] cursor-pointer transition-colors">前往软装项目核算任务</button>
+            </div>
+        </div>
+    </div>
 
     <!-- PRD Viewer -->
     <link rel="stylesheet" href="common/prd-viewer.css">

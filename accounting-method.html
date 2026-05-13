@@ -274,7 +274,7 @@
                                 <option value="">全部</option>
                                 <option value="completed-contract">完成合同法</option>
                                 <option value="percentage-of-completion">完工百分比法</option>
-                                <option value="collection">收款确收</option>
+                                <option value="collection">开工确收</option>
                             </select>
                         </div>
                     </div>
@@ -282,7 +282,7 @@
 
                 <!-- 列表 -->
                 <div class="req-marker table-wrapper" id="req-marker-2">
-                    <span class="req-badge" data-req="2" data-title="需求描述：核算方法列表" data-content='<div class="req-section-title">列表字段清单（7个+操作列）</div><ul><li><strong>编码</strong>：字符串，唯一标识</li><li><strong>名称</strong>：字符串，64位</li><li><strong>项目类型</strong>：枚举值<ul><li>整装</li><li>软装</li><li>设计费</li></ul></li><li><strong>核算方法</strong>：枚举值<ul><li>完成合同法</li><li>完工百分比法</li><li>收款确收</li></ul></li><li><strong>生效日期</strong>：日期格式</li><li><strong>失效日期</strong>：日期格式</li><li><strong>状态</strong>：Switch按钮<ul><li><span class="status-dot status-green"></span>启用</li><li><span class="status-dot status-gray"></span>停用</li></ul></li></ul><div class="req-section-title">操作列</div><ul><li><strong>编辑</strong>：打开编辑抽屉弹窗，界面同新增</li></ul><div class="req-section-title">业务规则</div><ul><li><em>启用/停用无逻辑判断</em>，可直接切换</li></ul>'>2</span>
+                    <span class="req-badge" data-req="2" data-title="需求描述：核算方法列表" data-content='<div class="req-section-title">列表字段清单（7个+操作列）</div><ul><li><strong>编码</strong>：字符串，唯一标识</li><li><strong>名称</strong>：字符串，64位</li><li><strong>项目类型</strong>：枚举值<ul><li>整装</li><li>软装</li><li>设计费</li></ul></li><li><strong>核算方法</strong>：枚举值<ul><li>完成合同法</li><li>完工百分比法</li><li>开工确收</li></ul></li><li><strong>生效日期</strong>：日期格式</li><li><strong>失效日期</strong>：日期格式</li><li><strong>状态</strong>：Switch按钮<ul><li><span class="status-dot status-green"></span>启用</li><li><span class="status-dot status-gray"></span>停用</li></ul></li></ul><div class="req-section-title">操作列</div><ul><li><strong>编辑</strong>：打开编辑抽屉弹窗，界面同新增</li></ul><div class="req-section-title">业务规则</div><ul><li><em>启用/停用无逻辑判断</em>，可直接切换</li></ul>'>2</span>
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                         <thead class="bg-gray-50">
@@ -334,9 +334,9 @@
                             </tr>
                             <tr>
                                 <td class="px-4 py-3 text-sm text-gray-700">SJFS001</td>
-                                <td class="px-4 py-3 text-sm text-gray-700">设计费-收款确收</td>
+                                <td class="px-4 py-3 text-sm text-gray-700">设计费-开工确收</td>
                                 <td class="px-4 py-3 text-sm text-gray-700">设计费</td>
-                                <td class="px-4 py-3 text-sm text-gray-700">收款确收</td>
+                                <td class="px-4 py-3 text-sm text-gray-700">开工确收</td>
                                 <td class="px-4 py-3 text-sm text-gray-700">2026-01-01</td>
                                 <td class="px-4 py-3 text-sm text-gray-700">2099-12-31</td>
                                 <td class="px-4 py-3 text-sm">
@@ -370,7 +370,7 @@
         </div>
 
         <div class="req-marker block" id="req-marker-3">
-            <span class="req-badge" data-req="3" data-title="需求描述：新增/编辑核算方法表单" data-content='<div class="req-section-title">表单字段清单（8个）</div><ul><li><strong>编码</strong>：<ul><li>字符串类型</li><li>最大长度：32位</li><li><em>必填</em></li></ul></li><li><strong>名称</strong>：<ul><li>字符串类型</li><li>最大长度：64位</li><li><em>必填</em></li></ul></li><li><strong>项目类型</strong>：<ul><li>下拉单选</li><li>枚举值：整装、软装、设计费</li><li><em>必填</em></li></ul></li><li><strong>核算方法</strong>：<ul><li>下拉单选</li><li>枚举值：完成合同法、完工百分比法、收款确收</li><li><em>必填</em></li></ul></li><li><strong>状态</strong>：Switch按钮（启用/停用），<em>无逻辑判断</em></li><li><strong>生效日期</strong>：<ul><li>日期选择器</li><li><em>限制：最早只能选择今天</em></li><li><em>必填</em></li></ul></li><li><strong>失效日期</strong>：<ul><li>日期选择器</li><li><em>限制：最早只能选择今天</em></li><li><em>必填</em></li></ul></li></ul><div class="req-section-title">操作按钮</div><ul><li><strong>保存</strong>：<blockquote>校验规则：<br/>• 启用状态下，<em>同一项目类型的生效和失效日期不能有重合</em><br/>• 且<em>生效日期不能早于失效日期</em></blockquote></li><li><strong>关闭</strong>：关闭抽屉弹窗</li></ul>'>3</span>
+            <span class="req-badge" data-req="3" data-title="需求描述：新增/编辑核算方法表单" data-content='<div class="req-section-title">表单字段清单（8个）</div><ul><li><strong>编码</strong>：<ul><li>字符串类型</li><li>最大长度：32位</li><li><em>必填</em></li></ul></li><li><strong>名称</strong>：<ul><li>字符串类型</li><li>最大长度：64位</li><li><em>必填</em></li></ul></li><li><strong>项目类型</strong>：<ul><li>下拉单选</li><li>枚举值：整装、软装、设计费</li><li><em>必填</em></li></ul></li><li><strong>核算方法</strong>：<ul><li>下拉单选</li><li>枚举值：完成合同法、完工百分比法、开工确收</li><li><em>必填</em></li></ul></li><li><strong>状态</strong>：Switch按钮（启用/停用），<em>无逻辑判断</em></li><li><strong>生效日期</strong>：<ul><li>日期选择器</li><li><em>限制：最早只能选择今天</em></li><li><em>必填</em></li></ul></li><li><strong>失效日期</strong>：<ul><li>日期选择器</li><li><em>限制：最早只能选择今天</em></li><li><em>必填</em></li></ul></li></ul><div class="req-section-title">操作按钮</div><ul><li><strong>保存</strong>：<blockquote>校验规则：<br/>• 启用状态下，<em>同一项目类型的生效和失效日期不能有重合</em><br/>• 且<em>生效日期不能早于失效日期</em></blockquote></li><li><strong>关闭</strong>：关闭抽屉弹窗</li></ul>'>3</span>
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">编码 <span class="text-red-500">*</span></label>
@@ -395,7 +395,7 @@
                         <option value="">请选择</option>
                         <option value="completed-contract">完成合同法</option>
                         <option value="percentage-of-completion">完工百分比法</option>
-                        <option value="collection">收款确收</option>
+                        <option value="collection">开工确收</option>
                     </select>
                 </div>
                 <div>
