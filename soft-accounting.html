@@ -1102,7 +1102,7 @@
                                         <i data-lucide="download" class="w-4 h-4 mr-1"></i>
                                         导出
                                     </button>
-                                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center whitespace-nowrap text-sm">
+                                    <button id="confirm-revenue-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center whitespace-nowrap text-sm">
                                         <i data-lucide="check-circle" class="w-4 h-4 mr-1"></i>
                                         确认本期收入
                                     </button>
@@ -1120,6 +1120,7 @@
                                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                                         <thead class="bg-gray-50">
                                             <tr>
+                                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><input type="checkbox" id="checkAll"></th>
                                                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">单据编号</th>
                                                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">会计期间</th>
                                                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">财务主体</th>
@@ -1149,6 +1150,7 @@
                                         </thead>
                                         <tbody class="bg-white divide-y divide-gray-200">
                                             <tr class="hover:bg-gray-50">
+                                                <td class="px-3 py-3 whitespace-nowrap"><input type="checkbox" class="row-check" data-calc-status="已计算" data-confirm-status="已确认"></td>
                                                 <td class="px-3 py-3 text-gray-900 font-medium whitespace-nowrap">RG26041500000001</td>
                                                 <td class="px-3 py-3 text-gray-700 whitespace-nowrap">2026-04</td>
                                                 <td class="px-3 py-3 text-gray-700 whitespace-nowrap">成都分公司</td>
@@ -1186,6 +1188,7 @@
                                                 </td>
                                             </tr>
                                             <tr class="hover:bg-gray-50">
+                                                <td class="px-3 py-3 whitespace-nowrap"><input type="checkbox" class="row-check" data-calc-status="计算中" data-confirm-status="审批中"></td>
                                                 <td class="px-3 py-3 text-gray-900 font-medium whitespace-nowrap">RG26041600000002</td>
                                                 <td class="px-3 py-3 text-gray-700 whitespace-nowrap">2026-04</td>
                                                 <td class="px-3 py-3 text-gray-700 whitespace-nowrap">上海分公司</td>
@@ -2279,8 +2282,9 @@
                         if (typeof initCommonFunctions === 'function') {
                             initCommonFunctions();
                         }
-                        initPageFunctions();
-                        lucide.createIcons();
+                    };
+                    script.onerror = function() {
+                        console.warn('scripts.js加载失败，跳过公共脚本初始化');
                     };
                     document.body.appendChild(script);
                 }, 100);
@@ -3094,6 +3098,42 @@
                     }
                 });
             }
+
+            // 确认本期收入按钮
+            var confirmRevenueBtn = document.getElementById('confirm-revenue-btn');
+            if (confirmRevenueBtn) {
+                confirmRevenueBtn.addEventListener('click', function() {
+                    var checkedRows = document.querySelectorAll('.row-check:checked');
+                    if (checkedRows.length === 0) {
+                        alert('请先勾选需要确认收入的单据');
+                        return;
+                    }
+                    // 校验：勾选单据需满足计算状态=已计算 且 确认状态=未确认
+                    var invalidRows = [];
+                    checkedRows.forEach(function(cb) {
+                        var calcStatus = cb.getAttribute('data-calc-status');
+                        var confirmStatus = cb.getAttribute('data-confirm-status');
+                        if (calcStatus !== '已计算' || confirmStatus !== '未确认') {
+                            invalidRows.push(cb.closest('tr').querySelector('td:nth-child(2)').textContent.trim());
+                        }
+                    });
+                    if (invalidRows.length > 0) {
+                        alert('以下单据不满足确认条件（需计算状态=已计算且确认状态=未确认）：\n' + invalidRows.join('\n'));
+                        return;
+                    }
+                    alert('确认本期收入成功');
+                });
+            }
+
+            // 全选checkbox
+            var checkAll = document.getElementById('checkAll');
+            if (checkAll) {
+                checkAll.addEventListener('change', function() {
+                    document.querySelectorAll('.row-check').forEach(function(cb) {
+                        cb.checked = checkAll.checked;
+                    });
+                });
+            }
         }
 
         // 处理URL参数，自动切换到指定tab
@@ -3114,10 +3154,12 @@
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
                 loadSidebar();
+                initPageFunctions();
                 initTabFromUrlParam();
             });
         } else {
             loadSidebar();
+            initPageFunctions();
             initTabFromUrlParam();
         }
     </script>
