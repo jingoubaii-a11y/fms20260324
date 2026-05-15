@@ -775,7 +775,7 @@
         }
         async function loadSidebar() {
             try {
-                const response = await fetch('common/sidebar.html');
+                const response = await fetch('common/sidebar.html?t=' + Date.now());
                 var sidebarHtml = await response.text();
                 document.getElementById('sidebar-container').innerHTML = sidebarHtml;
                 setTimeout(function() {

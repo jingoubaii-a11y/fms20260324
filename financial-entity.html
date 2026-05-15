@@ -393,7 +393,7 @@
         // 加载侧边栏
         async function loadSidebar() {
             try {
-                const response = await fetch('common/sidebar.html');
+                const response = await fetch('common/sidebar.html?t=' + Date.now());
                 const sidebarHtml = await response.text();
                 document.getElementById('sidebar-container').innerHTML = sidebarHtml;
                 

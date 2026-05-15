@@ -356,7 +356,7 @@
     // ================== 侧边栏加载 ==================
     async function loadSidebar() {
         try {
-            const res = await fetch('common/sidebar.html');
+            const res = await fetch('common/sidebar.html?t=' + Date.now());
             document.getElementById('sidebar-container').innerHTML = await res.text();
             const s = document.createElement('script');
             s.src = 'common/scripts.js';
