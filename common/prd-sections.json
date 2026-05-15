@@ -118,7 +118,7 @@
       "sectionSlug": "币别",
       "moduleRange": {
         "start": 1044,
-        "end": 1737
+        "end": 1745
       },
       "sectionRange": {
         "start": 1052,
@@ -136,7 +136,7 @@
       "sectionSlug": "会计日历",
       "moduleRange": {
         "start": 1044,
-        "end": 1737
+        "end": 1745
       },
       "sectionRange": {
         "start": 1118,
@@ -147,18 +147,24 @@
       "title": "单据类型",
       "module": "公共资料",
       "section": "单据类型",
-      "markdown": "#### 单据类型\n\n##### 说明\n\n- 对同一业务单据通过类型区分不同业务场景，扩展单据用途、定义差异化处理规则，提升系统复用性与扩展性。如：不同类型，系统要自动走不同的财务逻辑\n\n##### 筛选条件\n\n- `单据类型编码`：模糊搜索\n\n- `单据类型名称`：模糊搜索\n\n- `单据`：下拉单选（现有使用单据类型的单据：应收单、销售出库单、整软项目收入核算单、软装收入分摊单）\n\n- `状态`：下拉单选（启用、停用）\n\n##### 按钮\n\n- `新增`：打开新增单据类型抽屉弹窗\n\n##### 列表\n\n- 字段：\n\n  - `单据类型编码`\n\n  - `单据类型名称`\n\n  - `是否默认`\n\n  - `EBS主场景`\n\n  - `EBS子场景`\n\n  - `状态`：switch按钮，启用、停用，是否默认=是，则不能停用，默认启用\n\n  - `操作`：\n\n    - `编辑`：打开编辑单据类型抽屉弹窗，界面同新增\n\n##### 单据类型新增\n\n- 字段：\n\n  - `单据类型编码`：字符串，32位，必填\n\n  - `单据类型名称`：字符串，64位，必填\n\n  - `是否默认`：下拉单选（是/否），默认否\n\n  - `EBS主场景`：字符串，64位\n\n  - `EBS子场景`：字符串，64位\n\n  - `说明`：字符串，256位\n\n  - `状态`：switch按钮，启用、停用，是否默认=是，则不能停用，默认启用\n\n  - `操作`：\n\n    - `关闭`：关闭抽屉弹窗\n\n    - `保存`：校验单据类型编码、单据类型名称唯一性；校验同一个单据中只能有一个默认单据类型。\n",
-      "changelog": [],
+      "markdown": "#### 单据类型\n\n##### 说明\n\n- 对同一业务单据通过类型区分不同业务场景，扩展单据用途、定义差异化处理规则，提升系统复用性与扩展性。如：不同类型，系统要自动走不同的财务逻辑\n\n##### 筛选条件\n\n- `单据类型编码`：模糊搜索\n\n- `单据类型名称`：模糊搜索\n\n- `单据`：下拉单选（现有使用单据类型的单据：应收单、销售出库单、整软项目收入核算单、软装收入分摊单）\n\n- `状态`：下拉单选（启用、停用）\n\n##### 按钮\n\n- `新增`：打开新增单据类型抽屉弹窗\n\n##### 列表\n\n- 字段：\n\n  - `单据类型编码`\n\n  - `单据类型名称`\n\n  - `是否默认`\n\n  - `EBS主场景编码`\n\n  - `EBS主场景名称`\n\n  - `EBS子场景编码`\n\n  - `EBS子场景名称`\n\n  - `状态`：switch按钮，启用、停用，是否默认=是，则不能停用，默认启用\n\n  - `操作`：\n\n    - `编辑`：打开编辑单据类型抽屉弹窗，界面同新增\n\n##### 单据类型新增\n\n- 字段：\n\n  - `单据类型编码`：字符串，32位，必填\n\n  - `单据类型名称`：字符串，64位，必填\n\n  - `是否默认`：下拉单选（是/否），默认否\n\n  - `EBS主场景编码`：字符串，64位\n\n  - `EBS主场景名称`：字符串，128位\n\n  - `EBS子场景编码`：字符串，64位\n\n  - `EBS子场景名称`：字符串，128位\n\n  - `说明`：字符串，256位\n\n  - `状态`：switch按钮，启用、停用，是否默认=是，则不能停用，默认启用\n\n  - `操作`：\n\n    - `关闭`：关闭抽屉弹窗\n\n    - `保存`：校验单据类型编码、单据类型名称唯一性；校验同一个单据中只能有一个默认单据类型。\n",
+      "changelog": [
+        {
+          "date": "2026-05-15",
+          "summary": "将列表和新增/编辑表单中的`EBS主场景`拆分为`EBS主场景编码`（字符串，64位）+`EBS主场景名称`（字符串，128位），`EBS子场景`拆分为`EBS子场景编码`（字符串，64位）+`EBS子场景名称`（字符串，128位），共4个字段。同步更新PRD列表字段、新增表单字段、原型页面列表表头/数据行/抽屉表单",
+          "scope": "公共资料/单据类型"
+        }
+      ],
       "missing": false,
       "moduleSlug": "公共资料",
       "sectionSlug": "单据类型",
       "moduleRange": {
         "start": 1044,
-        "end": 1737
+        "end": 1745
       },
       "sectionRange": {
         "start": 1314,
-        "end": 1377
+        "end": 1385
       }
     },
     "business-type.html": {
@@ -172,11 +178,11 @@
       "sectionSlug": "业务类型",
       "moduleRange": {
         "start": 1044,
-        "end": 1737
+        "end": 1745
       },
       "sectionRange": {
-        "start": 1378,
-        "end": 1475
+        "start": 1386,
+        "end": 1483
       }
     },
     "tax-rate.html": {
@@ -190,11 +196,11 @@
       "sectionSlug": "税率",
       "moduleRange": {
         "start": 1044,
-        "end": 1737
+        "end": 1745
       },
       "sectionRange": {
-        "start": 1476,
-        "end": 1515
+        "start": 1484,
+        "end": 1523
       }
     },
     "invoice-type.html": {
@@ -208,11 +214,11 @@
       "sectionSlug": "发票类型",
       "moduleRange": {
         "start": 1044,
-        "end": 1737
+        "end": 1745
       },
       "sectionRange": {
-        "start": 1536,
-        "end": 1589
+        "start": 1544,
+        "end": 1597
       }
     },
     "unit.html": {
@@ -226,11 +232,11 @@
       "sectionSlug": "计量单位",
       "moduleRange": {
         "start": 1044,
-        "end": 1737
+        "end": 1745
       },
       "sectionRange": {
-        "start": 1590,
-        "end": 1643
+        "start": 1598,
+        "end": 1651
       }
     },
     "requirement-type.html": {
@@ -250,11 +256,11 @@
       "sectionSlug": "需求类型",
       "moduleRange": {
         "start": 1044,
-        "end": 1737
+        "end": 1745
       },
       "sectionRange": {
-        "start": 1644,
-        "end": 1719
+        "start": 1652,
+        "end": 1727
       }
     },
     "source-system.html": {
@@ -268,11 +274,11 @@
       "sectionSlug": "来源系统",
       "moduleRange": {
         "start": 1044,
-        "end": 1737
+        "end": 1745
       },
       "sectionRange": {
-        "start": 1720,
-        "end": 1737
+        "start": 1728,
+        "end": 1745
       }
     },
     "accounting-method.html": {
@@ -285,8 +291,8 @@
       "moduleSlug": "项目核算",
       "sectionSlug": "核算方法管理-1",
       "moduleRange": {
-        "start": 1738,
-        "end": 5410
+        "start": 1746,
+        "end": 5418
       },
       "sectionRange": null
     },
@@ -300,8 +306,8 @@
       "moduleSlug": "项目核算",
       "sectionSlug": "核算工作台-1",
       "moduleRange": {
-        "start": 1738,
-        "end": 5410
+        "start": 1746,
+        "end": 5418
       },
       "sectionRange": null
     },
@@ -315,8 +321,8 @@
       "moduleSlug": "项目核算",
       "sectionSlug": "整装核算-5",
       "moduleRange": {
-        "start": 1738,
-        "end": 5410
+        "start": 1746,
+        "end": 5418
       },
       "sectionRange": null
     },
@@ -330,8 +336,8 @@
       "moduleSlug": "项目核算",
       "sectionSlug": "软装核算-13",
       "moduleRange": {
-        "start": 1738,
-        "end": 5410
+        "start": 1746,
+        "end": 5418
       },
       "sectionRange": null
     },
@@ -345,8 +351,8 @@
       "moduleSlug": "项目核算",
       "sectionSlug": "收入成本调整-22",
       "moduleRange": {
-        "start": 1738,
-        "end": 5410
+        "start": 1746,
+        "end": 5418
       },
       "sectionRange": null
     },
@@ -360,12 +366,12 @@
       "moduleSlug": "库存管理",
       "sectionSlug": "销售出库",
       "moduleRange": {
-        "start": 5411,
-        "end": 5650
+        "start": 5419,
+        "end": 5658
       },
       "sectionRange": {
-        "start": 5413,
-        "end": 5650
+        "start": 5421,
+        "end": 5658
       }
     },
     "receivable.html": {
@@ -378,12 +384,12 @@
       "moduleSlug": "应收管理",
       "sectionSlug": "应收单",
       "moduleRange": {
-        "start": 5651,
-        "end": 5908
+        "start": 5659,
+        "end": 5916
       },
       "sectionRange": {
-        "start": 5653,
-        "end": 5908
+        "start": 5661,
+        "end": 5916
       }
     },
     "period-end.html": {
@@ -437,8 +443,8 @@
       "moduleSlug": "期末处理",
       "sectionSlug": null,
       "moduleRange": {
-        "start": 5909,
-        "end": 6176
+        "start": 5917,
+        "end": 6184
       },
       "sectionRange": null
     },
@@ -468,12 +474,12 @@
       "moduleSlug": "集成管理",
       "sectionSlug": "EBS映射配置",
       "moduleRange": {
-        "start": 6177,
-        "end": 6358
+        "start": 6185,
+        "end": 6366
       },
       "sectionRange": {
-        "start": 6181,
-        "end": 6256
+        "start": 6189,
+        "end": 6264
       }
     },
     "sync-log.html": {
@@ -512,12 +518,12 @@
       "moduleSlug": "集成管理",
       "sectionSlug": "同步日志",
       "moduleRange": {
-        "start": 6177,
-        "end": 6358
+        "start": 6185,
+        "end": 6366
       },
       "sectionRange": {
-        "start": 6257,
-        "end": 6358
+        "start": 6265,
+        "end": 6366
       }
     }
   }
