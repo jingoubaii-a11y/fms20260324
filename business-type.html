@@ -435,74 +435,80 @@
 
                             <!-- 树形结构 -->
                             <div class="space-y-1 max-h-[calc(100vh-350px)] overflow-y-auto">
-                                <!-- 一级节点 -->
-                                <div class="tree-item selected" data-id="group-1">
+                                <!-- 整装 -->
+                                <div class="tree-item selected" data-id="group-zz">
                                     <div class="tree-toggle" onclick="toggleTreeNode(this)">
                                         <i data-lucide="chevron-down" class="w-3 h-3"></i>
                                     </div>
                                     <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
-                                    <span class="text-sm">收入类</span>
+                                    <span class="text-sm">整装</span>
+                                    <span class="ml-auto text-xs text-gray-400">(7)</span>
+                                </div>
+                                <div class="tree-node" id="children-group-zz">
+                                    <div class="tree-item" data-id="group-zz-1">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">整装收入</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-zz-2">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">材料成本</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-zz-3">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">材料进项税额转出成本</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-zz-4">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">人工成本</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-zz-5">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">劳务分包差额抵税成本</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-zz-6">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">运输成本</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-zz-7">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">其他成本</span>
+                                    </div>
+                                </div>
+
+                                <!-- 软装 -->
+                                <div class="tree-item" data-id="group-rz">
+                                    <div class="tree-toggle" onclick="toggleTreeNode(this)">
+                                        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                                    </div>
+                                    <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                    <span class="text-sm">软装</span>
+                                    <span class="ml-auto text-xs text-gray-400">(1)</span>
+                                </div>
+                                <div class="tree-node hidden" id="children-group-rz">
+                                    <div class="tree-item" data-id="group-rz-1">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">软装收入</span>
+                                    </div>
+                                </div>
+
+                                <!-- 设计费 -->
+                                <div class="tree-item" data-id="group-sjf">
+                                    <div class="tree-toggle" onclick="toggleTreeNode(this)">
+                                        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                                    </div>
+                                    <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                    <span class="text-sm">设计费</span>
                                     <span class="ml-auto text-xs text-gray-400">(2)</span>
                                 </div>
-                                <div class="tree-node" id="children-group-1">
-                                    <!-- 二级节点 -->
-                                    <div class="tree-item" data-id="group-1-1">
-                                        <div class="tree-toggle" onclick="toggleTreeNode(this)">
-                                            <i data-lucide="chevron-down" class="w-3 h-3"></i>
-                                        </div>
-                                        <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
-                                        <span class="text-sm">主营业务收入</span>
-                                        <span class="ml-auto text-xs text-gray-400">(1)</span>
+                                <div class="tree-node hidden" id="children-group-sjf">
+                                    <div class="tree-item" data-id="group-sjf-1">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">设计费收入</span>
                                     </div>
-                                    <div class="tree-node">
-                                        <!-- 三级节点 -->
-                                        <div class="tree-item" data-id="group-1-1-1">
-                                            <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
-                                            <span class="text-sm">销售收入</span>
-                                        </div>
+                                    <div class="tree-item" data-id="group-sjf-2">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">设计费成本</span>
                                     </div>
-                                    <div class="tree-item" data-id="group-1-1-2">
-                                        <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
-                                        <span class="text-sm">其他收入</span>
-                                        <span class="ml-auto text-xs text-gray-400">(1)</span>
-                                    </div>
-                                </div>
-
-                                <!-- 另一个一级节点 -->
-                                <div class="tree-item" data-id="group-2">
-                                    <div class="tree-toggle" onclick="toggleTreeNode(this)">
-                                        <i data-lucide="chevron-right" class="w-3 h-3"></i>
-                                    </div>
-                                    <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
-                                    <span class="text-sm">支出类</span>
-                                    <span class="ml-auto text-xs text-gray-400">(1)</span>
-                                </div>
-                                <div class="tree-node hidden" id="children-group-2">
-                                    <div class="tree-item" data-id="group-2-1">
-                                        <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
-                                        <span class="text-sm">采购支出</span>
-                                    </div>
-                                </div>
-
-                                <div class="tree-item" data-id="group-3">
-                                    <div class="tree-toggle" onclick="toggleTreeNode(this)">
-                                        <i data-lucide="chevron-right" class="w-3 h-3"></i>
-                                    </div>
-                                    <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
-                                    <span class="text-sm">费用类</span>
-                                    <span class="ml-auto text-xs text-gray-400">(1)</span>
-                                </div>
-                                <div class="tree-node hidden" id="children-group-3">
-                                    <div class="tree-item" data-id="group-3-1">
-                                        <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
-                                        <span class="text-sm">费用报销</span>
-                                    </div>
-                                </div>
-
-                                <div class="tree-item" data-id="group-4">
-                                    <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
-                                    <span class="text-sm">资产类</span>
-                                    <span class="ml-auto text-xs text-gray-400">(1)</span>
                                 </div>
                             </div>
                         </div>
@@ -544,10 +550,10 @@
                                     </thead>
                                     <tbody class="divide-y divide-gray-200">
                                         <tr>
-                                            <td class="px-4 py-3 text-sm text-gray-700">BT001</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">销售收入</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">收入类 > 主营业务收入</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">主营业务收入</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">1</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装收入</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
                                             <td class="px-4 py-3">
                                                 <label class="switch">
                                                     <input type="checkbox" checked>
@@ -562,10 +568,10 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="px-4 py-3 text-sm text-gray-700">BT002</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">其他业务收入</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">收入类 > 其他收入</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">其他业务收入</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">2</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">材料成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
                                             <td class="px-4 py-3">
                                                 <label class="switch">
                                                     <input type="checkbox" checked>
@@ -580,10 +586,10 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="px-4 py-3 text-sm text-gray-700">BT003</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">采购支出</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">支出类</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">原材料采购</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">3</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">材料进项税额转出成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
                                             <td class="px-4 py-3">
                                                 <label class="switch">
                                                     <input type="checkbox" checked>
@@ -598,13 +604,13 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="px-4 py-3 text-sm text-gray-700">BT004</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">费用报销</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">费用类</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">日常费用报销</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">4</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">人工成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
                                             <td class="px-4 py-3">
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" checked>
                                                     <span class="slider"></span>
                                                 </label>
                                             </td>
@@ -616,10 +622,100 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="px-4 py-3 text-sm text-gray-700">BT005</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">资产购置</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">资产类</td>
-                                            <td class="px-4 py-3 text-sm text-gray-700">固定资产购置</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">5</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">劳务分包差额抵税成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">6</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">运输成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">7</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">其他成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">8</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">软装收入</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">软装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">9</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">设计费收入</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">设计费</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">10</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">设计费成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">设计费</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
                                             <td class="px-4 py-3">
                                                 <label class="switch">
                                                     <input type="checkbox" checked>

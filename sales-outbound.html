@@ -381,6 +381,7 @@
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">税额</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">不含税金额</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">源单类型</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">源单单据类型</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">源单编号</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">出库单位<span class="text-red-500">*</span></th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">出库数量<span class="text-red-500">*</span></th>
@@ -444,79 +445,181 @@
             });
         });
 
-        // 明细行新增/删除
-        (function initDetailRows() {
-            const addBtn = document.getElementById('add-detail-row');
-            const tbody = document.getElementById('detail-rows');
-            if (!addBtn || !tbody) return;
+        // 明细行新增/删除（已更新）
+        let detailLineNo = 0;
+        (function() {
+            const addBtn2 = document.getElementById('add-detail-row');
+            const tbodyEl = document.getElementById('detail-rows');
+            if (!addBtn2 || !tbodyEl) return;
 
-            const inputCell = (extra = '') => `<td class="px-3 py-2"><input type="text" class="w-28 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-sm" ${extra}></td>`;
-            const selectCell = (options) => `<td class="px-3 py-2"><select class="w-28 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-sm">${options.map(o => `<option value="${o.v}">${o.t}</option>`).join('')}</select></td>`;
-            const lockCell = () => `<td class="px-3 py-2"><input type="text" class="w-28 px-2 py-1 border border-gray-200 bg-gray-100 rounded-md text-sm" readonly></td>`;
-
-            function buildRow(index) {
+            addBtn2.addEventListener('click', function() {
+                detailLineNo++;
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td class="px-3 py-2 text-sm text-gray-700 row-no">${index}</td>
-                    ${lockCell()}
-                    ${selectCell([{v:'',t:'请选择'},{v:'normal',t:'普通销售'},{v:'return',t:'销售退货'}])}
-                    ${lockCell()}
-                    ${inputCell()}
-                    ${lockCell()}
-                    ${inputCell()}
-                    ${inputCell()}
-                    ${inputCell()}
-                    ${selectCell([{v:'',t:'请选择'},{v:'pcs',t:'个'},{v:'kg',t:'千克'}])}
-                    ${inputCell('type="number" step="0.0001"')}
-                    ${selectCell([{v:'CNY',t:'CNY'},{v:'USD',t:'USD'}])}
-                    ${inputCell('type="number" step="0.0001"')}
-                    ${inputCell('type="number" step="0.0001"')}
-                    ${inputCell('type="number" step="0.0001"')}
-                    ${inputCell('type="number" step="0.01"')}
-                    ${inputCell('type="number" step="0.01"')}
-                    ${inputCell('type="number" step="0.01"')}
-                    ${inputCell('type="number" step="0.01"')}
-                    ${lockCell()}
-                    ${lockCell()}
-                    ${selectCell([{v:'',t:'请选择'},{v:'pcs',t:'个'},{v:'kg',t:'千克'}])}
-                    ${inputCell('type="number" step="0.0001"')}
-                    ${inputCell('type="number" step="0.01"')}
-                    ${inputCell('type="number" step="0.0001"')}
-                    <td class="px-3 py-2 text-center"><input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary gift-checkbox"></td>
-                    ${selectCell([{v:'no',t:'否'},{v:'yes',t:'是'}])}
-                    <td class="px-3 py-2 text-sm">
-                        <button type="button" class="text-red-500 hover:text-red-700 delete-row" title="删除">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </td>
+                    <td class="px-3 py-2 text-sm text-gray-700">${detailLineNo}</td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="businessType"></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><div class="flex"><input type="text" class="w-20 px-1 py-1 border border-gray-300 rounded-l text-xs" value="" data-field="subType" readonly placeholder="请选择"><button class="px-1 py-1 bg-gray-100 border border-l-0 border-gray-300 rounded-r text-xs lookup-btn" data-lookup="subType"><i data-lucide="search" class="w-3 h-3"></i></button></div></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-24 px-1 py-1 border border-gray-300 rounded text-xs" value="" readonly></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><div class="flex"><input type="text" class="w-20 px-1 py-1 border border-gray-300 rounded-l text-xs" value="" data-field="materialCode" readonly placeholder="请选择"><button class="px-1 py-1 bg-gray-100 border border-l-0 border-gray-300 rounded-r text-xs lookup-btn" data-lookup="material"><i data-lucide="search" class="w-3 h-3"></i></button></div></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="materialName"></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value=""></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value=""></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value=""></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="salesUnit"></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="salesQty"></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><select class="px-1 py-1 border border-gray-300 rounded text-xs"><option value="CNY" selected>人民币</option></select></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value=""></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="taxPrice"></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="noTaxPrice"></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="taxRate"></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="taxTotal"></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="taxAmount"></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="noTaxAmount"></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value="" readonly></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-24 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="sourceDocType"></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value="" readonly></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="outboundUnit"></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value=""></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value=""></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value=""></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><select class="px-1 py-1 border border-gray-300 rounded text-xs"><option value="no">否</option><option value="yes">是</option></select></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">否</span></td>
+                    <td class="px-3 py-2 text-sm text-gray-700"><button class="text-red-600 hover:text-red-800 delete-line">删除</button></td>
                 `;
-                return tr;
-            }
-
-            function renumber() {
-                tbody.querySelectorAll('tr').forEach((tr, i) => {
-                    const cell = tr.querySelector('.row-no');
-                    if (cell) cell.textContent = i + 1;
+                tbodyEl.appendChild(tr);
+                tr.querySelector('.delete-line').addEventListener('click', function() {
+                    tr.remove();
+                    tbodyEl.querySelectorAll('tr').forEach((row, i) => { row.querySelector('td').textContent = i + 1; });
                 });
-            }
-
-            addBtn.addEventListener('click', function() {
-                const idx = tbody.querySelectorAll('tr').length + 1;
-                tbody.appendChild(buildRow(idx));
-                if (window.lucide && typeof lucide.createIcons === 'function') {
-                    lucide.createIcons();
-                }
-            });
-
-            tbody.addEventListener('click', function(e) {
-                const btn = e.target.closest('.delete-row');
-                if (!btn) return;
-                btn.closest('tr')?.remove();
-                renumber();
+                lucide.createIcons();
             });
         })();
-            
-            // 筛选条件选择器功能
+
+        // ========== 查询弹框 & 金额计算 ==========
+        const lookupData = {
+            subType: {
+                title: '选择子类型',
+                headers: ['业务类型编码', '业务类型', '子类型编码', '子类型'],
+                data: [
+                    { businessCode: 'ZZ', businessType: '整装', code: '1', name: '整装收入' },
+                    { businessCode: 'ZZ', businessType: '整装', code: '2', name: '材料成本' },
+                    { businessCode: 'ZZ', businessType: '整装', code: '3', name: '材料进项税额转出成本' },
+                    { businessCode: 'ZZ', businessType: '整装', code: '4', name: '人工成本' },
+                    { businessCode: 'ZZ', businessType: '整装', code: '5', name: '劳务分包差额抵税成本' },
+                    { businessCode: 'ZZ', businessType: '整装', code: '6', name: '运输成本' },
+                    { businessCode: 'ZZ', businessType: '整装', code: '7', name: '其他成本' },
+                    { businessCode: 'RZ', businessType: '软装', code: '8', name: '软装收入' },
+                    { businessCode: 'SJF', businessType: '设计费', code: '9', name: '设计费收入' },
+                    { businessCode: 'SJF', businessType: '设计费', code: '10', name: '设计费成本' },
+                ]
+            },
+            material: {
+                title: '选择物料',
+                headers: ['物料编码', '物料名称', '规格型号', '销售单位', '主单位'],
+                data: [
+                    { code: 'M001', name: '瓷砖-800x800', spec: '800x800mm', salesUnit: '片', mainUnit: '片' },
+                    { code: 'M002', name: '地板-强化复合', spec: '1220x122mm', salesUnit: '㎡', mainUnit: '㎡' },
+                    { code: 'M003', name: '乳胶漆-内墙', spec: '5L/桶', salesUnit: '桶', mainUnit: '桶' },
+                    { code: 'M004', name: '橱柜-定制', spec: '按需定制', salesUnit: '套', mainUnit: '套' },
+                    { code: 'M005', name: '卫浴-马桶', spec: '标准款', salesUnit: '个', mainUnit: '个' },
+                ]
+            }
+        };
+
+        let currentLookupTarget = null;
+
+        function openLookup(type, targetRow) {
+            const config = lookupData[type];
+            if (!config) return;
+            currentLookupTarget = { type, row: targetRow };
+            document.getElementById('lookup-title').textContent = config.title;
+            document.getElementById('lookup-search').value = '';
+            document.getElementById('lookup-header').innerHTML = config.headers.map(h => `<th class="px-3 py-2 text-left text-xs font-medium text-gray-500">${h}</th>`).join('');
+            renderLookupBody(config.data);
+            document.getElementById('lookup-modal').classList.remove('hidden');
+        }
+
+        function renderLookupBody(data) {
+            const tbodyLk = document.getElementById('lookup-body');
+            tbodyLk.innerHTML = data.map(item => {
+                const cells = Object.values(item);
+                return `<tr class="hover:bg-blue-50 cursor-pointer lookup-row">${cells.map(c => `<td class="px-3 py-2 text-sm text-gray-700">${c}</td>`).join('')}</tr>`;
+            }).join('');
+            tbodyLk.querySelectorAll('.lookup-row').forEach((row, idx) => {
+                row.addEventListener('click', function() { selectLookupItem(data[idx]); });
+            });
+        }
+
+        function selectLookupItem(item) {
+            if (!currentLookupTarget) return;
+            const { type, row } = currentLookupTarget;
+            if (type === 'subType') {
+                row.querySelector('[data-field="subType"]').value = item.name;
+                row.querySelector('[data-field="businessType"]').value = item.businessType;
+            } else if (type === 'material') {
+                row.querySelector('[data-field="materialCode"]').value = item.code;
+                row.querySelector('[data-field="materialName"]').value = item.name;
+                row.querySelector('[data-field="salesUnit"]').value = item.salesUnit;
+                row.querySelector('[data-field="outboundUnit"]').value = item.mainUnit;
+            }
+            document.getElementById('lookup-modal').classList.add('hidden');
+            currentLookupTarget = null;
+        }
+
+        document.getElementById('lookup-search')?.addEventListener('input', function() {
+            const keyword = this.value.toLowerCase();
+            const config = lookupData[currentLookupTarget.type];
+            const filtered = config.data.filter(item => Object.values(item).some(v => String(v).toLowerCase().includes(keyword)));
+            renderLookupBody(filtered);
+        });
+
+        document.getElementById('lookup-close')?.addEventListener('click', function() {
+            document.getElementById('lookup-modal').classList.add('hidden');
+        });
+
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.lookup-btn');
+            if (!btn) return;
+            openLookup(btn.dataset.lookup, btn.closest('tr'));
+        });
+
+        // 金额计算逻辑
+        const PP = 6, AP = 2;
+        function r2(v, p) { return parseFloat(v.toFixed(p)); }
+        function gf(row) {
+            return {
+                q: parseFloat(row.querySelector('[data-field="salesQty"]')?.value) || 0,
+                r: parseFloat(row.querySelector('[data-field="taxRate"]')?.value) / 100 || 0,
+                tp: parseFloat(row.querySelector('[data-field="taxPrice"]')?.value) || 0,
+                np: parseFloat(row.querySelector('[data-field="noTaxPrice"]')?.value) || 0,
+                tt: parseFloat(row.querySelector('[data-field="taxTotal"]')?.value) || 0,
+                ta: parseFloat(row.querySelector('[data-field="taxAmount"]')?.value) || 0,
+                na: parseFloat(row.querySelector('[data-field="noTaxAmount"]')?.value) || 0,
+            };
+        }
+        function sf(row, v) {
+            for (const [k, f] of Object.entries({tt:'taxTotal',ta:'taxAmount',na:'noTaxAmount',np:'noTaxPrice',tp:'taxPrice'})) {
+                const el = row.querySelector(`[data-field="${f}"]`);
+                if (el && v[k] !== undefined) el.value = v[k];
+            }
+        }
+        function fix(v) { if(v.na!==undefined&&v.ta!==undefined&&v.tt!==undefined){const d=r2(v.na+v.ta-v.tt,AP);if(d!==0)v.ta=r2(v.tt-v.na,AP);} return v; }
+
+        document.getElementById('detail-rows')?.addEventListener('focusout', function(e) {
+            const el = e.target; if (!el.dataset.field) return;
+            const row = el.closest('tr'); if (!row) return;
+            const f = gf(row); let res = null;
+            switch(el.dataset.field) {
+                case 'noTaxPrice': res={na:r2(f.na*f.q,AP),ta:r2(f.na*f.q*f.r,AP),tt:r2(f.na*f.q*(1+f.r),AP),np:r2(f.na,PP),tp:r2(f.na*(1+f.r),PP)}; break;
+                case 'taxPrice': { const np2=r2(f.tp/(1+f.r),PP); res={np:np2,na:r2(np2*f.q,AP),ta:r2(np2*f.q*f.r,AP),tt:r2(np2*f.q*(1+f.r),AP),tp:r2(f.tp,PP)}; } break;
+                case 'noTaxAmount': res={ta:r2(f.na*f.r,AP),tt:r2(f.na*(1+f.r),AP),na:r2(f.na,AP),np:f.q?r2(f.na/f.q,PP):r2(f.np,PP),tp:f.q?r2(f.na/f.q*(1+f.r),PP):r2(f.tp,PP)}; break;
+                case 'taxAmount': res={na:r2(f.tt-f.ta,AP),tt:r2(f.tt,AP),ta:r2(f.ta,AP),np:r2(f.np,PP),tp:r2(f.tp,PP)}; break;
+                case 'taxTotal': { const na2=r2(f.tt/(1+f.r),AP); res={na:na2,ta:r2(f.tt-na2,AP),tt:r2(f.tt,AP),np:f.q?r2(na2/f.q,PP):r2(f.np,PP),tp:f.q?r2(na2/f.q*(1+f.r),PP):r2(f.tp,PP)}; } break;
+                case 'taxRate': case 'salesQty': if(f.q===0)break; { const na2=r2(f.np*f.q,AP); res={na:na2,ta:r2(na2*f.r,AP),tt:r2(na2*(1+f.r),AP),np:r2(f.np,PP),tp:r2(f.np*(1+f.r),PP)}; } break;
+            }
+            if(res){fix(res);sf(row,res);}
+        });
+    </script>
             const filterSelect = document.getElementById('filter-field-sales-outbound');
             const filterInput = document.getElementById('filter-value-sales-outbound');
             
@@ -556,6 +659,29 @@
                 lucide.createIcons();
             });
     </script>
+
+    <!-- 查询弹框 -->
+    <div id="lookup-modal" class="fixed inset-0 bg-black/50 hidden z-[60]">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+                <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                    <h3 id="lookup-title" class="text-lg font-semibold text-gray-800"></h3>
+                    <button id="lookup-close" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <div class="p-4">
+                    <input type="text" id="lookup-search" class="w-full px-3 py-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="搜索...">
+                    <div class="overflow-y-auto max-h-64 border border-gray-200 rounded-lg">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr id="lookup-header"></tr>
+                            </thead>
+                            <tbody id="lookup-body" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- PRD Viewer -->
     <link rel="stylesheet" href="common/prd-viewer.css">

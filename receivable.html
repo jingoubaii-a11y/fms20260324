@@ -120,6 +120,31 @@
                                 </div>
                             </div>
                             <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">业务类型</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="">全部</option>
+                                    <option value="ZZ">整装</option>
+                                    <option value="RZ">软装</option>
+                                    <option value="SJF">设计费</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">业务子类型</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="">全部</option>
+                                    <option value="1">整装收入</option>
+                                    <option value="2">材料成本</option>
+                                    <option value="3">材料进项税额转出成本</option>
+                                    <option value="4">人工成本</option>
+                                    <option value="5">劳务分包差额抵税成本</option>
+                                    <option value="6">运输成本</option>
+                                    <option value="7">其他成本</option>
+                                    <option value="8">软装收入</option>
+                                    <option value="9">设计费收入</option>
+                                    <option value="10">设计费成本</option>
+                                </select>
+                            </div>
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
                                 <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                             </div>
@@ -392,7 +417,7 @@
                         <div class="mb-6">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-lg font-medium text-gray-800">应收明细</h3>
-                                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
+                                <button id="add-receivable-line" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
                                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
                                     新增行
                                 </button>
@@ -417,10 +442,15 @@
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">税额</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">不含税金额</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">源单类型</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">源单单据类型</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">源单编号</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">收入计算来源类型</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">收入计算来源编号</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">收入计算来源单据类型</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">批号</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">出库单位</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">出库数量</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">是否赠品</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">成本金额</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">成本单价</th>
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">已开票金额</th>
@@ -429,7 +459,7 @@
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-gray-200">
+                                    <tbody id="receivable-detail-body" class="divide-y divide-gray-200">
                                     </tbody>
                                 </table>
                             </div>
@@ -438,7 +468,7 @@
                         <div class="mb-6">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-lg font-medium text-gray-800">成本明细</h3>
-                                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
+                                <button id="add-cost-line" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center">
                                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
                                     新增行
                                 </button>
@@ -456,7 +486,7 @@
                                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-gray-200">
+                                    <tbody id="cost-detail-body" class="divide-y divide-gray-200">
                                     </tbody>
                                 </table>
                             </div>
@@ -542,7 +572,319 @@
                 
                 lucide.createIcons();
             });
+
+        // 应收明细新增行
+        let receivableLineNo = 0;
+        document.getElementById('add-receivable-line')?.addEventListener('click', function() {
+            receivableLineNo++;
+            const tbody = document.getElementById('receivable-detail-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="px-3 py-2 text-sm text-gray-700">${receivableLineNo}</td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="businessType"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><div class="flex"><input type="text" class="w-20 px-1 py-1 border border-gray-300 rounded-l text-xs" value="" data-field="subType" readonly placeholder="请选择"><button class="px-1 py-1 bg-gray-100 border border-l-0 border-gray-300 rounded-r text-xs lookup-btn" data-lookup="subType"><i data-lucide="search" class="w-3 h-3"></i></button></div></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-24 px-1 py-1 border border-gray-300 rounded text-xs" value="" readonly></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><div class="flex"><input type="text" class="w-20 px-1 py-1 border border-gray-300 rounded-l text-xs" value="" data-field="materialCode" readonly placeholder="请选择"><button class="px-1 py-1 bg-gray-100 border border-l-0 border-gray-300 rounded-r text-xs lookup-btn" data-lookup="material"><i data-lucide="search" class="w-3 h-3"></i></button></div></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="materialName"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="salesUnit"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="salesQty"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><select class="px-1 py-1 border border-gray-300 rounded text-xs"><option value="CNY" selected>人民币</option></select></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="taxPrice"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="noTaxPrice"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="taxRate"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="taxTotal"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="taxAmount"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="" data-field="noTaxAmount"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value="" readonly></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-24 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="sourceDocType"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value=""></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="revenueCalcSourceType"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-24 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="revenueCalcSourceNo"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="revenueCalcSourceDocType"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value="" readonly></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-16 px-1 py-1 border border-gray-300 rounded text-xs" value=""></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><select class="px-1 py-1 border border-gray-300 rounded text-xs"><option value="no">否</option><option value="yes">是</option></select></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value=""></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value=""></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="0.00"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="0.00"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">否</span></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><button class="text-red-600 hover:text-red-800 delete-line">删除</button></td>
+            `;
+            tbody.appendChild(tr);
+            tr.querySelector('.delete-line').addEventListener('click', function() {
+                tr.remove();
+            });
+        });
+
+        // 成本明细新增行
+        let costLineNo = 0;
+        document.getElementById('add-cost-line')?.addEventListener('click', function() {
+            costLineNo++;
+            const tbody = document.getElementById('cost-detail-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="px-3 py-2 text-sm text-gray-700">${costLineNo}</td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="text" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs bg-gray-100" value="" readonly data-field="businessType"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><div class="flex"><input type="text" class="w-20 px-1 py-1 border border-gray-300 rounded-l text-xs" value="" data-field="subType" readonly placeholder="请选择"><button class="px-1 py-1 bg-gray-100 border border-l-0 border-gray-300 rounded-r text-xs lookup-btn" data-lookup="subType"><i data-lucide="search" class="w-3 h-3"></i></button></div></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><select class="px-1 py-1 border border-gray-300 rounded text-xs"><option value="CNY" selected>人民币</option></select></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><input type="number" class="w-20 px-1 py-1 border border-gray-300 rounded text-xs" value="0.00"></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">否</span></td>
+                <td class="px-3 py-2 text-sm text-gray-700"><button class="text-red-600 hover:text-red-800 delete-line">删除</button></td>
+            `;
+            tbody.appendChild(tr);
+            tr.querySelector('.delete-line').addEventListener('click', function() {
+                tr.remove();
+            });
+            lucide.createIcons();
+        });
+
+        // 查询弹框数据
+        const lookupData = {
+            subType: {
+                title: '选择子类型',
+                headers: ['业务类型编码', '业务类型', '子类型编码', '子类型'],
+                data: [
+                    { businessCode: 'ZZ', businessType: '整装', code: '1', name: '整装收入' },
+                    { businessCode: 'ZZ', businessType: '整装', code: '2', name: '材料成本' },
+                    { businessCode: 'ZZ', businessType: '整装', code: '3', name: '材料进项税额转出成本' },
+                    { businessCode: 'ZZ', businessType: '整装', code: '4', name: '人工成本' },
+                    { businessCode: 'ZZ', businessType: '整装', code: '5', name: '劳务分包差额抵税成本' },
+                    { businessCode: 'ZZ', businessType: '整装', code: '6', name: '运输成本' },
+                    { businessCode: 'ZZ', businessType: '整装', code: '7', name: '其他成本' },
+                    { businessCode: 'RZ', businessType: '软装', code: '8', name: '软装收入' },
+                    { businessCode: 'SJF', businessType: '设计费', code: '9', name: '设计费收入' },
+                    { businessCode: 'SJF', businessType: '设计费', code: '10', name: '设计费成本' },
+                ]
+            },
+            material: {
+                title: '选择物料',
+                headers: ['物料编码', '物料名称', '规格型号', '销售单位', '主单位'],
+                data: [
+                    { code: 'M001', name: '瓷砖-800x800', spec: '800x800mm', salesUnit: '片', mainUnit: '片' },
+                    { code: 'M002', name: '地板-强化复合', spec: '1220x122mm', salesUnit: '㎡', mainUnit: '㎡' },
+                    { code: 'M003', name: '乳胶漆-内墙', spec: '5L/桶', salesUnit: '桶', mainUnit: '桶' },
+                    { code: 'M004', name: '橱柜-定制', spec: '按需定制', salesUnit: '套', mainUnit: '套' },
+                    { code: 'M005', name: '卫浴-马桶', spec: '标准款', salesUnit: '个', mainUnit: '个' },
+                ]
+            }
+        };
+
+        let currentLookupTarget = null;
+
+        function openLookup(type, targetRow) {
+            const config = lookupData[type];
+            if (!config) return;
+            currentLookupTarget = { type, row: targetRow };
+
+            document.getElementById('lookup-title').textContent = config.title;
+            document.getElementById('lookup-search').value = '';
+
+            const headerRow = document.getElementById('lookup-header');
+            headerRow.innerHTML = config.headers.map(h => `<th class="px-3 py-2 text-left text-xs font-medium text-gray-500">${h}</th>`).join('');
+
+            renderLookupBody(config.data);
+
+            document.getElementById('lookup-modal').classList.remove('hidden');
+        }
+
+        function renderLookupBody(data) {
+            const tbody = document.getElementById('lookup-body');
+            const config = lookupData[currentLookupTarget.type];
+            tbody.innerHTML = data.map(item => {
+                const cells = Object.values(item);
+                return `<tr class="hover:bg-blue-50 cursor-pointer lookup-row">${cells.map(c => `<td class="px-3 py-2 text-sm text-gray-700">${c}</td>`).join('')}</tr>`;
+            }).join('');
+
+            tbody.querySelectorAll('.lookup-row').forEach((row, idx) => {
+                row.addEventListener('click', function() {
+                    selectLookupItem(data[idx]);
+                });
+            });
+        }
+
+        function selectLookupItem(item) {
+            if (!currentLookupTarget) return;
+            const { type, row } = currentLookupTarget;
+
+            if (type === 'subType') {
+                const subTypeInput = row.querySelector('[data-field="subType"]');
+                const businessTypeInput = row.querySelector('[data-field="businessType"]');
+                if (subTypeInput) subTypeInput.value = item.name;
+                if (businessTypeInput) businessTypeInput.value = item.businessType;
+            } else if (type === 'material') {
+                const codeInput = row.querySelector('[data-field="materialCode"]');
+                const nameInput = row.querySelector('[data-field="materialName"]');
+                const unitInput = row.querySelector('[data-field="salesUnit"]');
+                if (codeInput) codeInput.value = item.code;
+                if (nameInput) nameInput.value = item.name;
+                if (unitInput) unitInput.value = item.salesUnit;
+            }
+
+            document.getElementById('lookup-modal').classList.add('hidden');
+            currentLookupTarget = null;
+        }
+
+        // 弹框搜索过滤
+        document.getElementById('lookup-search')?.addEventListener('input', function() {
+            const keyword = this.value.toLowerCase();
+            const config = lookupData[currentLookupTarget.type];
+            const filtered = config.data.filter(item => Object.values(item).some(v => String(v).toLowerCase().includes(keyword)));
+            renderLookupBody(filtered);
+        });
+
+        // 弹框关闭
+        document.getElementById('lookup-close')?.addEventListener('click', function() {
+            document.getElementById('lookup-modal').classList.add('hidden');
+        });
+
+        // 弹框按钮点击委托
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.lookup-btn');
+            if (!btn) return;
+            const type = btn.dataset.lookup;
+            const row = btn.closest('tr');
+            openLookup(type, row);
+        });
+
+        // ========== 应收明细金额计算逻辑 ==========
+        const PRICE_PRECISION = 6;  // 单价精度
+        const AMOUNT_PRECISION = 2; // 金额精度
+
+        function round(val, precision) {
+            return parseFloat(val.toFixed(precision));
+        }
+
+        function getRowFields(row) {
+            return {
+                salesQty:    parseFloat(row.querySelector('[data-field="salesQty"]')?.value) || 0,
+                taxRate:     parseFloat(row.querySelector('[data-field="taxRate"]')?.value) / 100 || 0,
+                taxPrice:    parseFloat(row.querySelector('[data-field="taxPrice"]')?.value) || 0,
+                noTaxPrice:  parseFloat(row.querySelector('[data-field="noTaxPrice"]')?.value) || 0,
+                taxTotal:    parseFloat(row.querySelector('[data-field="taxTotal"]')?.value) || 0,
+                taxAmount:   parseFloat(row.querySelector('[data-field="taxAmount"]')?.value) || 0,
+                noTaxAmount: parseFloat(row.querySelector('[data-field="noTaxAmount"]')?.value) || 0,
+            };
+        }
+
+        function setRowValues(row, vals) {
+            const map = { taxTotal: 'taxTotal', taxAmount: 'taxAmount', noTaxAmount: 'noTaxAmount', noTaxPrice: 'noTaxPrice', taxPrice: 'taxPrice' };
+            for (const [key, field] of Object.entries(map)) {
+                const el = row.querySelector(`[data-field="${field}"]`);
+                if (el && vals[key] !== undefined) el.value = vals[key];
+            }
+        }
+
+        // 场景1：修改不含税单价（基准）
+        function calcByNoTaxPrice(f) {
+            const noTaxAmount = round(f.noTaxPrice * f.salesQty, AMOUNT_PRECISION);
+            const taxAmount = round(noTaxAmount * f.taxRate, AMOUNT_PRECISION);
+            const taxTotal = round(noTaxAmount + taxAmount, AMOUNT_PRECISION);
+            const taxPrice = round(f.noTaxPrice * (1 + f.taxRate), PRICE_PRECISION);
+            return { noTaxAmount, taxAmount, taxTotal, noTaxPrice: round(f.noTaxPrice, PRICE_PRECISION), taxPrice };
+        }
+
+        // 场景2：修改含税单价（基准）
+        function calcByTaxPrice(f) {
+            const noTaxPrice = round(f.taxPrice / (1 + f.taxRate), PRICE_PRECISION);
+            const noTaxAmount = round(noTaxPrice * f.salesQty, AMOUNT_PRECISION);
+            const taxAmount = round(noTaxAmount * f.taxRate, AMOUNT_PRECISION);
+            const taxTotal = round(noTaxAmount + taxAmount, AMOUNT_PRECISION);
+            return { noTaxPrice, noTaxAmount, taxAmount, taxTotal, taxPrice: round(f.taxPrice, PRICE_PRECISION) };
+        }
+
+        // 场景3：修改不含税金额（基准）
+        function calcByNoTaxAmount(f) {
+            const taxAmount = round(f.noTaxAmount * f.taxRate, AMOUNT_PRECISION);
+            const taxTotal = round(f.noTaxAmount + taxAmount, AMOUNT_PRECISION);
+            const noTaxPrice = f.salesQty !== 0 ? round(f.noTaxAmount / f.salesQty, PRICE_PRECISION) : round(f.noTaxPrice, PRICE_PRECISION);
+            const taxPrice = round(noTaxPrice * (1 + f.taxRate), PRICE_PRECISION);
+            return { noTaxAmount: round(f.noTaxAmount, AMOUNT_PRECISION), taxAmount, taxTotal, noTaxPrice, taxPrice };
+        }
+
+        // 场景4：修改税额（不倒算单价）
+        function calcByTaxAmount(f) {
+            const noTaxAmount = round(f.taxTotal - f.taxAmount, AMOUNT_PRECISION);
+            const taxTotal = round(noTaxAmount + f.taxAmount, AMOUNT_PRECISION);
+            return { noTaxAmount, taxTotal, taxAmount: round(f.taxAmount, AMOUNT_PRECISION), noTaxPrice: round(f.noTaxPrice, PRICE_PRECISION), taxPrice: round(f.taxPrice, PRICE_PRECISION) };
+        }
+
+        // 场景5：修改价税合计（基准）
+        function calcByTaxTotal(f) {
+            const noTaxAmount = round(f.taxTotal / (1 + f.taxRate), AMOUNT_PRECISION);
+            const taxAmount = round(f.taxTotal - noTaxAmount, AMOUNT_PRECISION);
+            const noTaxPrice = f.salesQty !== 0 ? round(noTaxAmount / f.salesQty, PRICE_PRECISION) : round(f.noTaxPrice, PRICE_PRECISION);
+            const taxPrice = round(noTaxPrice * (1 + f.taxRate), PRICE_PRECISION);
+            return { noTaxAmount, taxAmount, taxTotal: round(f.taxTotal, AMOUNT_PRECISION), noTaxPrice, taxPrice };
+        }
+
+        // 税率/数量修改：按不含税单价为基准重算
+        function calcByRateOrQtyChange(f) {
+            if (f.salesQty === 0) return null; // 数量=0时不刷新金额
+            return calcByNoTaxPrice(f);
+        }
+
+        // 处理尾差：保证 价税合计=不含税金额+税额
+        function fixRounding(vals) {
+            if (vals.noTaxAmount !== undefined && vals.taxAmount !== undefined && vals.taxTotal !== undefined) {
+                const diff = round(vals.noTaxAmount + vals.taxAmount - vals.taxTotal, AMOUNT_PRECISION);
+                if (diff !== 0) {
+                    vals.taxAmount = round(vals.taxTotal - vals.noTaxAmount, AMOUNT_PRECISION);
+                }
+            }
+            return vals;
+        }
+
+        // blur事件委托
+        document.getElementById('receivable-detail-body')?.addEventListener('focusout', function(e) {
+            const el = e.target;
+            if (!el.dataset.field) return;
+            const row = el.closest('tr');
+            if (!row) return;
+
+            const field = el.dataset.field;
+            const f = getRowFields(row);
+            let result = null;
+
+            switch (field) {
+                case 'noTaxPrice':  result = calcByNoTaxPrice(f); break;
+                case 'taxPrice':    result = calcByTaxPrice(f); break;
+                case 'noTaxAmount': result = calcByNoTaxAmount(f); break;
+                case 'taxAmount':   result = calcByTaxAmount(f); break;
+                case 'taxTotal':    result = calcByTaxTotal(f); break;
+                case 'taxRate':
+                case 'salesQty':    result = calcByRateOrQtyChange(f); break;
+            }
+
+            if (result) {
+                fixRounding(result);
+                setRowValues(row, result);
+            }
+        });
     </script>
+
+    <!-- 查询弹框 -->
+    <div id="lookup-modal" class="fixed inset-0 bg-black/50 hidden z-[60]">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+                <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                    <h3 id="lookup-title" class="text-lg font-semibold text-gray-800"></h3>
+                    <button id="lookup-close" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <div class="p-4">
+                    <input type="text" id="lookup-search" class="w-full px-3 py-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="搜索...">
+                    <div class="overflow-y-auto max-h-64 border border-gray-200 rounded-lg">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr id="lookup-header"></tr>
+                            </thead>
+                            <tbody id="lookup-body" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- PRD Viewer -->
     <link rel="stylesheet" href="common/prd-viewer.css">

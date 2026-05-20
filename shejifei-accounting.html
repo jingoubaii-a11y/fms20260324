@@ -39,9 +39,134 @@
             width: 100%;
             overflow-x: auto;
         }
+        .req-badge {
+            display: inline-block;
+            vertical-align: top;
+            background-color: rgb(250, 173, 20);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 16px;
+            padding: 0px 5px;
+            border-radius: 2px;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            top: -10px;
+            right: -6px;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .req-badge-float {
+            display: inline-block;
+            vertical-align: top;
+            background-color: rgb(250, 173, 20);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 16px;
+            padding: 0px 5px;
+            border-radius: 2px;
+            border: none;
+            cursor: pointer;
+            position: fixed !important;
+            z-index: 9999;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            pointer-events: auto;
+            white-space: nowrap;
+        }
+        .req-badge-float:hover {
+            transform: scale(1.15);
+            box-shadow: 0 3px 12px rgba(250,173,20,0.6);
+            z-index: 10000;
+        }
+        .req-marker {
+            position: relative;
+            display: inline-block;
+            padding-top: 12px;
+        }
+        .req-marker.block {
+            display: block !important;
+        }
+        .req-marker > *:first-child {
+            margin-top: -12px;
+        }
+        .req-tooltip {
+            position: fixed;
+            background-color: #f0efef;
+            border-radius: 4px;
+            width: 450px;
+            max-height: 500px;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(-5px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            pointer-events: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .req-tooltip.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .req-tooltip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background-color: #e8e8e8;
+            border-bottom: 1px solid #d9d9d9;
+            border-radius: 4px 4px 0 0;
+        }
+        .req-tooltip-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+        .req-tooltip-close {
+            cursor: pointer;
+            font-size: 18px;
+            color: #999;
+            padding: 0 4px;
+            line-height: 1;
+        }
+        .req-tooltip-close:hover {
+            color: #333;
+        }
+        .req-tooltip-content {
+            padding: 12px 14px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .req-content .req-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #003eb3;
+            margin: 10px 0 4px 0;
+            padding-left: 6px;
+            border-left: 3px solid #003eb3;
+        }
+        .req-content .req-section-title:first-child {
+            margin-top: 0;
+        }
+        .req-change-tag {
+            display: inline-block;
+            background-color: #ff4d4f;
+            color: white;
+            font-size: 10px;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body class="bg-neutral">
+    <div id="req-tooltip-container"></div>
     <div class="flex h-screen">
         <div id="sidebar-container"></div>
         <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
@@ -632,9 +757,9 @@
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase whitespace-nowrap">到账日期</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase whitespace-nowrap">来源单据编号</th>
                                     <th class="px-4 py-2 text-right text-xs font-medium text-gray-600 uppercase whitespace-nowrap">单据金额</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-600 uppercase whitespace-nowrap">设计费税额</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-600 uppercase whitespace-nowrap"><span class="req-marker" id="req-marker-tax"><span class="req-badge" data-req="1" data-title="需求说明：设计费税额" data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[1] 需求说明：设计费税额</h3><div class="req-section-title">计算公式</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>设计费税额</strong> = 单据金额 - 设计费收入，精度2</li></ul><div class="req-section-title">字段说明</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>单据金额</strong>：取收款金额，精度2</li><li><strong>设计费收入</strong>：单据金额 / (1 + 税率)，精度2</li><li><strong>精度</strong>：保留2位小数</li></ul><div class="req-section-title">计算顺序</div><ul style="margin-left: 20px; line-height: 1.8;"><li>属于"计算顺序2：采集收款单并计算"中的字段</li><li>需先计算设计费收入，再计算设计费税额</li></ul><div class="req-section-title">汇总规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li>本次确认税额 = 本次确认设计费收入明细中设计费税额合计，精度2</li></ul></div>'>1</span>设计费税额</span></th>
                                     <th class="px-4 py-2 text-right text-xs font-medium text-gray-600 uppercase whitespace-nowrap">设计费成本</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-600 uppercase whitespace-nowrap">设计费收入</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-600 uppercase whitespace-nowrap"><span class="req-marker" id="req-marker-revenue"><span class="req-badge" data-req="2" data-title="需求说明：设计费收入" data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[2] 需求说明：设计费收入 <span class="req-change-tag">变更</span></h3><div class="req-section-title">计算公式</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>设计费收入</strong> = 单据金额 / (1 + 税率)，精度2</li></ul><div class="req-section-title">字段说明</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>单据金额</strong>：取收款金额，精度2</li><li><strong>税率</strong>：取设计费项目所适配的税率配置</li><li><strong>精度</strong>：保留2位小数</li></ul><div class="req-section-title">计算顺序</div><ul style="margin-left: 20px; line-height: 1.8;"><li>属于"计算顺序2：采集收款单并计算"中的字段</li><li>设计费收入需先于设计费税额计算（因为税额 = 单据金额 - 设计费收入）</li></ul><div class="req-section-title">汇总规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li>本次确认收入 = 本次确认设计费收入明细中设计费收入合计，精度2</li></ul><div class="req-section-title">需求变更说明</div><ul style="margin-left: 20px; line-height: 1.8;"><li><span class="req-change-tag">变更</span> 计算公式明确为：单据金额 / (1 + 税率)，即不含税口径</li><li><span class="req-change-tag">变更</span> 设计费税额依赖设计费收入计算结果：税额 = 单据金额 - 设计费收入</li></ul></div>'>2</span>设计费收入</span></th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
@@ -831,6 +956,14 @@
             var crb = document.getElementById('confirm-revenue-btn'); if (crb) crb.addEventListener('click', function() { var c = document.querySelectorAll('.row-check:checked'); if (c.length===0) { alert('请先勾选需要确认收入的单据'); return; } alert('确认本期收入'); });
         }
         document.addEventListener('DOMContentLoaded', function() { loadSidebar(); initPageFunctions(); });
+    </script>
+    <script src="js/req-annotation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof ReqAnnotation !== 'undefined' && typeof ReqAnnotation.init === 'function') {
+                ReqAnnotation.init();
+            }
+        });
     </script>
 </body>
 </html>
