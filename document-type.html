@@ -225,20 +225,18 @@
                     <div class="req-marker inline-block relative" id="req-marker-4" style="display: block; width: 100%;">
                         <span class="req-badge" data-req="4"
                               data-title="单据类型列表"
-                              data-content='<div class="req-section-title">单据类型列表</div><div><strong>字段：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>单据类型编码</code></li><li><code>单据类型名称</code></li><li><code>单据</code></li><li><code>是否默认</code></li><li><code>EBS主场景编码</code></li><li><code>EBS主场景名称</code></li><li><code>EBS子场景编码</code></li><li><code>EBS子场景名称</code></li><li><code>说明</code></li><li><code>状态</code>：switch按钮，启用/停用；是否默认=是则不能停用，默认启用</li><li><code>操作</code>：编辑（打开编辑抽屉弹窗，界面同新增）</li></ul>'>4</span>
+                              data-content='<div class="req-section-title">单据类型列表</div><div><strong>字段：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>单据类型编码</code></li><li><code>单据类型名称</code></li><li><code>是否默认</code></li><li><code>EBS主场景编码</code></li><li><code>EBS主场景名称</code></li><li><code>EBS子场景编码</code></li><li><code>EBS子场景名称</code></li><li><code>状态</code>：switch按钮，启用/停用；是否默认=是则不能停用，默认启用</li><li><code>操作</code>：编辑（打开编辑抽屉弹窗，界面同新增）</li></ul>'>4</span>
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">单据类型编码</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">单据类型名称</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">单据</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">是否默认</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EBS主场景编码</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EBS主场景名称</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EBS子场景编码</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EBS子场景名称</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">说明</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                                 </tr>
@@ -247,13 +245,11 @@
                                 <tr>
                                     <td class="px-4 py-2 text-sm text-gray-700">DOC001</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">标准应收单</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">应收单</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">是</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">AR_INVOICE</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">应收发票</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">STANDARD</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">标准</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">标准应收单类型</td>
                                     <td class="px-4 py-2">
                                         <label class="switch">
                                             <input type="checkbox" checked>
@@ -269,13 +265,11 @@
                                 <tr>
                                     <td class="px-4 py-2 text-sm text-gray-700">DOC002</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">定制应收单</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">应收单</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">否</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">AR_INVOICE</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">应收发票</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">CUSTOMIZED</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">定制</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">定制应收单类型</td>
                                     <td class="px-4 py-2">
                                         <label class="switch">
                                             <input type="checkbox" checked>
@@ -291,13 +285,11 @@
                                 <tr>
                                     <td class="px-4 py-2 text-sm text-gray-700">DOC003</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">标准销售出库单</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">销售出库单</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">是</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">SALES_ISSUE</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">销售出库</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">STANDARD</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">标准</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">标准销售出库单类型</td>
                                     <td class="px-4 py-2">
                                         <label class="switch">
                                             <input type="checkbox" checked>
@@ -313,13 +305,11 @@
                                 <tr>
                                     <td class="px-4 py-2 text-sm text-gray-700">DOC004</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">定制销售出库单</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">销售出库单</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">否</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">SALES_ISSUE</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">销售出库</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">CUSTOMIZED</td>
                                     <td class="px-4 py-2 text-sm text-gray-700">定制</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">定制销售出库单类型</td>
                                     <td class="px-4 py-2">
                                         <label class="switch">
                                             <input type="checkbox">
