@@ -292,7 +292,7 @@
       "sectionSlug": "核算方法管理-1",
       "moduleRange": {
         "start": 1755,
-        "end": 5850
+        "end": 5852
       },
       "sectionRange": null
     },
@@ -307,7 +307,7 @@
       "sectionSlug": "核算工作台-1",
       "moduleRange": {
         "start": 1755,
-        "end": 5850
+        "end": 5852
       },
       "sectionRange": null
     },
@@ -322,7 +322,7 @@
       "sectionSlug": "整装核算-5",
       "moduleRange": {
         "start": 1755,
-        "end": 5850
+        "end": 5852
       },
       "sectionRange": null
     },
@@ -337,7 +337,7 @@
       "sectionSlug": "软装核算-13",
       "moduleRange": {
         "start": 1755,
-        "end": 5850
+        "end": 5852
       },
       "sectionRange": null
     },
@@ -352,7 +352,7 @@
       "sectionSlug": "收入成本调整-22",
       "moduleRange": {
         "start": 1755,
-        "end": 5850
+        "end": 5852
       },
       "sectionRange": null
     },
@@ -377,12 +377,12 @@
       "moduleSlug": "库存管理",
       "sectionSlug": "销售出库",
       "moduleRange": {
-        "start": 5851,
-        "end": 6098
+        "start": 5853,
+        "end": 6100
       },
       "sectionRange": {
-        "start": 5853,
-        "end": 6098
+        "start": 5855,
+        "end": 6100
       }
     },
     "receivable.html": {
@@ -411,12 +411,12 @@
       "moduleSlug": "应收管理",
       "sectionSlug": "应收单",
       "moduleRange": {
-        "start": 6099,
-        "end": 6366
+        "start": 6101,
+        "end": 6368
       },
       "sectionRange": {
-        "start": 6101,
-        "end": 6366
+        "start": 6103,
+        "end": 6368
       }
     },
     "period-end.html": {
@@ -470,8 +470,8 @@
       "moduleSlug": "期末处理",
       "sectionSlug": null,
       "moduleRange": {
-        "start": 6367,
-        "end": 6634
+        "start": 6369,
+        "end": 6636
       },
       "sectionRange": null
     },
@@ -501,12 +501,12 @@
       "moduleSlug": "集成管理",
       "sectionSlug": "EBS映射配置",
       "moduleRange": {
-        "start": 6635,
-        "end": 6815
+        "start": 6637,
+        "end": 6817
       },
       "sectionRange": {
-        "start": 6639,
-        "end": 6714
+        "start": 6641,
+        "end": 6716
       }
     },
     "sync-log.html": {
@@ -545,12 +545,12 @@
       "moduleSlug": "集成管理",
       "sectionSlug": "同步日志",
       "moduleRange": {
-        "start": 6635,
-        "end": 6815
+        "start": 6637,
+        "end": 6817
       },
       "sectionRange": {
-        "start": 6715,
-        "end": 6815
+        "start": 6717,
+        "end": 6817
       }
     }
   }
