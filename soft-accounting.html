@@ -363,6 +363,29 @@
                                                 <button class="text-green-600 hover:text-green-800">库存明细</button>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td class="px-3 py-2"><input type="checkbox" class="w-4 h-4"></td>
+                                            <td class="px-3 py-2 text-sm text-gray-900 font-medium">DZ202604140003</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">RZ901000003</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">北京分公司</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">竣工出库对账</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">2026-04</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">2026-04-05</td>
+                                            <td class="px-3 py-2 text-sm">
+                                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">否</span>
+                                            </td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">-</td>
+                                            <td class="px-3 py-2 text-sm text-red-500">客户价全为0</td>
+                                            <td class="px-3 py-2 text-sm">
+                                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">对账失败</span>
+                                            </td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">2026-04-14 15:20:00</td>
+                                            <td class="px-3 py-2 text-sm space-x-1">
+                                                <button class="text-primary hover:text-blue-700">详情</button>
+                                                <button class="text-blue-600 hover:text-blue-800">重新对账</button>
+                                                <button class="text-green-600 hover:text-green-800">库存明细</button>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                                 </div>
@@ -1821,96 +1844,8 @@
     </div>
 
     <!-- ========== ⑤ 新增项目核算任务抽屉 (Tab4: 软装项目核算任务) [20] ========== -->
-    <!-- 抽屉遮罩层 -->
-    <div id="soft-project-task-overlay" class="drawer-overlay" onclick="closeSoftProjectTaskDrawer()"></div>
-    <!-- 抽屉面板 -->
-    <div id="soft-project-task-drawer" class="fixed top-0 right-0 h-full w-[480px] bg-white shadow-2xl z-50 drawer overflow-y-auto">
-        <!-- 抽屉头部 -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-[#e8e8e8] bg-[#fafafa] req-marker relative block" id="req-marker-18-modal">
-            <div class="flex items-center space-x-2">
-                <span class="req-badge" data-req="18"
-                      data-title="需求描述：新增软装项目收入核算任务（抽屉）"
-                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[18] 需求描述：新增软装项目收入核算任务（抽屉）</h3><div class="req-section-title">打开方式</div><p style="line-height: 1.8; margin-bottom: 12px;">点击<em>新增计算任务</em>按钮后弹出此抽屉/弹窗</p><div class="req-section-title">字段清单（5个字段）</div><ol style="margin-left: 20px; line-height: 1.8; margin-bottom: 16px;"><li><strong>项目类型</strong>：<span class="status-dot status-gray" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#999;margin-right:4px;"></span><em>锁定</em>，默认<code>软装</code><br/>枚举值：整装 | 软装 | 设计费</li><li><strong>核算方法</strong>：<span class="status-dot status-gray" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#999;margin-right:4px;"></span><em>锁定</em>，默认<code>完成合同法</code><br/>枚举值：完成合同法 | 完工百分比 | 开工确收</li><li><strong>财务组织</strong>：<em>下拉多选，支持全选，必填</em></li><li><strong>核算期间</strong>：<span class="status-dot status-gray" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#999;margin-right:4px;"></span><em>锁定</em>，自动带出当前会计期间，必填</li><li><strong>合同号</strong>：<em>输入后下拉多选，非必填</em><br/>不填则没有合同过滤条件</li></ol><div class="req-section-title">默认筛选条件（未勾选重算选项时）</div><blockquote style="border-left: 3px solid #ccc; padding-left: 12px; margin: 8px 0 16px 0; color: #666; background: #fafafa; padding: 10px; font-size: 12px;"><strong>以下两个重算选项均未勾选时</strong>，项目需要同时满足以下3个条件，若不满足则提示错误信息<strong>"未满足条件xxx"</strong>：<ol style="margin-left: 16px; margin-top: 6px; line-height: 1.8;"><li>计算状态 = <span class="status-dot status-blue" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#17a2b8;margin-right:4px;"></span>未计算 <strong>or</strong> <span class="status-dot status-red" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#dc3545;margin-right:4px;"></span>计算失败</li><li>确认状态 = 未确认 <strong>且</strong> 没有审批中的项目收入确认审批流程</li><li>未创建当期核算单据</li></ol></blockquote><div class="req-section-title">重算选项（布尔开关）</div><p style="font-size: 12px; color: #888; margin-bottom: 8px;">若勾选以下布尔选项，就在以上三个条件上取对应勾选条件的<strong>并集</strong></p><ul style="margin-left: 20px; line-height: 1.8; margin-bottom: 16px;"><li><strong>选项1：是否重算项目收入已计算且未确认的合同</strong>：布尔，<em>默认不勾选</em><br/><blockquote style="border-left: 3px solid #f0ad4e; padding-left: 12px; margin: 6px 0; color: #666; background: #fffdf7; padding: 8px; font-size: 11px;">勾选后合同需要满足条件：<br/>1. 计算状态 = 未计算 or 计算失败 or <span class="status-dot status-orange" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f0ad4e;margin-right:4px;"></span><strong>已计算</strong><br/>2. 确认状态 = 未确认 且 没有审批中的项目收入确认审批流程</blockquote></li><li><strong>选项2：是否重算项目收入已计算且已确认的合同</strong>：布尔，<em>默认不勾选</em><br/><blockquote style="border-left: 3px solid #28a745; padding-left: 12px; margin: 6px 0; color: #666; background: #f0fff0; padding: 8px; font-size: 11px;">勾选后合同需要满足条件：<br/>1. 计算状态 = 未计算 or 计算失败 or <span class="status-dot status-orange" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f0ad4e;margin-right:4px;"></span><strong>已计算</strong><br/>2. 确认状态 = <span class="status-dot status-green" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#28a745;margin-right:4px;"></span><strong>已确认</strong></blockquote></li></ul><div class="req-section-title">操作按钮逻辑</div><div style="margin-bottom: 12px;"><strong style="color: #007bff;">确认按钮交互逻辑（5步）：</strong><ol style="margin-left: 20px; line-height: 1.8; margin-top: 8px;"><li><strong>步骤1 - 二次确认判断</strong>：<br/>点击确认后，若<strong>勾选了重算已确认的合同</strong>需要进行<em>二次确认</em>，否则直接创建一个软装收入分摊计算任务<br/><blockquote style="border-left: 3px solid #17a2b8; padding-left: 10px; margin: 6px 0; background: #f0f8ff; padding: 8px; font-size: 11px;"><strong>确认计算范围</strong>：在本期应核算项目条件基础上加上根据新增任务选择的项（合同号、是否重算的计算状态、确认状态），但需排除掉<strong>合同有计算批次且对应批次计算任务正在计算中</strong>的项目</blockquote></li><li><strong>步骤2 - 创建项目核算单据</strong>：<br/><table style="width:100%;font-size:11px;margin:6px 0;border-collapse:collapse;"><tr style="background:#f5f5f5;"><th style="border:1px solid #ddd;padding:4px;text-align:left;">单据类型</th><th style="border:1px solid #ddd;padding:4px;text-align:left;">适用场景</th><th style="border:1px solid #ddd;padding:4px;text-align:left;">处理方式</th></tr><tr><td style="border:1px solid #ddd;padding:4px;"><span class="status-dot status-green" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#28a745;margin-right:4px;"></span>增量单据</td><td style="border:1px solid #ddd;padding:4px;">未创建核算单据的合同</td><td style="border:1px solid #ddd;padding:4px;">创建项目核算单据（是否重算=否），并更新当前计算批次号</td></tr><tr><td style="border:1px solid #ddd;padding:4px;"><span class="status-dot status-green" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#28a745;margin-right:4px;"></span>增量单据</td><td style="border:1px solid #ddd;padding:4px;">重算本期核算状态=已确认的合同</td><td style="border:1px solid #ddd;padding:4px;">创建项目核算单据（是否重算=是），并更新当前计算批次号</td></tr><tr><td style="border:1px solid #ddd;padding:4px;"><span class="status-dot status-orange" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#f0ad4e;margin-right:4px;"></span>存量单据</td><td style="border:1px solid #ddd;padding:4px;">已有核算单据的合同</td><td style="border:1px solid #ddd;padding:4px;">直接更新计算批次号</td></tr></table></li><li><strong>步骤3 - 执行计算</strong>：<br/>根据计算范围执行<em>项目核算收入计算逻辑</em></li><li><strong>步骤4 - 后台计算</strong>：<br/>退出界面后<em>自动后台计算</em></li><li><strong>步骤5 - 完成提示</strong>：<br/>计算完成后弹框提示<em>"你有项目收入核算任务已经计算完成，请查看详情！"</em> → 点击后跳转查询核算报告</li></ol></div><div style="padding: 8px; background: #fff3cd; border-left: 3px solid #ffc107; font-size: 11px; margin-top: 12px;"><strong>取消按钮</strong>：关闭弹窗</div></div>'>18</span>
-                <h3 class="text-[16px] font-bold text-[#003366]">新增软装项目收入核算任务</h3>
-            </div>
-            <button id="close-soft-task-drawer" class="text-[#999] hover:text-[#333] text-[20px] leading-none cursor-pointer">&times;</button>
-        </div>
-        <!-- 抽屉内容 -->
-        <div class="px-6 py-5 space-y-5">
-            <!-- 项目类型 -->
-            <div>
-                <label class="text-[13px] text-[#333] font-medium mb-2 block">项目类型 <span class="text-[#ff4d4f]">*</span></label>
-                <div class="flex items-center space-x-2">
-                    <input type="text" value="软装" readonly class="flex-1 border border-[#d9d9d9] rounded px-3 py-2 text-[13px] bg-[#f5f5f5] text-[#333] cursor-not-allowed" />
-                    <span class="text-[12px] text-[#999]">锁定</span>
-                </div>
-            </div>
-            <!-- 核算方法 -->
-            <div>
-                <label class="text-[13px] text-[#333] font-medium mb-2 block">核算方法 <span class="text-[#ff4d4f]">*</span></label>
-                <div class="flex items-center space-x-2">
-                    <input type="text" value="完成合同法" readonly class="flex-1 border border-[#d9d9d9] rounded px-3 py-2 text-[13px] bg-[#f5f5f5] text-[#333] cursor-not-allowed" />
-                    <span class="text-[12px] text-[#999]">锁定</span>
-                </div>
-            </div>
-            <!-- 财务组织 -->
-            <div>
-                <label class="text-[13px] text-[#333] font-medium mb-2 block">财务组织 <span class="text-[#ff4d4f]">*</span></label>
-                <div class="relative">
-                    <div id="soft-task-entity-tags" class="flex flex-wrap gap-2 p-2 border border-[#d9d9d9] rounded min-h-[36px] cursor-pointer bg-white"></div>
-                    <div id="soft-task-entity-dropdown" class="hidden absolute z-10 top-full left-0 right-0 bg-white border border-[#d9d9d9] rounded shadow-lg max-h-60 overflow-y-auto mt-1">
-                        <div class="p-2">
-                            <div class="flex items-center p-2 hover:bg-[#f5f5f5] cursor-pointer" data-value="all">
-                                <input type="checkbox" class="mr-2" id="soft-entity-all"><label for="soft-entity-all">全选</label>
-                            </div>
-                            <div class="flex items-center p-2 hover:bg-[#f5f5f5] cursor-pointer" data-value="cdgf">
-                                <input type="checkbox" class="mr-2" id="soft-entity-cdgf"><label for="soft-entity-cdgf">成都分公司</label>
-                            </div>
-                            <div class="flex items-center p-2 hover:bg-[#f5f5f5] cursor-pointer" data-value="bjgf">
-                                <input type="checkbox" class="mr-2" id="soft-entity-bjgf"><label for="soft-entity-bjgf">北京分公司</label>
-                            </div>
-                            <div class="flex items-center p-2 hover:bg-[#f5f5f5] cursor-pointer" data-value="shgf">
-                                <input type="checkbox" class="mr-2" id="soft-entity-shgf"><label for="soft-entity-shgf">上海分公司</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- 核算期间 -->
-            <div>
-                <label class="text-[13px] text-[#333] font-medium mb-2 block">核算期间 <span class="text-[#ff4d4f]">*</span></label>
-                <div class="flex items-center space-x-2">
-                    <input type="text" value="2026-04" readonly class="flex-1 border border-[#d9d9d9] rounded px-3 py-2 text-[13px] bg-[#f5f5f5] text-[#333] cursor-not-allowed" />
-                    <span class="text-[12px] text-[#999]">锁定</span>
-                </div>
-            </div>
-            <!-- 合同号 -->
-            <div>
-                <label class="text-[13px] text-[#333] font-medium mb-2 block">合同号</label>
-                <input type="text" placeholder="输入后下拉多选，不填默认无合同过滤" class="w-full border border-[#d9d9d9] rounded px-3 py-2 text-[13px] outline-none focus:border-[#0055ff]" id="soft-task-contract" />
-            </div>
-            <!-- 重算选项 -->
-            <div class="border border-[#e8e8e8] rounded p-4 space-y-3 bg-[#fafafa]">
-                <div class="text-[13px] font-medium text-[#333] mb-1">重算选项</div>
-                <!-- 是否重算项目收入已计算且未确认的合同 -->
-                <label class="flex items-start space-x-2 cursor-pointer">
-                    <input type="checkbox" class="mt-1 cursor-pointer" id="soft-recalc-calculated" />
-                    <span class="text-[12px] text-[#333] leading-5">是否重算已计算未确认的合同</span>
-                </label>
-                <!-- 是否重算项目收入已计算且已确认的合同 -->
-                <label class="flex items-start space-x-2 cursor-pointer">
-                    <input type="checkbox" class="mt-1 cursor-pointer" id="soft-recalc-confirmed" />
-                    <span class="text-[12px] text-[#333] leading-5">是否重算已确认的合同</span>
-                </label>
-                <div class="text-[11px] text-[#999] mt-2 leading-4">以上选项均未勾选时，仅核算满足条件的增量合同；勾选后取对应条件的并集</div>
-            </div>
-        </div>
-        <!-- 抽屉底部 -->
-        <div class="flex justify-end space-x-3 px-6 py-4 border-t border-[#e8e8e8] bg-[#fafafa] sticky bottom-0">
-            <button id="cancel-soft-task-btn" class="px-4 py-2 border border-[#d9d9d9] rounded text-[14px] text-[#666] hover:border-[#0055ff] hover:text-[#0055ff] cursor-pointer transition-colors">取消</button>
-            <button id="confirm-soft-task-btn" class="px-4 py-2 bg-[#0055ff] text-white rounded text-[14px] hover:bg-[#003399] cursor-pointer transition-colors">确认</button>
-        </div>
-    </div>
+    <!-- 通过fetch加载公共抽屉组件 -->
+    <div id="soft-project-task-drawer-container"></div>
 
     <!-- ========== ⑥ 核算单详情弹窗 (Tab5: 软装项目核算单) [24] ========== -->
     <div id="soft-accounting-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
@@ -2954,6 +2889,32 @@
 
             // ========== Tab4: 软装项目核算任务 ==========
 
+            // 加载公共抽屉组件
+            async function loadSoftProjectTaskDrawer() {
+                try {
+                    var response = await fetch('common/soft-project-task-drawer.html?t=' + Date.now());
+                    var drawerHtml = await response.text();
+                    document.getElementById('soft-project-task-drawer-container').innerHTML = drawerHtml;
+                    initSoftProjectTaskDrawer();
+                } catch (error) {
+                    console.error('加载抽屉组件失败:', error);
+                }
+            }
+
+            function initSoftProjectTaskDrawer() {
+            // 注入req-badge需求标注到抽屉头部
+            var drawerHeader = document.querySelector('#soft-project-task-drawer .flex.items-center.justify-between.px-6');
+            if (drawerHeader) {
+                var badgeWrapper = document.createElement('div');
+                badgeWrapper.className = 'req-marker relative inline-block';
+                badgeWrapper.id = 'req-marker-20-drawer';
+                badgeWrapper.innerHTML = '<span class="req-badge" data-req="20" data-title="需求描述：新增软装项目核算任务" data-content=\'<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[20] 需求描述：新增软装项目核算任务</h3><div class="req-section-title">字段清单（6个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>项目类型</strong>：锁定，软装</li><li><strong>核算方法</strong>：锁定，完成合同法</li><li><strong>财务组织</strong>：复选框，下拉多选，支持全选</li><li><strong>核算期间</strong>：锁定，当前会计期间</li><li><strong>合同号</strong>：非必填，输入后下拉多选</li></ol><div class="req-section-title">重算选项（三个布尔选项）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>是否重算已计算未确认的合同</strong>：布尔，默认不勾选</li><li><strong>是否重算已确认的合同</strong>：布尔，默认不勾选</li><li><strong>是否重算已确认的合同（仅未完全获取材料成本合同）</strong>：布尔，默认不勾选</li></ol><div class="req-section-title">操作按钮逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>确认按钮</strong>：提交核算任务，勾选重算已确认选项需二次确认</li><li><strong>取消按钮</strong>：关闭抽屉</li></ul></div>\'>20</span>';
+                var h3 = drawerHeader.querySelector('h3');
+                if (h3) {
+                    h3.parentNode.insertBefore(badgeWrapper, h3);
+                }
+            }
+
             // ⑤ 新增按钮 → 打开抽屉
             var projectTaskAddBtn = document.getElementById('soft-project-task-add-btn');
             var softProjectTaskDrawer = document.getElementById('soft-project-task-drawer');
@@ -2993,10 +2954,19 @@
             var confirmSoftTaskBtn = document.getElementById('confirm-soft-task-btn');
             if (confirmSoftTaskBtn) {
                 confirmSoftTaskBtn.addEventListener('click', function() {
+                    var recalcConfirmed = document.getElementById('soft-recalc-confirmed');
+                    var recalcConfirmedPartial = document.getElementById('soft-recalc-confirmed-partial');
+                    // 勾选了重算已确认的合同 或 重算已确认的合同（仅未完全获取材料成本合同），需二次确认
+                    if ((recalcConfirmed && recalcConfirmed.checked) || (recalcConfirmedPartial && recalcConfirmedPartial.checked)) {
+                        var confirmed = confirm('你勾选了重算已确认的合同选项，这将对已确认的合同重新进行核算计算，是否确认？');
+                        if (!confirmed) return;
+                    }
                     alert('确认提交计算成功！');
                     closeSoftProjectTaskDrawer();
                 });
             }
+
+            } // end initSoftProjectTaskDrawer
 
             // 报告查询按钮（Tab4: 软装项目核算任务）
             var projectTaskReportModal = document.getElementById('project-task-report-modal');
@@ -3154,11 +3124,13 @@
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
                 loadSidebar();
+                loadSoftProjectTaskDrawer();
                 initPageFunctions();
                 initTabFromUrlParam();
             });
         } else {
             loadSidebar();
+            loadSoftProjectTaskDrawer();
             initPageFunctions();
             initTabFromUrlParam();
         }

@@ -411,6 +411,56 @@
                 <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-customer-code" value="MER001">
             </div>
             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">签单设计师</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none" id="project-sign-designer" value="李明" disabled>
+                <p class="text-xs text-gray-400 mt-1">跨系统取值，取报价签约设计师（订单创建人）</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">签单设计部</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none" id="project-sign-design-dept" value="设计一部" disabled>
+                <p class="text-xs text-gray-400 mt-1">跨系统取值，取报价签约设计师所在部门</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">开工设计师</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none" id="project-start-designer" value="王芳" disabled>
+                <p class="text-xs text-gray-400 mt-1">跨系统取值，取业务系统的开工设计师</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">开工设计部</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none" id="project-start-design-dept" value="设计二部" disabled>
+                <p class="text-xs text-gray-400 mt-1">跨系统取值，取业务系统的开工设计部</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">开工设计部经理</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none" id="project-start-design-manager" value="赵强" disabled>
+                <p class="text-xs text-gray-400 mt-1">跨系统取值，取业务系统的开工设计部经理</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">项目经理编号</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none" id="project-pm-code" value="PM001" disabled>
+                <p class="text-xs text-gray-400 mt-1">跨系统取值，取业务系统的项目经理编号</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">项目经理名称</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none" id="project-pm-name" value="陈伟" disabled>
+                <p class="text-xs text-gray-400 mt-1">跨系统取值，取业务系统的项目经理姓名</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">质检员</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none" id="project-quality-inspector" value="孙丽" disabled>
+                <p class="text-xs text-gray-400 mt-1">跨系统取值，取业务系统的质检员</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">工程部部门</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none" id="project-engineering-dept" value="交付一部" disabled>
+                <p class="text-xs text-gray-400 mt-1">跨系统取值，取业务系统的工程部部门</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">工程部经理</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none" id="project-engineering-manager" value="刘洋" disabled>
+                <p class="text-xs text-gray-400 mt-1">跨系统取值，取业务系统的工程部经理</p>
+            </div>
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">订单号 <span class="text-red-500">*</span></label>
                 <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="project-order" value="OD20260001">
             </div>
@@ -819,6 +869,16 @@
                     document.getElementById('project-requirement').value = 'decoration';
                     document.getElementById('project-customer').value = '张三';
                     document.getElementById('project-customer-code').value = 'MER001';
+                    document.getElementById('project-sign-designer').value = '李明';
+                    document.getElementById('project-sign-design-dept').value = '设计一部';
+                    document.getElementById('project-start-designer').value = '王芳';
+                    document.getElementById('project-start-design-dept').value = '设计二部';
+                    document.getElementById('project-start-design-manager').value = '赵强';
+                    document.getElementById('project-pm-code').value = 'PM001';
+                    document.getElementById('project-pm-name').value = '陈伟';
+                    document.getElementById('project-quality-inspector').value = '孙丽';
+                    document.getElementById('project-engineering-dept').value = '交付一部';
+                    document.getElementById('project-engineering-manager').value = '刘洋';
                     document.getElementById('project-order').value = 'OD20260001';
                     document.getElementById('project-contract').value = 'HT20260001';
                     document.getElementById('project-contract-name').value = '家装设计合同';
@@ -858,6 +918,16 @@
                     document.getElementById('project-requirement').value = 'decoration';
                     document.getElementById('project-customer').value = '张三';
                     document.getElementById('project-customer-code').value = 'MER001';
+                    document.getElementById('project-sign-designer').value = '李明';
+                    document.getElementById('project-sign-design-dept').value = '设计一部';
+                    document.getElementById('project-start-designer').value = '王芳';
+                    document.getElementById('project-start-design-dept').value = '设计二部';
+                    document.getElementById('project-start-design-manager').value = '赵强';
+                    document.getElementById('project-pm-code').value = 'PM001';
+                    document.getElementById('project-pm-name').value = '陈伟';
+                    document.getElementById('project-quality-inspector').value = '孙丽';
+                    document.getElementById('project-engineering-dept').value = '交付一部';
+                    document.getElementById('project-engineering-manager').value = '刘洋';
                     document.getElementById('project-order').value = 'OD20260001';
                     document.getElementById('project-contract').value = 'HT20260001';
                     document.getElementById('project-contract-name').value = '家装设计合同';
