@@ -5,7 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>软装核算 - 财务中台</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" onerror="console.warn('lucide CDN failed, icons disabled')"></script>
+    <script>
+        // 安全包装：lucide可能未加载，防止调用报错中断整个函数
+        function safeCreateIcons() {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                try { lucide.createIcons(); } catch(e) { console.warn('lucide.createIcons error:', e); }
+            }
+        }
+    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -1853,7 +1861,7 @@
             <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10 req-marker relative block" id="req-marker-24">
                 <span class="req-badge" data-req="24"
                       data-title="需求描述：详情弹窗"
-                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[24] 需求描述：详情弹窗</h3><div class="req-section-title">基本信息（28个）</div><p style="line-height:1.6;">单据编号、会计期间、财务主体、计算状态、核算确认状态、合同号、合同名称、计税方式、税率、客户名称、客户编号、楼盘名称、楼盘地址、需求类型、产品名称、产品分类、业务线、签单设计师、签单设计部、签单日期、到店门店、实际开工日期、实际竣工日期、财务确认竣工日期、应收总额、预计总成本、预计总收入、预计毛利率</p><div class="req-section-title">本次核算信息（11个）</div><p style="line-height:1.6;">当月确认总收入、当月确认总成本、本次毛利率（本次核算口径）、本次确认收入=本次销售收入金额+收入调整金额（不含税）、本次确认成本=本次确认合同履约总成本余额+成本调整金额、累计当月毛利率（截止本月累计口径）、本次销售收入金额、销售收入分摊单号、收入调整金额（不含税口径）、成本调整金额、调整单号</p><div class="req-section-title">累计确认信息（6个）</div><p style="line-height:1.6;">当月累计已确认收入、当月累计已确认成本、截止本月累计确认收入、截止本月累计确认成本、截止上次累计确认收入、截止上次累计确认成本</p><div class="req-section-title">本次成本调整明细（6个子项）</div><p style="line-height:1.6;">本次成本调整材料成本-其中材料、材料进项税额转出、人工成本（工人及员工）、劳务分包差额抵税、运输成本、其他成本</p><div class="req-section-title">当月合同履约总成本余额（6个子项）</div><p style="line-height:1.6;">=本月已确认的项目核算单的本次确认xxx合计+本次确认xxx</p><div class="req-section-title">本次确认合同履约总成本余额（6个子项）</div><p style="line-height:1.6;">=截止本月累计值-截止上次累计值+本次成本调整</p><div class="req-section-title">截止本月累计合同履约成本（6个子项）</div><p style="line-height:1.6;">截止当前会计期间的合同履约成本累计（材料取销售出库成本，人工取金蝶应付单）</p><div class="req-section-title">截止上次累计合同履约成本（6个子项）</div><p style="line-height:1.6;">取该合同核算确认时间最近一次项目核算表的累计值，计算状态=已计算，核算确认状态=已确认</p><div class="req-section-title">系统信息（13个）</div><p style="line-height:1.6;">软装销售收入应收单号、软装调整收入应收单号、材料成本是否获取完整、计算批次、是否重算、本月计算次数、核算确认时间、计算完成时间、错误信息、创建时间、创建人、修改时间、修改人</p><div class="req-section-title">业务规则</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">所有金额字段保留2位小数；百分比值精度为2；收入调整金额为不含税口径</blockquote></div>'>24</span>
+                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[24] 需求描述：详情弹窗</h3><div class="req-section-title">基本信息（29个）</div><p style="line-height:1.6;">单据编号、单据类型、会计期间、财务主体、计算状态、核算确认状态、合同号、合同名称、计税方式、税率、客户名称、客户编号、楼盘名称、楼盘地址、需求类型、产品名称、产品分类、业务线、签单设计师、签单设计部、签单日期、到店门店、实际开工日期、实际竣工日期、财务确认竣工日期、应收总额、预计总成本、预计总收入、预计毛利率</p><div class="req-section-title">本次核算信息（12个）</div><p style="line-height:1.6;">当月确认总收入、当月确认总成本、当月毛利率、本次毛利率（本次核算口径）、本次确认收入=本次销售收入金额+收入调整金额（不含税）、本次确认成本=本次确认合同履约总成本余额+成本调整金额、累计当月毛利率（截止本月累计口径）、本次销售收入金额、销售收入分摊单号、收入调整金额（不含税口径）、成本调整金额、调整单号</p><div class="req-section-title">累计确认信息（6个）</div><p style="line-height:1.6;">当月累计已确认收入、当月累计已确认成本、截止本月累计确认收入、截止本月累计确认成本、截止上次累计确认收入、截止上次累计确认成本</p><div class="req-section-title">本次成本调整明细（6个子项）</div><p style="line-height:1.6;">本次成本调整材料成本-其中材料、材料进项税额转出、人工成本（工人及员工）、劳务分包差额抵税、运输成本、其他成本</p><div class="req-section-title">当月合同履约总成本余额（6个子项）</div><p style="line-height:1.6;">=本月已确认的项目核算单的本次确认xxx合计+本次确认xxx</p><div class="req-section-title">本次确认合同履约总成本余额（6个子项）</div><p style="line-height:1.6;">=截止本月累计值-截止上次累计值+本次成本调整</p><div class="req-section-title">截止本月累计合同履约成本（6个子项）</div><p style="line-height:1.6;">截止当前会计期间的合同履约成本累计（材料取销售出库成本，人工取金蝶应付单）</p><div class="req-section-title">截止上次累计合同履约成本（6个子项）</div><p style="line-height:1.6;">取该合同核算确认时间最近一次项目核算表的累计值，计算状态=已计算，核算确认状态=已确认</p><div class="req-section-title">系统信息（13个）</div><p style="line-height:1.6;">软装销售收入应收单号、软装调整收入应收单号、材料成本是否获取完整、计算批次、是否重算、本月计算次数、核算确认时间、计算完成时间、错误信息、创建时间、创建人、修改时间、修改人</p><div class="req-section-title">业务规则</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">所有金额字段保留2位小数；百分比值精度为2；收入调整金额为不含税口径</blockquote></div>'>24</span>
                 <h3 class="text-lg font-semibold text-gray-900">软装项目核算单详情</h3>
                 <button id="close-soft-accounting-detail-btn" class="text-gray-400 hover:text-gray-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -1863,11 +1871,12 @@
                 <!-- 基本信息 -->
                 <div class="mb-6 req-marker relative block" id="req-marker-24-basic">
                     <span class="req-badge" data-req="24"
-                          data-title="需求描述：基本信息（28个字段）"
-                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[24] 需求描述：基本信息</h3><div class="req-section-title">字段清单（28个字段）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>单据编号</strong>：自动生成</li><li><strong>会计期间</strong>：当前会计期间</li><li><strong>财务主体</strong>：取项目基础资料</li><li><strong>计算状态</strong>：枚举（未计算/已计算/计算失败）</li><li><strong>核算确认状态</strong>：枚举（未确认/审批中/已确认）<br/><em>状态机：[新增]→未确认→[确认收入]→已确认</em></li><li><strong>合同号/合同名称</strong>：取项目基础资料</li><li><strong>计税方式/税率</strong>：取项目基础资料</li><li><strong>客户名称/客户编号</strong>：取项目基础资料</li><li><strong>楼盘名称/楼盘地址</strong>：取项目基础资料</li><li><strong>需求类型/产品名称/产品分类</strong>：取项目基础资料</li><li><strong>业务线</strong>：取项目基础资料</li><li><strong>签单设计师/签单设计部</strong>：取项目基础资料</li><li><strong>签单日期/到店门店</strong>：取项目基础资料</li><li><strong>实际开工日期/实际竣工日期</strong>：取项目基础资料</li><li><strong>财务确认竣工日期</strong>：取项目基础资料</li><li><strong>应收总额</strong>：取项目基础资料</li><li><strong>预计总成本</strong>：取项目基础资料</li><li><strong>预计总收入</strong>：取项目基础资料</li><li><strong>预计毛利率</strong>：(预计总收入-预计总成本)/预计总收入</li></ol></div>'>24</span>
+                          data-title="需求描述：基本信息（29个字段）"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[24] 需求描述：基本信息</h3><div class="req-section-title">字段清单（29个字段）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>单据编号</strong>：自动生成</li><li><strong>单据类型</strong>：枚举（项目核算调整单、标准项目核算单）</li><li><strong>会计期间</strong>：当前会计期间</li><li><strong>财务主体</strong>：取项目基础资料</li><li><strong>计算状态</strong>：枚举（未计算/已计算/计算失败）</li><li><strong>核算确认状态</strong>：枚举（未确认/审批中/已确认）<br/><em>状态机：[新增]→未确认→[确认收入]→已确认</em></li><li><strong>合同号/合同名称</strong>：取项目基础资料</li><li><strong>计税方式/税率</strong>：取项目基础资料</li><li><strong>客户名称/客户编号</strong>：取项目基础资料</li><li><strong>楼盘名称/楼盘地址</strong>：取项目基础资料</li><li><strong>需求类型/产品名称/产品分类</strong>：取项目基础资料</li><li><strong>业务线</strong>：取项目基础资料</li><li><strong>签单设计师/签单设计部</strong>：取项目基础资料</li><li><strong>签单日期/到店门店</strong>：取项目基础资料</li><li><strong>实际开工日期/实际竣工日期</strong>：取项目基础资料</li><li><strong>财务确认竣工日期</strong>：取项目基础资料</li><li><strong>应收总额</strong>：取项目基础资料</li><li><strong>预计总成本</strong>：取项目基础资料</li><li><strong>预计总收入</strong>：取项目基础资料</li><li><strong>预计毛利率</strong>：(预计总收入-预计总成本)/预计总收入</li></ol></div>'>24</span>
                     <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">基本信息</h4>
                     <div class="grid grid-cols-4 gap-x-6 gap-y-3">
                         <div><label class="text-xs text-gray-500">单据编号</label><p class="text-sm font-medium mt-1">RG26041500000001</p></div>
+                        <div><label class="text-xs text-gray-500">单据类型</label><p class="text-sm font-medium mt-1">标准项目核算单</p></div>
                         <div><label class="text-xs text-gray-500">会计期间</label><p class="text-sm font-medium mt-1">2026-04</p></div>
                         <div><label class="text-xs text-gray-500">财务主体</label><p class="text-sm font-medium mt-1">成都分公司</p></div>
                         <div><label class="text-xs text-gray-500">计算状态</label><p class="text-sm font-medium mt-1"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><span class="status-dot status-green"></span>已计算</span></p></div>
@@ -1902,11 +1911,12 @@
                 <div class="mb-6 req-marker relative block" id="req-marker-24-calc">
                     <span class="req-badge" data-req="24"
                           data-title="需求描述：本次核算信息（11个字段）"
-                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[24] 需求描述：本次核算信息</h3><div class="req-section-title">字段清单（11个字段）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>当月确认总收入</strong>= 本月已确认+本次确认收入</li><li><strong>当月确认总成本</strong>= 本月已确认+本次确认成本</li><li><strong>本次毛利率</strong>= (本次确认收入-本次确认成本)/本次确认收入</li><li><strong>本次确认收入</strong>= 本次销售收入金额+收入调整金额（不含税）</li><li><strong>本次确认成本</strong>= 本次确认合同履约总成本余额+成本调整金额</li><li><strong>累计当月毛利率</strong>= (截止本月累计确认收入-截止本月累计确认成本)/截止本月累计确认收入</li><li><strong>本次销售收入金额</strong>：<br/>• 首次计算：取竣工收入分摊单【本次应确认价税合计】<br/>• 重算：取重算收入分摊单【本次应确认价税合计】或0</li><li><strong>销售收入分摊单号</strong>：本次销售收入金额来源单据编号</li><li><strong>收入调整金额</strong>（不含税口径）：手动调整<em>，须与公式其他项保持一致，若调整单录入含税金额则需先除以(1+税率)再参与计算</em></li><li><strong>成本调整金额</strong>：手动调整</li><li><strong>调整单号</strong>：调整来源单号</li></ol></div>'>24</span>
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[24] 需求描述：本次核算信息</h3><div class="req-section-title">字段清单（12个字段）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>当月确认总收入</strong>= 本月已确认+本次确认收入</li><li><strong>当月确认总成本</strong>= 本月已确认+本次确认成本</li><li><strong>当月毛利率</strong>= (当月确认总收入-当月确认总成本)/当月确认总收入</li><li><strong>本次毛利率</strong>= (本次确认收入-本次确认成本)/本次确认收入</li><li><strong>本次确认收入</strong>= 本次销售收入金额+收入调整金额（不含税）</li><li><strong>本次确认成本</strong>= 本次确认合同履约总成本余额+成本调整金额</li><li><strong>累计当月毛利率</strong>= (截止本月累计确认收入-截止本月累计确认成本)/截止本月累计确认收入</li><li><strong>本次销售收入金额</strong>：<br/>• 首次计算：取竣工收入分摊单【本次应确认价税合计】<br/>• 重算：取重算收入分摊单【本次应确认价税合计】或0</li><li><strong>销售收入分摊单号</strong>：本次销售收入金额来源单据编号</li><li><strong>收入调整金额</strong>（不含税口径）：手动调整<em>，须与公式其他项保持一致，若调整单录入含税金额则需先除以(1+税率)再参与计算</em></li><li><strong>成本调整金额</strong>：手动调整</li><li><strong>调整单号</strong>：调整来源单号</li></ol></div>'>24</span>
                     <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">本次核算信息</h4>
                     <div class="grid grid-cols-4 gap-x-6 gap-y-3">
                         <div><label class="text-xs text-gray-500">当月确认总收入</label><p class="text-sm font-medium mt-1 text-blue-600">60,000.00</p></div>
                         <div><label class="text-xs text-gray-500">当月确认总成本</label><p class="text-sm font-medium mt-1">45,000.00</p></div>
+                        <div><label class="text-xs text-gray-500">当月毛利率</label><p class="text-sm font-medium mt-1 text-green-600">25.00%</p></div>
                         <div><label class="text-xs text-gray-500">本次毛利率</label><p class="text-sm font-medium mt-1">25.00%</p></div>
                         <div><label class="text-xs text-gray-500">本次确认收入</label><p class="text-sm font-semibold mt-1 text-blue-600">60,000.00</p></div>
                         <div><label class="text-xs text-gray-500">本次确认成本</label><p class="text-sm font-semibold mt-1 text-orange-600">45,000.00</p></div>
@@ -2243,7 +2253,7 @@
                             } else {
                                 icon.setAttribute('data-lucide', 'chevron-up');
                             }
-                            lucide.createIcons();
+                            safeCreateIcons();
                         }
                     }
                 });
@@ -2313,7 +2323,7 @@
                         } else {
                             icon.setAttribute('data-lucide', 'chevron-up');
                         }
-                        lucide.createIcons();
+                        safeCreateIcons();
                     }
                 });
             }
@@ -2459,7 +2469,7 @@
                     var tabId = this.getAttribute('data-tab');
                     document.getElementById(tabId).classList.remove('hidden');
 
-                    lucide.createIcons();
+                    safeCreateIcons();
                 });
             });
 
@@ -2479,7 +2489,7 @@
                     var subTabId = this.getAttribute('data-subtab');
                     document.getElementById(subTabId).classList.remove('hidden');
 
-                    lucide.createIcons();
+                    safeCreateIcons();
                 });
             });
 
@@ -2499,7 +2509,7 @@
                     var inventoryTabId = this.getAttribute('data-inventorytab');
                     document.getElementById(inventoryTabId).classList.remove('hidden');
 
-                    lucide.createIcons();
+                    safeCreateIcons();
                 });
             });
 
@@ -2514,7 +2524,7 @@
                 addReconciliationBtn.addEventListener('click', function() {
                     reconciliationDrawer.classList.add('open');
                     reconciliationOverlay.classList.add('open');
-                    lucide.createIcons();
+                    safeCreateIcons();
                 });
             }
 
@@ -2559,7 +2569,7 @@
                     btn.addEventListener('click', function() {
                         if (reconDetailModal) {
                             reconDetailModal.style.display = 'flex';
-                            lucide.createIcons();
+                            safeCreateIcons();
                         }
                     });
                 }
@@ -2635,7 +2645,7 @@
                             inventoryDetailTab.classList.remove('hidden');
                         }
 
-                        lucide.createIcons();
+                        safeCreateIcons();
                     });
                 }
             });
@@ -2676,7 +2686,7 @@
                 addRevenueTaskBtn.addEventListener('click', function() {
                     allocationDrawer.classList.add('open');
                     allocationOverlay.classList.add('open');
-                    lucide.createIcons();
+                    safeCreateIcons();
                 });
             }
 
@@ -2778,7 +2788,7 @@
                             allocEntityCheckboxes[0].checked = allSel;
                         });
                         allocEntityTags.appendChild(tag);
-                        lucide.createIcons();
+                        safeCreateIcons();
                     }
                 }
 
@@ -2797,7 +2807,7 @@
                     if (revenueTaskReportModal) {
                         revenueTaskReportModal.classList.remove('hidden');
                         revenueTaskReportModal.style.display = 'flex';
-                        lucide.createIcons();
+                        safeCreateIcons();
                     }
                 });
             });
@@ -2837,7 +2847,7 @@
                     btn.addEventListener('click', function() {
                         if (allocationDetailModal) {
                             allocationDetailModal.style.display = 'flex';
-                            lucide.createIcons();
+                            safeCreateIcons();
                         }
                     });
                 }
@@ -2976,7 +2986,7 @@
                 if (projectTaskReportModal) {
                     projectTaskReportModal.classList.remove('hidden');
                     projectTaskReportModal.style.display = 'flex';
-                    lucide.createIcons();
+                    safeCreateIcons();
                 }
             }
             function closeProjectTaskReportModal() {
@@ -3028,7 +3038,7 @@
                     btn.addEventListener('click', function() {
                         if (softAccountingDetailModal) {
                             softAccountingDetailModal.style.display = 'flex';
-                            lucide.createIcons();
+                            safeCreateIcons();
                         }
                     });
                 }
@@ -3053,7 +3063,7 @@
                 btn.addEventListener('click', function() {
                     if (workflowModal) {
                         workflowModal.classList.remove('hidden');
-                        lucide.createIcons();
+                        safeCreateIcons();
                     }
                 });
             });
@@ -3123,16 +3133,18 @@
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
-                loadSidebar();
-                loadSoftProjectTaskDrawer();
-                initPageFunctions();
-                initTabFromUrlParam();
+                try { loadSidebar(); } catch(e) { console.error('loadSidebar error:', e); }
+                try { loadSoftProjectTaskDrawer(); } catch(e) { console.error('loadSoftProjectTaskDrawer error:', e); }
+                try { initPageFunctions(); } catch(e) { console.error('initPageFunctions error:', e); }
+                try { initTabFromUrlParam(); } catch(e) { console.error('initTabFromUrlParam error:', e); }
+                safeCreateIcons();
             });
         } else {
-            loadSidebar();
-            loadSoftProjectTaskDrawer();
-            initPageFunctions();
-            initTabFromUrlParam();
+            try { loadSidebar(); } catch(e) { console.error('loadSidebar error:', e); }
+            try { loadSoftProjectTaskDrawer(); } catch(e) { console.error('loadSoftProjectTaskDrawer error:', e); }
+            try { initPageFunctions(); } catch(e) { console.error('initPageFunctions error:', e); }
+            try { initTabFromUrlParam(); } catch(e) { console.error('initTabFromUrlParam error:', e); }
+            safeCreateIcons();
         }
     </script>
     <!-- 流程查看弹窗 [26] -->
