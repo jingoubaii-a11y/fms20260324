@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工单中心 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="common/styles.css">
+    <style>
+        /* 中栏分类树 */
+        .cat-group { border-bottom: 1px solid #f1f5f9; }
+        .cat-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; cursor: pointer; font-size: 14px; color: #334155;
+            transition: background .15s;
+        }
+        .cat-header:hover { background: #f8fafc; }
+        .cat-header .chev { width: 14px; height: 14px; color: #94a3b8; transition: transform .15s; margin-right: 8px; }
+        .cat-group.open .chev { transform: rotate(90deg); }
+        .cat-header .count { color: #94a3b8; font-size: 13px; }
+        .cat-children { display: none; padding-bottom: 8px; }
+        .cat-group.open .cat-children { display: block; }
+        .cat-child {
+            display: flex; align-items: center; gap: 8px;
+            margin: 4px 12px; padding: 8px 12px;
+            font-size: 13px; color: #475569; cursor: pointer; border-radius: 4px;
+            border-left: 3px solid transparent;
+        }
+        .cat-child:hover { background: #f1f5f9; }
+        .cat-child.active {
+            background: #e6f0ff; color: #003eb3; font-weight: 600;
+            border-left-color: #003eb3;
+        }
+
+        /* 工单卡片 */
+        .ticket-card {
+            background: #fff; border: 1px solid #e5e7eb; border-radius: 6px;
+            padding: 14px 16px; margin-bottom: 10px; cursor: pointer;
+            transition: all .15s;
+        }
+        .ticket-card:hover { border-color: #93c5fd; }
+        .ticket-card.selected {
+            border-color: #003eb3; box-shadow: 0 0 0 2px rgba(0,62,179,.12);
+        }
+        .ticket-card .title { font-size: 14px; font-weight: 600; color: #1f2937; }
+        .ticket-card .field { font-size: 12.5px; color: #4b5563; margin-top: 4px; }
+        .ticket-card .field .lbl { color: #6b7280; }
+        .ticket-card .end-tag { color: #dc2626; font-size: 12px; font-weight: 500; }
+
+        /* 详情 */
+        .detail-title {
+            font-size: 15px; font-weight: 600; color: #1f2937;
+            padding: 16px 24px; border-bottom: 1px solid #e5e7eb; background: #fff;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .detail-tabs { display: flex; gap: 24px; padding: 0 24px; background: #fff; border-bottom: 1px solid #e5e7eb; }
+        .detail-tab {
+            padding: 12px 0; font-size: 14px; color: #6b7280; cursor: pointer;
+            border-bottom: 2px solid transparent; transition: all .15s;
+        }
+        .detail-tab.active { color: #003eb3; border-bottom-color: #003eb3; font-weight: 600; }
+
+        .section-label {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 14px; font-weight: 600; color: #1f2937;
+            padding: 16px 24px 12px;
+        }
+        .section-label::before {
+            content: ''; width: 3px; height: 14px; background: #003eb3; border-radius: 2px;
+        }
+        .export-btn-group { margin-left: auto; display: inline-flex; gap: 8px; }
+        .export-btn {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; font-size: 12px; font-weight: 500;
+            color: #003eb3; background: #eff6ff; border: 1px solid #bfdbfe;
+            border-radius: 4px; cursor: pointer; transition: all .15s;
+        }
+        .export-btn:hover { background: #003eb3; color: #fff; border-color: #003eb3; }
+
+        .info-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 16px 32px; padding: 0 24px 20px;
+        }
+        .info-item { display: flex; align-items: baseline; font-size: 13px; }
+        .info-item .lbl { color: #6b7280; margin-right: 4px; white-space: nowrap; }
+        .info-item .val { color: #1f2937; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* 状态标签 */
+        .status-end { color: #dc2626; font-weight: 500; }
+
+        /* 搜索栏 */
+        .search-bar {
+            display: flex; align-items: center; gap: 8px;
+            padding: 12px 16px; border-bottom: 1px solid #f1f5f9; background: #fff;
+        }
+        .search-bar input {
+            flex: 1; padding: 6px 12px; font-size: 13px;
+            border: 1px solid #e5e7eb; border-radius: 4px;
+            outline: none; transition: border-color .15s;
+        }
+        .search-bar input:focus { border-color: #003eb3; }
+        .search-bar .refresh {
+            padding: 6px; border: 1px solid #e5e7eb; border-radius: 4px;
+            color: #6b7280; cursor: pointer;
+        }
+        .search-bar .refresh:hover { color: #003eb3; border-color: #003eb3; }
+
+        /* 整装核算表格 */
+        .dz-wrap { padding: 0 24px 20px; }
+        .dz-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e5e7eb; border-radius: 6px; }
+        .dz-scroll + .dz-scroll { margin-top: 0; }
+        .dz-table { width: max-content; min-width: 100%; border-collapse: collapse; font-size: 12.5px; background: #fff; table-layout: auto; }
+        .dz-table th, .dz-table td {
+            border: 1px solid #e5e7eb; padding: 8px 10px; text-align: right;
+            white-space: nowrap;
+        }
+        .dz-table th {
+            background: #f8fafc; color: #475569; font-weight: 600; text-align: center;
+        }
+        .dz-table th.left, .dz-table td.left { text-align: left; }
+        .dz-table th.center, .dz-table td.center { text-align: center; }
+        .dz-table tbody tr:hover { background: #f8fafc; }
+        .dz-table tr.summary-row { cursor: pointer; }
+        .dz-table tr.summary-row:hover { background: #eff6ff; }
+        .dz-table tr.total-row { background: #f1f5f9; font-weight: 600; color: #1f2937; }
+        .dz-table tr.total-row td { border-color: #cbd5e1; }
+        .dz-table .num { font-variant-numeric: tabular-nums; color: #1f2937; }
+        .dz-table .pos { color: #059669; }
+        .dz-table .neg { color: #dc2626; }
+        .dz-table .drill-btn {
+            color: #003eb3; font-weight: 500; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 2px;
+        }
+        .dz-table .drill-btn:hover { text-decoration: underline; }
+
+        /* 双色分区表头(当月琥珀/累计天蓝) */
+        .dz-table th.grp-month { background: #fef3c7; color: #92400e; }
+        .dz-table th.grp-total { background: #dbeafe; color: #1e40af; }
+        .dz-table td.col-month { background: #fffbeb; }
+        .dz-table td.col-total { background: #eff6ff; }
+
+        /* 明细面板 */
+        .detail-drill {
+            margin-top: 12px; border: 1px solid #dbeafe; border-radius: 6px;
+            background: #f8fafc; padding: 12px; display: none;
+        }
+        .detail-drill.open { display: block; }
+        .detail-drill-title {
+            font-size: 13px; font-weight: 600; color: #1e40af;
+            margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+        }
+        .detail-drill-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e5e7eb; border-radius: 6px; }
+        .dz-table th, .dz-table td { white-space: nowrap; padding: 8px 10px; }
+        .dz-table th.num, .dz-table td.num { min-width: 100px; }
+        .dz-table th.left, .dz-table td.left { min-width: 120px; }
+
+        /* 审批操作区 */
+        .approve-area {
+            border-top: 1px solid #e5e7eb; padding: 16px 24px; background: #fafafa;
+        }
+        .approve-area textarea {
+            width: 100%; min-height: 60px; padding: 8px 12px; font-size: 13px;
+            border: 1px solid #e5e7eb; border-radius: 4px; outline: none; resize: vertical;
+        }
+        .approve-area textarea:focus { border-color: #003eb3; }
+        .approve-btns { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-primary {
+            padding: 6px 20px; background: #003eb3; color: #fff; border: none; border-radius: 4px;
+            font-size: 13px; cursor: pointer;
+        }
+        .btn-primary:hover { background: #002d80; }
+        .btn-danger {
+            padding: 6px 20px; background: #fff; color: #dc2626; border: 1px solid #dc2626;
+            border-radius: 4px; font-size: 13px; cursor: pointer;
+        }
+        .btn-danger:hover { background: #fef2f2; }
+        .btn-default {
+            padding: 6px 20px; background: #fff; color: #4b5563; border: 1px solid #d1d5db;
+            border-radius: 4px; font-size: 13px; cursor: pointer;
+        }
+        .btn-default:hover { border-color: #003eb3; color: #003eb3; }
+    </style>
+</head>
+<body class="bg-neutral">
+<div class="flex h-screen">
+    <div id="sidebar-container"></div>
+
+    <main class="flex-1 ml-64 flex flex-col overflow-hidden">
+        <!-- 顶部面包屑 -->
+        <header class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shrink-0">
+            <div class="flex items-center text-sm text-gray-500">
+                <i data-lucide="home" class="w-4 h-4 mr-1"></i>
+                <span>工单中心</span>
+                <i data-lucide="chevron-right" class="w-3 h-3 mx-1"></i>
+                <span class="text-gray-900 font-medium" id="crumb-tab">已办工单 · 整装核算</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 pl-3 border-l border-gray-200">
+                    <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium">杨</div>
+                    <span class="text-sm text-gray-700">杨静</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 三栏工作区 -->
+        <div class="flex-1 flex overflow-hidden">
+            <!-- 左：分类树 -->
+            <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto shrink-0" id="cat-panel"></aside>
+
+            <!-- 中：搜索 + 工单列表 -->
+            <section class="w-80 bg-neutral border-r border-gray-200 flex flex-col shrink-0">
+                <div class="search-bar">
+                    <input id="search-input" type="text" placeholder="请输入关键字搜索" />
+                    <div class="refresh" title="刷新"><i data-lucide="refresh-cw" class="w-4 h-4"></i></div>
+                </div>
+                <div class="flex-1 overflow-y-auto p-3" id="ticket-list"></div>
+            </section>
+
+            <!-- 右：详情 -->
+            <section class="flex-1 flex flex-col overflow-hidden bg-white" id="detail-panel">
+                <div class="detail-title" id="detail-title">请从左侧选择一条工单</div>
+                <div class="detail-tabs">
+                    <div class="detail-tab active" data-dtab="info">审批信息</div>
+                    <div class="detail-tab" data-dtab="log">审批日志</div>
+                    <div class="detail-tab" data-dtab="flow">流程图</div>
+                </div>
+                <div class="flex-1 overflow-y-auto" id="detail-body"></div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<script>
+/* ========== 分类树数据 ========== */
+const categories = [
+    { key: 'todo',     name: '待办工单',   icon: 'inbox',        count: 0, children: [] },
+    { key: 'canceled', name: '已取消的',   icon: 'x-circle',     count: 0, children: [] },
+    { key: 'done',     name: '已办工单',   icon: 'check-square', count: null, defaultOpen: true, children: [
+        { key: 'done-decoration', name: '整装核算', icon: 'building', active: true },
+        { key: 'done-softdec',    name: '软装核算', icon: 'sofa' }
+    ]},
+    { key: 'submitted', name: '我发起的',  icon: 'send',         count: 0, children: [] },
+    { key: 'followed',  name: '我关注的',  icon: 'star',         count: 0, children: [] },
+];
+
+/* ========== 工单列表（当前选中：已办 · 整装核算） ==========
+   一个审批工单 = 一个会计期间 × 一个申请人下所有实际发生核算的财务主体的合并审批
+   ticket.summaries[]：按财务主体聚合（多行，每主体一行）
+   ticket.details[]  ：合同粒度明细（跨主体全量，含 entity 字段）
+*/
+const tickets = [
+    {
+        id: 'WG2509001',
+        billNo: 'WG202509000123',
+        title: '整装项目核算审批',
+        status: '已结束',
+        period: '2025-09',
+        createTime: '2025-10-08 14:32',
+        wfNo: 'WO2510081128309712450612032',
+        applicant: '王芳',
+        applicantDept: '总部交付COE',
+        applyTime: '2025-10-08 14:32',
+        currentNode: '总部财务BP · 张涛',
+        // 汇总（按财务主体聚合）
+        summaries: [
+            { entity: '北京家装有限公司', buildCnt: 8, doneCnt: 4, revenue: 3286450.00, cost: 2411230.50, gross: 875219.50 },
+            { entity: '上海家装有限公司', buildCnt: 6, doneCnt: 3, revenue: 2158900.00, cost: 1585620.30, gross: 573279.70 },
+            { entity: '广州家装有限公司', buildCnt: 5, doneCnt: 2, revenue: 1865320.00, cost: 1382145.80, gross: 483174.20 },
+            { entity: '成都家装有限公司', buildCnt: 4, doneCnt: 2, revenue: 1256800.00, cost: 928450.00, gross: 328350.00 },
+        ],
+        // 合同粒度明细（含 entity 关联主体）
+        details: [
+            // 北京
+            { entity: '北京家装有限公司', no: 'HT2508001', name: '朝阳区望京SOHO-刘先生', type: '整装',
+              planRev: 385000, planCost: 285000, mPct: 32.50, mRev: 125125, mCost: 92625, mGross: 32500,
+              tPct: 82.30, tRev: 316855, tCost: 234555, tGross: 82300 },
+            { entity: '北京家装有限公司', no: 'HT2508007', name: '海淀区中关村-陈女士', type: '整装',
+              planRev: 268000, planCost: 195400, mPct: 25.00, mRev: 67000, mCost: 48850, mGross: 18150,
+              tPct: 75.00, tRev: 201000, tCost: 146550, tGross: 54450 },
+            { entity: '北京家装有限公司', no: 'HT2506022', name: '西城区月坛-赵先生', type: '局改',
+              planRev: 456000, planCost: 342300, mPct: 18.20, mRev: 82992, mCost: 62299, mGross: 20693,
+              tPct: 100.00, tRev: 456000, tCost: 342300, tGross: 113700 },
+            // 上海
+            { entity: '上海家装有限公司', no: 'HT2508101', name: '浦东新区世纪公园-吴先生', type: '整装',
+              planRev: 412000, planCost: 305000, mPct: 28.40, mRev: 117008, mCost: 86620, mGross: 30388,
+              tPct: 78.60, tRev: 323832, tCost: 239730, tGross: 84102 },
+            { entity: '上海家装有限公司', no: 'HT2507068', name: '徐汇区衡山路-孙女士', type: '整装',
+              planRev: 356000, planCost: 268400, mPct: 22.10, mRev: 78676, mCost: 59316.44, mGross: 19359.56,
+              tPct: 85.20, tRev: 303312, tCost: 228676.80, tGross: 74635.20 },
+            { entity: '上海家装有限公司', no: 'HT2506045', name: '静安区南京西路-周先生', type: '局改',
+              planRev: 528000, planCost: 398500, mPct: 12.50, mRev: 66000, mCost: 49812.50, mGross: 16187.50,
+              tPct: 100.00, tRev: 528000, tCost: 398500, tGross: 129500 },
+            // 广州
+            { entity: '广州家装有限公司', no: 'HT2508201', name: '天河区珠江新城-郑先生', type: '整装',
+              planRev: 385000, planCost: 285000, mPct: 30.00, mRev: 115500, mCost: 85500, mGross: 30000,
+              tPct: 80.00, tRev: 308000, tCost: 228000, tGross: 80000 },
+            { entity: '广州家装有限公司', no: 'HT2507126', name: '越秀区北京路-钱女士', type: '整装',
+              planRev: 268000, planCost: 198500, mPct: 26.50, mRev: 71020, mCost: 52602.50, mGross: 18417.50,
+              tPct: 72.30, tRev: 193764, tCost: 143515.50, tGross: 50248.50 },
+            // 成都
+            { entity: '成都家装有限公司', no: 'HT2508301', name: '锦江区春熙路-冯先生', type: '整装',
+              planRev: 298000, planCost: 221500, mPct: 24.00, mRev: 71520, mCost: 53160, mGross: 18360,
+              tPct: 68.00, tRev: 202640, tCost: 150620, tGross: 52020 },
+            { entity: '成都家装有限公司', no: 'HT2507220', name: '高新区天府三街-陈女士', type: '整装',
+              planRev: 218000, planCost: 165000, mPct: 21.50, mRev: 46870, mCost: 35475, mGross: 11395,
+              tPct: 76.50, tRev: 166770, tCost: 126225, tGross: 40545 },
+        ]
+    },
+    {
+        id: 'WG2509002',
+        billNo: 'WG202509000158',
+        title: '整装项目核算审批',
+        status: '审批中',
+        period: '2025-09',
+        createTime: '2025-10-08 16:15',
+        wfNo: 'WO2510081615208912450612033',
+        applicant: '李娜',
+        applicantDept: '总部交付COE',
+        applyTime: '2025-10-08 16:15',
+        currentNode: '总部财务BP · 审批中',
+        summaries: [
+            { entity: '深圳家装有限公司', buildCnt: 7, doneCnt: 3, revenue: 2865200.00, cost: 2118450.00, gross: 746750.00 },
+            { entity: '杭州家装有限公司', buildCnt: 5, doneCnt: 2, revenue: 1685400.00, cost: 1248900.00, gross: 436500.00 },
+        ],
+        details: [
+            { entity: '深圳家装有限公司', no: 'HT2508401', name: '南山区科技园-孙先生', type: '整装',
+              planRev: 468000, planCost: 348000, mPct: 28.00, mRev: 131040, mCost: 97440, mGross: 33600,
+              tPct: 76.50, tRev: 358020, tCost: 266220, tGross: 91800 },
+            { entity: '深圳家装有限公司', no: 'HT2507315', name: '福田区华强北-王女士', type: '整装',
+              planRev: 352000, planCost: 262000, mPct: 22.30, mRev: 78496, mCost: 58426, mGross: 20070,
+              tPct: 82.00, tRev: 288640, tCost: 214840, tGross: 73800 },
+            { entity: '杭州家装有限公司', no: 'HT2508501', name: '西湖区龙井-赵先生', type: '整装',
+              planRev: 398000, planCost: 296000, mPct: 26.00, mRev: 103480, mCost: 76960, mGross: 26520,
+              tPct: 79.00, tRev: 314420, tCost: 233840, tGross: 80580 },
+        ]
+    },
+    {
+        id: 'WG2509003',
+        billNo: 'WG202509000201',
+        title: '整装项目核算审批',
+        status: '待审批',
+        period: '2025-09',
+        createTime: '2025-10-09 09:20',
+        wfNo: 'WO2510090920318912450612034',
+        applicant: '周敏',
+        applicantDept: '总部交付COE',
+        applyTime: '2025-10-09 09:20',
+        currentNode: '总部交付COE · 待审批',
+        summaries: [
+     { entity: '武汉家装有限公司', buildCnt: 4, doneCnt: 1, revenue: 986500.00, cost: 736200.00, gross: 250300.00 },
+            { entity: '西安家装有限公司', buildCnt: 3, doneCnt: 1, revenue: 758400.00, cost: 562800.00, gross: 195600.00 },
+            { entity: '南京家装有限公司', buildCnt: 3, doneCnt: 2, revenue: 1128600.00, cost: 831500.00, gross: 297100.00 },
+        ],
+        details: [
+            { entity: '武汉家装有限公司', no: 'HT2508601', name: '武昌区光谷-钱先生', type: '整装',
+              planRev: 288000, planCost: 215000, mPct: 25.00, mRev: 72000, mCost: 53750, mGross: 18250,
+              tPct: 72.00, tRev: 207360, tCost: 154800, tGross: 52560 },
+            { entity: '西安家装有限公司', no: 'HT2508701', name: '雁塔区大雁塔-孙女士', type: '整装',
+              planRev: 268000, planCost: 199000, mPct: 24.00, mRev: 64320, mCost: 47760, mGross: 16560,
+              tPct: 70.00, tRev: 187600, tCost: 139300, tGross: 48300 },
+            { entity: '南京家装有限公司', no: 'HT2508801', name: '鼓楼区新街口-李先生', type: '整装',
+              planRev: 336000, planCost: 248000, mPct: 27.00, mRev: 90720, mCost: 66960, mGross: 23760,
+              tPct: 78.00, tRev: 262080, tCost: 193440, tGross: 68640 },
+        ]
+    },
+];
+
+/* ========== 分类树渲染 ========== */
+function renderCategories() {
+    const panel = document.getElementById('cat-panel');
+    panel.innerHTML = categories.map(cat => {
+        const open = cat.defaultOpen ? 'open' : '';
+        const countHtml = cat.count !== null ? `<span class="count">${cat.count}</span>` : '';
+        const childrenHtml = (cat.children || []).map(ch => `
+            <div class="cat-child ${ch.active ? 'active' : ''}" data-catchild="${ch.key}">
+                <i data-lucide="${ch.icon}" class="w-4 h-4"></i>
+                <span>${ch.name}</span>
+            </div>
+        `).join('');
+        return `
+        <div class="cat-group ${open}" data-cat="${cat.key}">
+            <div class="cat-header">
+                <span class="flex items-center">
+                    <i data-lucide="chevron-right" class="chev"></i>
+                    <span>${cat.name}</span>
+                </span>
+                ${countHtml}
+            </div>
+            <div class="cat-children">${childrenHtml}</div>
+        </div>`;
+    }).join('');
+
+    // 事件
+    panel.querySelectorAll('.cat-header').forEach(h => {
+        h.addEventListener('click', () => {
+            h.parentElement.classList.toggle('open');
+            lucide.createIcons();
+        });
+    });
+    panel.querySelectorAll('.cat-child').forEach(c => {
+        c.addEventListener('click', (e) => {
+            e.stopPropagation();
+            panel.querySelectorAll('.cat-child').forEach(x => x.classList.remove('active'));
+            c.classList.add('active');
+        });
+    });
+    lucide.createIcons();
+}
+
+/* ========== 工单列表渲染 ========== */
+let selectedTicketId = tickets[0].id;
+function statusColor(s) {
+    if (s === '已结束') return 'color:#dc2626;';
+    if (s === '审批中') return 'color:#d97706;';
+    if (s === '待审批') return 'color:#2563eb;';
+    return 'color:#6b7280;';
+}
+function renderTicketList() {
+    const box = document.getElementById('ticket-list');
+    box.innerHTML = tickets.map(t => {
+        const totalRev = t.summaries.reduce((a, x) => a + x.revenue, 0);
+        const entities = t.summaries.map(s => s.entity).join('、');
+        const shortEntities = t.summaries.length <= 2
+            ? entities
+            : `${t.summaries.slice(0,2).map(s=>s.entity).join('、')} 等 ${t.summaries.length} 家`;
+        return `
+        <div class="ticket-card ${t.id === selectedTicketId ? 'selected' : ''}" data-tid="${t.id}">
+            <div class="flex items-center justify-between">
+                <div class="title">${t.title}</div>
+                <div class="end-tag" style="${statusColor(t.status)}">${t.status}</div>
+            </div>
+            <div class="field"><span class="lbl">单据编号：</span>${t.billNo}</div>
+            <div class="field"><span class="lbl">会计期间：</span>${t.period}</div>
+            <div class="field"><span class="lbl">涉及主体：</span>${shortEntities}</div>
+            <div class="field"><span class="lbl">合同总数：</span>${t.details.length} 个 · 主体 ${t.summaries.length} 家</div>
+            <div class="field"><span class="lbl">收入合计：</span>¥${fmtMoney(totalRev)}</div>
+            <div class="field text-gray-400 mt-2">${t.applicant} · ${t.createTime}</div>
+        </div>`;
+    }).join('');
+    box.querySelectorAll('.ticket-card').forEach(c => {
+        c.addEventListener('click', () => {
+            selectedTicketId = c.dataset.tid;
+            renderTicketList();
+            renderDetail();
+        });
+    });
+}
+
+/* ========== 详情渲染 ========== */
+let currentDetailTab = 'info';
+function renderDetail() {
+    const t = tickets.find(x => x.id === selectedTicketId);
+    if (!t) return;
+    window.__currentTicket = t;
+
+    // 顶部标题
+    document.getElementById('detail-title').innerHTML = `
+        <span>【整装项目核算审批】</span>
+        <span class="text-gray-500 font-normal mx-2">-</span>
+        <span>会计期间：${t.period}</span>
+        <span class="text-gray-500 font-normal mx-2">-</span>
+        <span>涉及主体：${t.summaries.length} 家 / 合同 ${t.details.length} 个</span>
+        <span class="text-gray-500 font-normal mx-2">·</span>
+        <span>单据编号：${t.billNo}</span>
+        <span class="text-gray-500 font-normal mx-2">·</span>
+        <span class="text-gray-500 font-normal">流程号：${t.wfNo}</span>
+    `;
+
+    const body = document.getElementById('detail-body');
+    if (currentDetailTab === 'info') {
+        body.innerHTML = renderInfoTab(t);
+    } else if (currentDetailTab === 'log') {
+        body.innerHTML = renderLogTab(t);
+    } else {
+        body.innerHTML = renderFlowTab(t);
+    }
+    lucide.createIcons();
+    if (currentDetailTab === 'info') { bindDrillToggle(); bindExportButtons(t); }
+}
+
+function fmtMoney(v) {
+    if (v === null || v === undefined || v === '') return '-';
+    const n = Number(v);
+    if (isNaN(n)) return v;
+    return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtPct(v) {
+    if (v === null || v === undefined) return '-';
+    return Number(v).toFixed(2) + '%';
+}
+
+function renderDetailRow(d) {
+    const mRate = d.mRev ? (d.mGross / d.mRev) * 100 : null;
+    const tRate = d.tRev ? (d.tGross / d.tRev) * 100 : null;
+    return `
+        <tr data-entity="${d.entity}">
+            <td class="left">${d.entity}</td>
+            <td class="left">${d.no}</td>
+            <td class="left">${d.name}</td>
+            <td class="center">${d.type}</td>
+            <td class="num">${fmtMoney(d.planRev)}</td>
+            <td class="num">${fmtMoney(d.planCost)}</td>
+            <td class="col-month num">${fmtPct(d.mPct)}</td>
+            <td class="col-month num">${fmtMoney(d.mRev)}</td>
+            <td class="col-month num">${fmtMoney(d.mCost)}</td>
+            <td class="col-month num pos">${fmtMoney(d.mGross)}</td>
+            <td class="col-month num pos">${fmtPct(mRate)}</td>
+            <td class="col-total num">${fmtPct(d.tPct)}</td>
+            <td class="col-total num">${fmtMoney(d.tRev)}</td>
+            <td class="col-total num">${fmtMoney(d.tCost)}</td>
+            <td class="col-total num pos">${fmtMoney(d.tGross)}</td>
+            <td class="col-total num pos">${fmtPct(tRate)}</td>
+        </tr>
+    `;
+}
+
+function detailTotalRow(rows, labelSuffix = '') {
+    const sum = (k) => rows.reduce((a, x) => a + (Number(x[k]) || 0), 0);
+    const sumMRev = sum('mRev'), sumMGross = sum('mGross');
+    const sumTRev = sum('tRev'), sumTGross = sum('tGross');
+    const mRate = sumMRev ? (sumMGross / sumMRev) * 100 : null;
+    const tRate = sumTRev ? (sumTGross / sumTRev) * 100 : null;
+    return `
+        <tr class="total-row" id="detail-total-row">
+            <td class="left" colspan="4">合计${labelSuffix}（${rows.length} 个合同）</td>
+            <td class="num">${fmtMoney(sum('planRev'))}</td>
+            <td class="num">${fmtMoney(sum('planCost'))}</td>
+            <td class="col-month">—</td>
+            <td class="col-month num">${fmtMoney(sumMRev)}</td>
+            <td class="col-month num">${fmtMoney(sum('mCost'))}</td>
+            <td class="col-month num pos">${fmtMoney(sumMGross)}</td>
+            <td class="col-month num pos">${fmtPct(mRate)}</td>
+            <td class="col-total">—</td>
+            <td class="col-total num">${fmtMoney(sumTRev)}</td>
+            <td class="col-total num">${fmtMoney(sum('tCost'))}</td>
+            <td class="col-total num pos">${fmtMoney(sumTGross)}</td>
+            <td class="col-total num pos">${fmtPct(tRate)}</td>
+        </tr>
+    `;
+}
+
+function renderInfoTab(t) {
+    const entitySum = (k) => t.summaries.reduce((a, x) => a + (Number(x[k]) || 0), 0);
+    return `
+        <div class="section-label">基本信息</div>
+        <div class="info-grid">
+            <div class="info-item"><span class="lbl">单据编号：</span><span class="val">${t.billNo}</span></div>
+            <div class="info-item"><span class="lbl">会计期间：</span><span class="val">${t.period}</span></div>
+            <div class="info-item"><span class="lbl">涉及主体：</span><span class="val">${t.summaries.length} 家</span></div>
+            <div class="info-item"><span class="lbl">审批状态：</span><span class="val" style="${statusColor(t.status)}">${t.status}</span></div>
+
+            <div class="info-item"><span class="lbl">发起人：</span><span class="val">${t.applicant}</span></div>
+            <div class="info-item"><span class="lbl">发起部门：</span><span class="val">${t.applicantDept}</span></div>
+            <div class="info-item"><span class="lbl">申请时间：</span><span class="val">${t.applyTime}</span></div>
+            <div class="info-item"><span class="lbl">当前节点：</span><span class="val">${t.currentNode}</span></div>
+        </div>
+
+        <div class="section-label">收入核算汇总（按财务主体，${t.summaries.length} 家）
+            <span class="export-btn-group">
+                <button class="export-btn" data-export="summary"><i data-lucide="download" class="w-3.5 h-3.5"></i>导出汇总</button>
+            </span>
+        </div>
+        <div class="dz-wrap">
+            <div class="dz-scroll">
+            <table class="dz-table" id="summary-table">
+                <thead>
+                    <tr>
+                        <th class="left">财务主体</th>
+                        <th class="center">月份</th>
+                    <th class="center">在建工地收入个数</th>
+                        <th class="center">完工收入工地个数</th>
+                        <th>当月收入总金额</th>
+                        <th>当月成本总金额</th>
+                        <th>当月毛利总金额</th>
+                        <th>当月毛利率</th>
+                        <th class="center">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${t.summaries.map(s => `
+                        <tr class="summary-row">
+                            <td class="left">${s.entity}</td>
+                            <td class="center">${t.period}</td>
+                            <td class="center num">${s.buildCnt}</td>
+                            <td class="center num">${s.doneCnt}</td>
+                            <td class="num">${fmtMoney(s.revenue)}</td>
+                            <td class="num">${fmtMoney(s.cost)}</td>
+                            <td class="num pos">${fmtMoney(s.gross)}</td>
+                            <td class="num pos">${fmtPct(s.revenue ? (s.gross / s.revenue) * 100 : null)}</td>
+                            <td class="center">
+                                <span class="drill-btn" data-drill="entity" data-entity="${s.entity}">
+                                    <i data-lucide="filter" class="w-3.5 h-3.5"></i>
+                                    <span>查看合同</span>
+                                </span>
+                            </td>
+                        </tr>
+                    `).join('')}
+                    <tr class="total-row">
+                        <td class="left" colspan="2">合计（${t.summaries.length} 家主体 · ${t.details.length} 个合同）</td>
+                        <td class="center num">${entitySum('buildCnt')}</td>
+                        <td class="center num">${entitySum('doneCnt')}</td>
+                        <td class="num">${fmtMoney(entitySum('revenue'))}</td>
+                        <td class="num">${fmtMoney(entitySum('cost'))}</td>
+                        <td class="num pos">${fmtMoney(entitySum('gross'))}</td>
+                        <td class="num pos">${fmtPct(entitySum('revenue') ? (entitySum('gross') / entitySum('revenue')) * 100 : null)}</td>
+                        <td class="center">
+                            <span class="drill-btn" id="btn-drill-all">
+                                <i data-lucide="chevrons-down" class="w-3.5 h-3.5"></i>
+                                <span id="drill-label">查看全部合同</span>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+
+            <div class="detail-drill" id="drill-panel">
+                <div class="detail-drill-title">
+                    <i data-lucide="list-tree" class="w-4 h-4"></i>
+                    <span id="drill-panel-title">合同粒度明细（${t.details.length} 条 · 全部主体）</span>
+                    <span class="text-gray-500 font-normal">— 琥珀色为当月数据，蓝色为截止本月累计数据</span>
+                    <span class="export-btn-group" style="margin-left:auto">
+                        <button class="export-btn" data-export="detail"><i data-lucide="download" class="w-3.5 h-3.5"></i>导出明细</button>
+                    </span>
+                </div>
+                <div class="detail-drill-scroll">
+                    <table class="dz-table" id="detail-table">
+                        <thead>
+                            <tr>
+                                <th class="left" rowspan="2">财务主体</th>
+                                <th class="left" rowspan="2">合同号</th>
+                                <th class="left" rowspan="2">合同名称</th>
+                                <th class="center" rowspan="2">需求类型</th>
+                                <th rowspan="2">预计总收入</th>
+                                <th rowspan="2">预计总成本</th>
+                                <th class="grp-month" colspan="5">当月</th>
+                                <th class="grp-total" colspan="5">截止本月（累计）</th>
+                            </tr>
+                    <tr>
+                                <th class="grp-month">完工百分比</th>
+                                <th class="grp-month">收入金额</th>
+                                <th class="grp-month">成本金额</th>
+                                <th class="grp-month">毛利金额</th>
+                                <th class="grp-month">毛利率</th>
+                                <th class="grp-total">完工百分比</th>
+                                <th class="grp-total">收入金额</th>
+                                <th class="grp-total">成本金额</th>
+                                <th class="grp-total">毛利金额</th>
+                                <th class="grp-total">毛利率</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-tbody">
+                            ${t.details.map(renderDetailRow).join('')}
+                            ${detailTotalRow(t.details, ' · 全部主体')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        ${t.status !== '已结束' ? `
+        <div class="approve-area">
+            <div class="text-sm font-medium text-gray-700 mb-2">审批意见</div>
+            <textarea placeholder="请输入审批意见..."></textarea>
+            <div class="approve-btns">
+                <button class="btn-primary">同意</button>
+                <button class="btn-danger">驳回</button>
+                <button class="btn-default">转交</button>
+                    </div>
+        </div>
+        ` : ''}
+    `;
+}
+
+/* 明细面板下钻切换（详情渲染后绑定） */
+function bindDrillToggle() {
+    const panel = document.getElementById('drill-panel');
+    const tbody = document.getElementById('detail-tbody');
+    const title = document.getElementById('drill-panel-title');
+    const label = document.getElementById('drill-label');
+    if (!panel || !tbody) return;
+
+    // 当前详情数据（在 renderDetail 中通过 window.__currentTicket 传入）
+    const t = window.__currentTicket;
+    if (!t) return;
+
+    function renderRows(rows, labelSuffix) {
+        tbody.innerHTML = rows.map(renderDetailRow).join('') + detailTotalRow(rows, labelSuffix);
+        if (title) title.textContent = `合同粒度明细（${rows.length} 条${labelSuffix}）`;
+        lucide.createIcons();
+    }
+
+    // 主体行：过滤对应主体
+    document.querySelectorAll('.drill-btn[data-drill="entity"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const entity = btn.dataset.entity;
+            const rows = t.details.filter(d => d.entity === entity);
+            panel.classList.add('open');
+            renderRows(rows, ` · ${entity}`);
+        });
+    });
+
+    // 合计行：显示 / 隐藏全部
+    const allBtn = document.getElementById('btn-drill-all');
+    if (allBtn) {
+        allBtn.addEventListener('click', () => {
+            const isOpen = panel.classList.toggle('open');
+            if (isOpen) renderRows(t.details, ' · 全部主体');
+            if (label) label.textContent = isOpen ? '收起全部合同' : '查看全部合同';
+            lucide.createIcons();
+        });
+    }
+}
+
+/* ============ CSV 导出 ============ */
+function bindExportButtons(t) {
+    document.querySelectorAll('.export-btn[data-export]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const kind = btn.dataset.export;
+            if (kind === 'summary') exportSummaryCSV(t);
+            else if (kind === 'detail') exportDetailCSV(t);
+        });
+    });
+}
+
+function csvEscape(v) {
+    if (v === null || v === undefined) return '';
+    const s = String(v);
+    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+}
+
+function downloadCSV(rows, filename) {
+    const csv = rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
+    // BOM 让 Excel 正确识别 UTF-8
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+}
+
+function tsStamp() {
+    const d = new Date();
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
+}
+
+function exportSummaryCSV(t) {
+    const entitySum = (k) => t.summaries.reduce((a, x) => a + (Number(x[k]) || 0), 0);
+    const header = ['财务主体', '月份', '在建工地收入个数', '完工收入工地个数', '当月收入总金额', '当月成本总金额', '当月毛利总金额', '当月毛利率(%)'];
+    const rows = [header];
+    t.summaries.forEach(s => {
+        const rate = s.revenue ? (s.gross / s.revenue) * 100 : null;
+        rows.push([s.entity, t.period, s.buildCnt, s.doneCnt, s.revenue, s.cost, s.gross, rate === null ? '' : rate.toFixed(2)]);
+    });
+    const totRev = entitySum('revenue'), totGross = entitySum('gross');
+    const totRate = totRev ? (totGross / totRev) * 100 : null;
+    rows.push([`合计（${t.summaries.length} 家主体 · ${t.details.length} 个合同）`, '', entitySum('buildCnt'), entitySum('doneCnt'), totRev, entitySum('cost'), totGross, totRate === null ? '' : totRate.toFixed(2)]);
+    downloadCSV(rows, `收入核算汇总_${t.billNo}_${tsStamp()}.csv`);
+}
+
+function exportDetailCSV(t) {
+    const header = [
+        '财务主体', '合同号', '合同名称', '需求类型', '预计总收入', '预计总成本',
+        '当月完工百分比(%)', '当月收入金额', '当月成本金额', '当月毛利金额', '当月毛利率(%)',
+        '累计完工百分比(%)', '累计收入金额', '累计成本金额', '累计毛利金额', '累计毛利率(%)'
+    ];
+    const rows = [header];
+    t.details.forEach(d => {
+        const mRate = d.mRev ? (d.mGross / d.mRev) * 100 : null;
+        const tRate = d.tRev ? (d.tGross / d.tRev) * 100 : null;
+        rows.push([
+            d.entity, d.no, d.name, d.type, d.planRev, d.planCost,
+            d.mPct, d.mRev, d.mCost, d.mGross, mRate === null ? '' : mRate.toFixed(2),
+            d.tPct, d.tRev, d.tCost, d.tGross, tRate === null ? '' : tRate.toFixed(2)
+        ]);
+    });
+    // 合计行
+    const sum = k => t.details.reduce((a, x) => a + (Number(x[k]) || 0), 0);
+    const sMRev = sum('mRev'), sMGross = sum('mGross');
+    const sTRev = sum('tRev'), sTGross = sum('tGross');
+    const mR = sMRev ? (sMGross / sMRev) * 100 : null;
+    const tR = sTRev ? (sTGross / sTRev) * 100 : null;
+    rows.push([
+        `合计（${t.details.length} 个合同）`, '', '', '', sum('planRev'), sum('planCost'),
+        '', sMRev, sum('mCost'), sMGross, mR === null ? '' : mR.toFixed(2),
+        '', sTRev, sum('tCost'), sTGross, tR === null ? '' : tR.toFixed(2)
+    ]);
+    downloadCSV(rows, `合同粒度明细_${t.billNo}_${tsStamp()}.csv`);
+}
+
+
+
+function renderLogTab(t) {
+    return `
+        <div class="section-label">审批日志</div>
+        <div class="px-6 pb-6">
+            <div class="border-l-2 border-gray-200 pl-6 space-y-6">
+                <div class="relative">
+                    <div class="absolute -left-[29px] top-1 w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-emerald-100"></div>
+                    <div class="text-sm font-medium text-gray-900">审批通过</div>
+                    <div class="text-xs text-gray-500 mt-1">财务BP 张三 · 2025-08-05 15:20</div>
+                    <div class="text-sm text-gray-700 mt-2 bg-gray-50 rounded p-2">同意，符合合同变更规范。</div>
+                </div>
+                <div class="relative">
+                    <div class="absolute -left-[29px] top-1 w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-emerald-100"></div>
+                    <div class="text-sm font-medium text-gray-900">审批通过</div>
+                    <div class="text-xs text-gray-500 mt-1">交付COE 李四 · 2025-08-05 11:10</div>
+                    <div class="text-sm text-gray-700 mt-2 bg-gray-50 rounded p-2">同意</div>
+                </div>
+                <div class="relative">
+                    <div class="absolute -left-[29px] top-1 w-3 h-3 rounded-full bg-blue-500 ring-4 ring-blue-100"></div>
+                    <div class="text-sm font-medium text-gray-900">发起申请</div>
+                    <div class="text-xs text-gray-500 mt-1">王五 · 2025-08-05 10:43</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderFlowTab(t) {
+    const nodes = [
+        { name: '发起', role: '门店', status: 'done' },
+        { name: '交付COE 审核', role: '总部交付COE', status: 'done' },
+        { name: '财务BP 审核', role: '总部财务BP', status: 'done' },
+        { name: '结束', role: '', status: 'done' },
+    ];
+    return `
+        <div class="section-label">流程图</div>
+        <div class="px-6 pb-6 flex items-center gap-4 flex-wrap">
+            ${nodes.map((n, i) => `
+                <div class="flex items-center">
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm ${n.status === 'done' ? 'bg-emerald-500' : 'bg-gray-300'}">
+                            <i data-lucide="${n.status === 'done' ? 'check' : 'circle'}" class="w-5 h-5"></i>
+                        </div>
+                        <div class="text-xs font-medium mt-2">${n.name}</div>
+                        ${n.role ? `<div class="text-[11px] text-gray-500">${n.role}</div>` : ''}
+                    </div>
+                    ${i < nodes.length - 1 ? '<div class="w-16 h-0.5 bg-emerald-400 mx-2"></div>' : ''}
+              </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+/* ========== 详情 Tab 切换 ========== */
+document.querySelectorAll('.detail-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentDetailTab = tab.dataset.dtab;
+        renderDetail();
+    });
+});
+
+/* ========== sidebar 加载 ========== */
+function loadSidebar() {
+    fetch('common/sidebar.html')
+        .then(r => r.text())
+        .then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+            const scr = document.createElement('script');
+            scr.src = 'common/scripts.js';
+            document.body.appendChild(scr);
+            setTimeout(() => lucide.createIcons(), 60);
+        });
+}
+
+/* ========== init ========== */
+document.addEventListener('DOMContentLoaded', () => {
+    loadSidebar();
+    renderCategories();
+    renderTicketList();
+    renderDetail();
+    lucide.createIcons();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>整装项目核算审批 - 积木云装</title>
+    <script src="https://storage.360buyimg.com/dist-dev/joycoder/fe-page-cdn/tailwindcss.js"></script>
+    <script src="https://storage.360buyimg.com/dist-dev/joycoder/fe-page-cdn/lucide.js"></script>
+    <style>
+        html, body { height: 100%; margin: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f6f8; overflow: hidden; }
+        .sidebar { background: linear-gradient(180deg, #1e5b4a 0%, #164438 100%); }
+        .sidebar-item { color: rgba(255,255,255,0.85); }
+        .sidebar-item:hover { background: rgba(255,255,255,0.08); }
+        .sidebar-item.active { background: rgba(255,255,255,0.12); color: #fff; }
+        .num-cell { font-variant-numeric: tabular-nums; text-align: right; }
+        .tab-active { color: #059669; border-bottom: 2px solid #059669; font-weight: 500; }
+        .status-tag { display: inline-block; padding: 1px 8px; border-radius: 3px; font-size: 12px; }
+        .status-done { color: #dc2626; background: transparent; font-weight: 500; }
+        .status-approving { color: #d97706; background: #fef3c7; }
+        .row-hover:hover { background: #f8fafc; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+    </style>
+</head>
+<body>
+
+<div class="flex h-screen w-screen">
+
+    <!-- 左侧主导航 -->
+    <aside class="sidebar w-[110px] shrink-0 flex flex-col text-white">
+        <div class="pt-4 pb-3 px-3 flex flex-col items-center border-b border-white/10">
+            <div class="flex items-center gap-1.5">
+                <div class="w-6 h-6 bg-white rounded-sm flex items-center justify-center">
+                    <i data-lucide="blocks" class="w-4 h-4 text-emerald-700"></i>
+                </div>
+                <span class="text-sm font-semibold">积木云装</span>
+            </div>
+            <span class="text-[10px] text-white/60 mt-1">V1.1.0</span>
+        </div>
+        <nav class="flex-1 py-2 overflow-y-auto text-[13px]">
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>工作台</a>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="bell" class="w-4 h-4"></i>消息通知</a>
+            <a class="sidebar-item active flex items-center gap-2 px-4 py-2.5"><i data-lucide="file-text" class="w-4 h-4"></i>工单中心</a>
+            <div class="h-2"></div>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="handshake" class="w-4 h-4"></i>供应商协同</a>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="users" class="w-4 h-4"></i>客户管理</a>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="trending-up" class="w-4 h-4"></i>销售运营</a>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="shopping-cart" class="w-4 h-4"></i>在线销售</a>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="clipboard-list" class="w-4 h-4"></i>订单管理</a>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="truck" class="w-4 h-4"></i>交付运营</a>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="package" class="w-4 h-4"></i>材料管理</a>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="wallet" class="w-4 h-4"></i>收款管理</a>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="sparkles" class="w-4 h-4"></i>AI提案</a>
+            <div class="h-3"></div>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="download" class="w-4 h-4"></i>下载中心</a>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="settings" class="w-4 h-4"></i>业务配置</a>
+            <a class="sidebar-item flex items-center gap-2 px-4 py-2.5"><i data-lucide="building" class="w-4 h-4"></i>企业后台</a>
+        </nav>
+    </aside>
+
+    <!-- 二级：工单分类 -->
+    <aside class="w-[180px] shrink-0 bg-white border-r border-slate-200 py-3 text-sm">
+        <div class="px-4 py-2 text-slate-700 flex items-center gap-1 cursor-pointer">
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>已取消的
+        </div>
+        <div class="px-4 py-2 text-slate-700 flex items-center justify-between cursor-pointer">
+            <span class="flex items-center gap-1"><i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>待办工单</span>
+            <span class="text-slate-400 text-xs">0</span>
+        </div>
+        <div class="text-slate-700">
+            <div class="px-4 py-2 flex items-center gap-1 cursor-pointer">
+                <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>已办工单
+            </div>
+            <div class="pl-8 pr-4 py-2 bg-emerald-50 text-emerald-700 border-l-2 border-emerald-600 flex items-center gap-1.5 cursor-pointer">
+                <i data-lucide="calculator" class="w-3.5 h-3.5"></i>项目核算
+            </div>
+            <div class="pl-8 pr-4 py-2 text-slate-600 flex items-center gap-1.5 cursor-pointer hover:bg-slate-50">
+                <i data-lucide="wallet" class="w-3.5 h-3.5"></i>收款管理
+            </div>
+        </div>
+        <div class="px-4 py-2 text-slate-700 flex items-center gap-1 cursor-pointer">
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>我发起的
+        </div>
+        <div class="px-4 py-2 text-slate-700 flex items-center gap-1 cursor-pointer">
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>我关注的
+        </div>
+    </aside>
+
+    <!-- 三级：工单列表 -->
+    <section class="w-[340px] shrink-0 bg-white border-r border-slate-200 flex flex-col">
+        <div class="p-3 border-b border-slate-100 flex items-center gap-2">
+            <div class="relative flex-1">
+                <input type="text" placeholder="请输入关键字搜索" class="w-full pl-3 pr-8 py-1.5 text-sm border border-slate-200 rounded bg-slate-50 focus:outline-none focus:border-emerald-500 focus:bg-white" />
+                <i data-lucide="search" class="w-4 h-4 absolute right-2.5 top-2 text-slate-400"></i>
+            </div>
+            <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100"><i data-lucide="refresh-cw" class="w-4 h-4 text-slate-500"></i></button>
+        </div>
+        <div id="ticket-list" class="flex-1 overflow-y-auto"></div>
+    </section>
+
+    <!-- 右侧：审批详情 -->
+    <main class="flex-1 flex flex-col bg-white overflow-hidden">
+        <!-- 标题栏 -->
+        <div class="px-6 py-3.5 border-b border-slate-100 flex items-center gap-2">
+            <span class="text-[15px] font-semibold text-slate-800">【整装项目核算审批】</span>
+            <span class="text-slate-400">-</span>
+            <span class="text-sm text-slate-600">项目类型：整装</span>
+            <span class="text-slate-400">-</span>
+            <span class="text-sm text-slate-600">会计期间：<span class="text-slate-800">2026-07</span></span>
+            <span class="text-slate-400">编号：</span>
+            <span class="text-sm text-slate-800 font-mono">WG26070000001</span>
+        </div>
+
+        <!-- Tab -->
+        <div class="px-6 border-b border-slate-100 flex items-center gap-6 text-sm">
+            <button onclick="switchTab('info')" id="tab-info" class="py-3 tab-active">审批信息</button>
+            <button onclick="switchTab('log')" id="tab-log" class="py-3 text-slate-600 hover:text-slate-800">审批日志</button>
+            <button onclick="switchTab('flow')" id="tab-flow" class="py-3 text-slate-600 hover:text-slate-800">流程图</button>
+        </div>
+
+        <!-- Tab 内容 -->
+        <div class="flex-1 overflow-y-auto">
+
+            <!-- 审批信息 -->
+            <div id="pane-info" class="p-6">
+                <!-- 基本信息 -->
+                <div class="mb-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="w-1 h-4 bg-emerald-600"></span>
+                        <span class="text-[15px] font-semibold text-slate-800">基本信息</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-x-8 gap-y-4 text-[13px] pl-3">
+                        <div><span class="text-slate-500">单据编号：</span><span class="text-slate-800">WG26070000001</span></div>
+                        <div><span class="text-slate-500">单据类型：</span><span class="text-slate-800">标准项目核算单</span></div>
+                        <div><span class="text-slate-500">会计期间：</span><span class="text-slate-800">2026-07</span></div>
+                        <div><span class="text-slate-500">项目类型：</span><span class="text-slate-800">整装</span></div>
+                        <div><span class="text-slate-500">计算状态：</span><span class="text-emerald-600">已计算</span></div>
+                        <div><span class="text-slate-500">核算确认状态：</span><span class="text-amber-600">审批中</span></div>
+                        <div><span class="text-slate-500">发起人：</span><span class="text-slate-800">李四</span></div>
+                        <div><span class="text-slate-500">发起时间：</span><span class="text-slate-800">2026-07-22 10:15</span></div>
+                        <div><span class="text-slate-500">涉及财务主体：</span><span class="text-slate-800">6 个</span></div>
+                        <div><span class="text-slate-500">涉及合同：</span><span class="text-slate-800">248 单</span></div>
+                        <div><span class="text-slate-500">收入总金额：</span><span class="text-slate-800 font-semibold">¥ 12,486,320.55</span></div>
+                        <div><span class="text-slate-500">毛利总金额：</span><span class="text-emerald-600 font-semibold">¥ 3,124,058.20</span></div>
+                    </div>
+                </div>
+
+                <!-- 按财务主体汇总 -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-1 h-4 bg-emerald-600"></span>
+                            <span class="text-[15px] font-semibold text-slate-800">按财务主体汇总</span>
+                            <span class="text-xs text-slate-500 ml-2">点击"明细"下钻查看该主体每个合同的收入情况</span>
+                        </div>
+                        <button class="text-xs text-emerald-600 hover:text-emerald-700 inline-flex items-center gap-1">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i>导出
+                        </button>
+                    </div>
+                    <div class="border border-slate-200 rounded overflow-hidden ml-3 mr-3">
+                        <table class="w-full text-[13px]">
+                            <thead class="bg-slate-50 text-slate-600">
+                                <tr>
+                                    <th class="px-3 py-2.5 text-left font-medium">财务主体</th>
+                                    <th class="px-3 py-2.5 text-left font-medium">月份</th>
+                                    <th class="px-3 py-2.5 text-right font-medium">在建工地收入个数</th>
+                                    <th class="px-3 py-2.5 text-right font-medium">完工收入工地个数</th>
+                                    <th class="px-3 py-2.5 text-right font-medium">当月收入总金额</th>
+                                    <th class="px-3 py-2.5 text-right font-medium">当月成本总金额</th>
+                                    <th class="px-3 py-2.5 text-right font-medium">当月毛利总金额</th>
+                                    <th class="px-3 py-2.5 text-center font-medium w-16">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="summary-tbody" class="divide-y divide-slate-100"></tbody>
+                            <tfoot class="bg-slate-50/60 font-semibold text-slate-800 text-[13px]">
+                                <tr>
+                                    <td class="px-3 py-2.5" colspan="2">合计</td>
+                                    <td class="px-3 py-2.5 num-cell">186</td>
+                                    <td class="px-3 py-2.5 num-cell">62</td>
+                                    <td class="px-3 py-2.5 num-cell">¥ 12,486,320.55</td>
+                                    <td class="px-3 py-2.5 num-cell">¥ 9,362,262.35</td>
+                                    <td class="px-3 py-2.5 num-cell text-emerald-600">¥ 3,124,058.20</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 明细区 -->
+                <div id="detail-section" class="mb-6 hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-1 h-4 bg-emerald-600"></span>
+                            <span class="text-[15px] font-semibold text-slate-800" id="detail-title">合同明细</span>
+                        </div>
+                        <button onclick="closeDetail()" class="text-xs text-slate-500 hover:text-slate-700 inline-flex items-center gap-1">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>收起
+                        </button>
+                    </div>
+                    <div class="border border-slate-200 rounded overflow-x-auto ml-3 mr-3">
+                        <table class="w-full text-[12px] whitespace-nowrap">
+                            <thead class="bg-slate-50 text-slate-600">
+                                <tr>
+                                    <th class="px-2.5 py-2 text-left font-medium">财务主体</th>
+                                    <th class="px-2.5 py-2 text-left font-medium">月份</th>
+                                    <th class="px-2.5 py-2 text-left font-medium">合同号</th>
+                                    <th class="px-2.5 py-2 text-left font-medium">合同名称</th>
+                                    <th class="px-2.5 py-2 text-left font-medium">需求类型</th>
+                                    <th class="px-2.5 py-2 text-right font-medium">预计总收入</th>
+                                    <th class="px-2.5 py-2 text-right font-medium">预计总成本</th>
+                                    <th class="px-2.5 py-2 text-right font-medium bg-amber-50">当月完工%</th>
+                                    <th class="px-2.5 py-2 text-right font-medium bg-amber-50">当月收入金额</th>
+                                    <th class="px-2.5 py-2 text-right font-medium bg-amber-50">当月成本金额</th>
+                                    <th class="px-2.5 py-2 text-right font-medium bg-amber-50">当月毛利金额</th>
+                                    <th class="px-2.5 py-2 text-right font-medium bg-sky-50">截止本月完工%</th>
+                                    <th class="px-2.5 py-2 text-right font-medium bg-sky-50">截止本月收入</th>
+                                    <th class="px-2.5 py-2 text-right font-medium bg-sky-50">截止本月成本</th>
+                                    <th class="px-2.5 py-2 text-right font-medium bg-sky-50">截止本月毛利</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-tbody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 审批意见 -->
+                <div class="mb-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="w-1 h-4 bg-emerald-600"></span>
+                        <span class="text-[15px] font-semibold text-slate-800">审批意见</span>
+                    </div>
+                    <div class="pl-3 pr-3">
+                        <textarea rows="3" placeholder="请输入审批意见（同意时可选，驳回时必填）" class="w-full px-3 py-2 text-[13px] border border-slate-200 rounded focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+                        <div class="flex items-center gap-2 mt-3">
+                            <button class="px-5 py-1.5 text-sm bg-emerald-600 text-white rounded hover:bg-emerald-700">
+                                <i data-lucide="check" class="w-3.5 h-3.5 inline mr-1"></i>同意
+                            </button>
+                            <button class="px-5 py-1.5 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50">
+                                <i data-lucide="x" class="w-3.5 h-3.5 inline mr-1"></i>驳回
+                            </button>
+                            <button class="px-5 py-1.5 text-sm border border-slate-200 text-slate-700 rounded hover:bg-slate-50">转交</button>
+                            <span class="ml-2 text-xs text-slate-500">
+                                <i data-lucide="info" class="w-3 h-3 inline"></i>
+                                审批通过后，核算确认状态由「审批中」反写为「已确认」
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 审批日志 -->
+            <div id="pane-log" class="p-6 hidden">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="w-1 h-4 bg-emerald-600"></span>
+                    <span class="text-[15px] font-semibold text-slate-800">审批日志</span>
+                </div>
+                <div class="pl-3 space-y-4 text-[13px]">
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0"><i data-lucide="check" class="w-4 h-4"></i></div>
+                        <div class="flex-1 pb-4 border-b border-slate-100">
+                            <div class="flex items-center gap-2"><span class="font-medium text-slate-800">王五</span><span class="text-slate-500">·  总部交付COE</span><span class="text-slate-400 text-xs">2026-07-22 11:30</span><span class="ml-2 text-emerald-600 text-xs">已同意</span></div>
+                            <div class="mt-1 text-slate-600">已核对各项目完工进度与实际交付情况一致，同意本期收入确认。</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0"><i data-lucide="send" class="w-4 h-4"></i></div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2"><span class="font-medium text-slate-800">李四</span><span class="text-slate-500">·  总部交付COE</span><span class="text-slate-400 text-xs">2026-07-22 10:15</span><span class="ml-2 text-blue-600 text-xs">发起审批</span></div>
+                            <div class="mt-1 text-slate-600">提交 2026-07 期整装项目核算收入确认，涉及 6 个主体、248 条合同。</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 流程图 -->
+            <div id="pane-flow" class="p-6 hidden">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="w-1 h-4 bg-emerald-600"></span>
+                    <span class="text-[15px] font-semibold text-slate-800">审批流程</span>
+                </div>
+                <div class="pl-3 flex items-center gap-2 text-[13px]">
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="send" class="w-4 h-4"></i></div>
+                        <div class="mt-2 font-medium">发起</div>
+                        <div class="text-xs text-slate-500">李四</div>
+                    </div>
+                    <div class="flex-1 h-0.5 bg-emerald-500"></div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-4 h-4"></i></div>
+                        <div class="mt-2 font-medium">总部交付COE</div>
+                        <div class="text-xs text-slate-500">王五 · 已同意</div>
+                    </div>
+                    <div class="flex-1 h-0.5 bg-amber-400"></div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center ring-4 ring-amber-100"><i data-lucide="user-check" class="w-4 h-4"></i></div>
+                        <div class="mt-2 font-medium text-amber-700">总部财务BP</div>
+                        <div class="text-xs text-slate-500">张三 · 待审批</div>
+                    </div>
+                    <div class="flex-1 h-0.5 bg-slate-200"></div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center"><i data-lucide="flag" class="w-4 h-4"></i></div>
+                        <div class="mt-2 font-medium text-slate-500">完成</div>
+                        <div class="text-xs text-slate-400">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // 工单列表
+    const tickets = [
+        { id: "WG26070000001", title: "整装项目核算 · 2026-07 收入确认", type: "标准项目核算单", period: "2026-07", status: "审批中", date: "2026-07-22 10:15", active: true },
+        { id: "WG26060000015", title: "整装项目核算 · 2026-06 收入确认", type: "标准项目核算单", period: "2026-06", status: "已结束", date: "2026-06-25 09:20" },
+        { id: "WG26060000012", title: "项目核算调整单 · 华北大区", type: "项目核算调整单", period: "2026-06", status: "已结束", date: "2026-06-20 14:32" },
+        { id: "WG26050000008", title: "整装项目核算 · 2026-05 收入确认", type: "标准项目核算单", period: "2026-05", status: "已结束", date: "2026-05-24 10:05" }
+    ];
+
+    const summaryData = [
+        { entity: "北京家装公司", month: "2026-07", inProgress: 42, completed: 15, income: 3125800.50, cost: 2358400.20, profit: 767400.30 },
+        { entity: "上海家装公司", month: "2026-07", inProgress: 38, completed: 12, income: 2856300.00, cost: 2145200.00, profit: 711100.00 },
+        { entity: "广州家装公司", month: "2026-07", inProgress: 31, completed: 10, income: 2103500.05, cost: 1587600.00, profit: 515900.05 },
+        { entity: "成都家装公司", month: "2026-07", inProgress: 28, completed: 9, income: 1856420.00, cost: 1402100.15, profit: 454319.85 },
+        { entity: "武汉家装公司", month: "2026-07", inProgress: 25, completed: 8, income: 1524300.00, cost: 1156800.00, profit: 367500.00 },
+        { entity: "西安家装公司", month: "2026-07", inProgress: 22, completed: 8, income: 1020000.00, cost: 712162.00, profit: 307838.00 }
+    ];
+
+    const detailTemplate = [
+        { contractNo: "HT2026030012", name: "朝阳区大悦城王女士整装", demand: "全包", estIncome: 285600, estCost: 214200, curPct: 35, curIncome: 100000, curCost: 74970, curProfit: 25030, cumPct: 65, cumIncome: 185640, cumCost: 139230, cumProfit: 46410 },
+        { contractNo: "HT2026030015", name: "海淀区西二旗李先生整装", demand: "半包", estIncome: 165000, estCost: 128700, curPct: 45, curIncome: 74250, curCost: 57915, curProfit: 16335, cumPct: 78, cumIncome: 128700, cumCost: 100386, cumProfit: 28314 },
+        { contractNo: "HT2026040021", name: "东城区南锣鼓巷张女士整装", demand: "全包+软装", estIncome: 458000, estCost: 343500, curPct: 25, curIncome: 114500, curCost: 85875, curProfit: 28625, cumPct: 50, cumIncome: 229000, cumCost: 171750, cumProfit: 57250 },
+        { contractNo: "HT2026040033", name: "西城区金融街刘总整装", demand: "全包", estIncome: 620000, estCost: 465000, curPct: 100, curIncome: 620000, curCost: 465000, curProfit: 155000, cumPct: 100, cumIncome: 620000, cumCost: 465000, cumProfit: 155000 },
+        { contractNo: "HT2026050008", name: "丰台区科技园陈先生整装", demand: "半包+主材", estIncome: 328000, estCost: 246000, curPct: 40, curIncome: 131200, curCost: 98400, curProfit: 32800, cumPct: 60, cumIncome: 196800, cumCost: 147600, cumProfit: 49200 }
+    ];
+
+    const fmtMoney = n => "¥ " + n.toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // 渲染工单列表
+    function renderTickets() {
+        document.getElementById("ticket-list").innerHTML = tickets.map(t => `
+            <div class="mx-3 my-2 p-3 rounded border ${t.active ? 'border-emerald-500 bg-emerald-50/40' : 'border-slate-200 hover:border-slate-300'} cursor-pointer text-[13px]">
+                <div class="flex items-start justify-between gap-2 mb-1.5">
+                    <span class="font-medium text-slate-800">${t.title}</span>
+                    <span class="${t.status === '审批中' ? 'status-approving' : 'status-done'} status-tag shrink-0">${t.status}</span>
+                </div>
+                <div class="text-slate-500 space-y-1 leading-relaxed">
+                    <div>单据类型：<span class="text-slate-700">${t.type}</span></div>
+                    <div>会计期间：<span class="text-slate-700">${t.period}</span></div>
+                    <div>单据编号：<span class="text-slate-700 font-mono text-xs">${t.id}</span></div>
+                    <div class="text-slate-400 text-xs pt-1">${t.date}</div>
+                </div>
+            </div>
+        `).join("");
+    }
+
+    // 渲染汇总
+    function renderSummary() {
+        document.getElementById("summary-tbody").innerHTML = summaryData.map((r, i) => `
+            <tr class="row-hover">
+                <td class="px-3 py-2.5 text-slate-800">${r.entity}</td>
+                <td class="px-3 py-2.5 text-slate-600">${r.month}</td>
+                <td class="px-3 py-2.5 num-cell text-slate-700">${r.inProgress}</td>
+                <td class="px-3 py-2.5 num-cell text-slate-700">${r.completed}</td>
+                <td class="px-3 py-2.5 num-cell text-slate-800 font-medium">${fmtMoney(r.income)}</td>
+                <td class="px-3 py-2.5 num-cell text-slate-700">${fmtMoney(r.cost)}</td>
+                <td class="px-3 py-2.5 num-cell text-emerald-600 font-medium">${fmtMoney(r.profit)}</td>
+                <td class="px-3 py-2.5 text-center">
+                    <button onclick="showDetail(${i})" class="text-emerald-600 hover:text-emerald-700 text-xs">明细</button>
+                </td>
+            </tr>
+        `).join("");
+    }
+
+    function showDetail(idx) {
+        const row = summaryData[idx];
+        document.getElementById("detail-title").textContent = `合同明细 · ${row.entity} · ${row.month}`;
+        document.getElementById("detail-tbody").innerHTML = detailTemplate.map(d => `
+            <tr class="row-hover">
+                <td class="px-2.5 py-2 text-slate-700">${row.entity}</td>
+                <td class="px-2.5 py-2 text-slate-600">${row.month}</td>
+                <td class="px-2.5 py-2 font-mono text-emerald-600">${d.contractNo}</td>
+                <td class="px-2.5 py-2 text-slate-800">${d.name}</td>
+                <td class="px-2.5 py-2"><span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[11px]">${d.demand}</span></td>
+                <td class="px-2.5 py-2 num-cell text-slate-700">${fmtMoney(d.estIncome)}</td>
+                <td class="px-2.5 py-2 num-cell text-slate-700">${fmtMoney(d.estCost)}</td>
+                <td class="px-2.5 py-2 num-cell bg-amber-50/40 text-slate-800">${d.curPct}%</td>
+                <td class="px-2.5 py-2 num-cell bg-amber-50/40 font-medium text-slate-800">${fmtMoney(d.curIncome)}</td>
+                <td class="px-2.5 py-2 num-cell bg-amber-50/40 text-slate-700">${fmtMoney(d.curCost)}</td>
+                <td class="px-2.5 py-2 num-cell bg-amber-50/40 text-emerald-600 font-medium">${fmtMoney(d.curProfit)}</td>
+                <td class="px-2.5 py-2 num-cell bg-sky-50/40 text-slate-800">${d.cumPct}%</td>
+                <td class="px-2.5 py-2 num-cell bg-sky-50/40 font-medium text-slate-800">${fmtMoney(d.cumIncome)}</td>
+                <td class="px-2.5 py-2 num-cell bg-sky-50/40 text-slate-700">${fmtMoney(d.cumCost)}</td>
+                <td class="px-2.5 py-2 num-cell bg-sky-50/40 text-emerald-600 font-medium">${fmtMoney(d.cumProfit)}</td>
+            </tr>
+        `).join("");
+        const section = document.getElementById("detail-section");
+        section.classList.remove("hidden");
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function closeDetail() {
+        document.getElementById("detail-section").classList.add("hidden");
+    }
+
+    function switchTab(name) {
+        ["info", "log", "flow"].forEach(k => {
+            const tab = document.getElementById("tab-" + k);
+            const pane = document.getElementById("pane-" + k);
+            if (k === name) {
+                tab.classList.add("tab-active");
+                tab.classList.remove("text-slate-600");
+                pane.classList.remove("hidden");
+            } else {
+                tab.classList.remove("tab-active");
+                tab.classList.add("text-slate-600");
+                pane.classList.add("hidden");
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        renderTickets();
+        renderSummary();
+        lucide.createIcons();
+    });
+</script>
+</body>
+</html>
