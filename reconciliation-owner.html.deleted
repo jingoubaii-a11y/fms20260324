@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>责任人配置 - 对账中心</title>
+    <script src="common/tailwind.js"></script>
+    <script src="common/lucide.min.js"></script>
+    <link rel="stylesheet" href="common/styles.css">
+    <script>
+        tailwind.config = { theme: { extend: { colors: { primary: '#003eb3', secondary: '#e6f0ff' } } } };
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div class="flex min-h-screen">
+        <div id="sidebar-container"></div>
+        <main class="flex-1 ml-64 p-6">
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-4">
+                <h1 class="text-xl font-bold text-gray-800">责任人配置</h1>
+                <p class="text-sm text-gray-500 mt-1">对账差异分派逻辑：<b>规则级覆盖层</b>命中 → 走覆盖，否则回落到<b>系统侧默认层</b>（按差异类型/流向）。默认层不允许为空，覆盖层可空。所有告警一律走京 ME。</p>
+            </div>
+
+            <div class="bg-white rounded-t-lg shadow-sm border-b border-gray-200 px-6">
+                <nav class="flex space-x-6" id="owner-tabs">
+                    <button data-tab="default" class="owner-tab-btn active border-b-2 border-primary text-primary py-3 px-1 text-sm font-medium">系统侧默认层</button>
+                    <button data-tab="override" class="owner-tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 py-3 px-1 text-sm font-medium">规则级覆盖层</button>
+                </nav>
+            </div>
+
+            <!-- Tab 1: 系统侧默认层 -->
+            <div id="tab-default" class="owner-tab-content bg-white rounded-b-lg shadow-sm p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <p class="text-sm text-gray-600">按<b>差异类型</b>×<b>流向</b>兜底分派：无规则级覆盖时，由此表决定责任人。财务主体全局生效。</p>
+                    <button class="ml-auto px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm flex items-center"><i data-lucide="plus" class="w-4 h-4 mr-1"></i>新增默认规则</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-200 rounded-lg">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">差异类型（⑦差异层标签）</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">流向（A→B / B→A / 双向）</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">默认责任人 / 团队</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">告警通道</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">升级人 (SLA 超时)</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-800">金额不一致</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">双向</td>
+                                <td class="px-4 py-3 text-sm text-gray-800">财务共享·结算组</td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs">京 ME</span></td>
+                            <td class="px-4 py-3 text-sm text-gray-600">共享中心 Leader</td>
+                                <td class="px-4 py-3 text-sm space-x-2"><button class="text-primary hover:underline">编辑</button></td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-800">单边缺失</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">A→B（源系统有目标无）</td>
+                                <td class="px-4 py-3 text-sm text-gray-800">源系统集成运维</td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs">京 ME</span></td>
+                                <td class="px-4 py-3 text-sm text-gray-600">中台 PM</td>
+                                <td class="px-4 py-3 text-sm space-x-2"><button class="text-primary hover:underline">编辑</button></td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-800">单边缺失</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">B→A（目标有源无）</td>
+                                <td class="px-4 py-3 text-sm text-gray-800">目标系统数据管理员</td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs">京 ME</span></td>
+                                <td class="px-4 py-3 text-sm text-gray-600">中台 PM</td>
+                                <td class="px-4 py-3 text-sm space-x-2"><button class="text-primary hover:underline">编辑</button></td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-800">数量不一致</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">双向</td>
+                                <td class="px-4 py-3 text-sm text-gray-800">供应链·收发货组</td>
+                      <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs">京 ME</span></td>
+                                <td class="px-4 py-3 text-sm text-gray-600">供应链 Leader</td>
+                                <td class="px-4 py-3 text-sm space-x-2"><button class="text-primary hover:underline">编辑</button></td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-800">字段差异（仅提示）</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">双向</td>
+                                <td class="px-4 py-3 text-sm text-gray-400 italic">无（仅记录不路由）</td>
+                                <td class="px-4 py-3 text-sm text-gray-400">—</td>
+                                <td class="px-4 py-3 text-sm text-gray-400">—</td>
+                                <td class="px-4 py-3 text-sm space-x-2"><button class="text-primary hover:underline">编辑</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs text-gray-500 mt-3">默认层由对账中心统一维护，全财务主体生效。差异类型枚举来源于场景卡「⑦差异层」的类型标签；WARN 级差异可不设责任人。</p>
+         </div>
+
+            <!-- Tab 2: 规则级覆盖层 -->
+            <div id="tab-override" class="owner-tab-content hidden bg-white rounded-b-lg shadow-sm p-6">
+                <div class="flex items-center gap-3 mb-4 flex-wrap">
+                    <div class="flex items-center border border-gray-300 rounded-md overflow-hidden">
+                        <select id="ov-filter-select" class="px-3 py-2 bg-gray-50 border-r border-gray-300 text-sm outline-none">
+                            <option value="rule">规则编号</option>
+                            <option value="scene">对账场景</option>
+                            <option value="entity">财务主体</option>
+                            <option value="owner">责任人</option>
+                        </select>
+                        <input id="ov-filter-input" type="text" placeholder="请输入规则编号" class="px-3 py-2 text-sm outline-none w-64">
+                    </div>
+                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm flex items-center"><i data-lucide="search" class="w-4 h-4 mr-1"></i>搜索</button>
+                    <button class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm flex items-center"><i data-lucide="sliders-horizontal" class="w-4 h-4 mr-1"></i>高级筛选</button>
+                    <button class="ml-auto px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm flex items-center"><i data-lucide="plus" class="w-4 h-4 mr-1"></i>新增覆盖</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-200 rounded-lg">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">规则编号</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">对账场景</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体范围</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">差异类型</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">覆盖责任人</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">告警通道</th>
+                               <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">生效状态</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-800 font-mono text-xs">R-006-01</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">R-006 采购订单对账</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">星辉家装（北京）</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">金额不一致</td>
+                                <td class="px-4 py-3 text-sm text-gray-800">采购-张伟</td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs">京 ME</span></td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-green-50 text-green-600 text-xs">已生效</span></td>
+                         <td class="px-4 py-3 text-sm space-x-2"><button class="text-primary hover:underline">编辑</button><button class="text-red-500 hover:underline">停用</button></td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-800 font-mono text-xs">R-001-01</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">R-001 供应链↔交付域</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">全部主体</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">单边缺失（B→A）</td>
+                                <td class="px-4 py-3 text-sm text-gray-800">集成-李娜</td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs">京 ME</span></td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-green-50 text-green-600 text-xs">已生效</span></td>
+                                <td class="px-4 py-3 text-sm space-x-2"><button class="text-primary hover:underline">编辑</button><button class="text-red-500 hover:underline">停用</button></td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-800 font-mono text-xs">R-003-01</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">R-003 在建项目工费</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">星辉家装（上海）</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">金额不一致</td>
+                                <td class="px-4 py-3 text-sm text-gray-800">劳务-王芳</td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs">京 ME</span></td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-gray-100 text-gray-500 text-xs">已停用</span></td>
+                                <td class="px-4 py-3 text-sm space-x-2"><button class="text-primary hover:underline">编辑</button><button class="text-green-600 hover:underline">启用</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs text-gray-500 mt-3">覆盖顺序：⟨规则 + 财务主体 + 差异类型⟩ 精确匹配 > ⟨规则 + 差异类型⟩ > 系统侧默认层。停用状态的覆盖不参与匹配，直接落回默认层。</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function loadSidebar() {
+            fetch('common/sidebar.html')
+                .then(function (res) { return res.text(); })
+                .then(function (html) {
+                    document.getElementById('sidebar-container').innerHTML = html;
+                    var s = document.createElement('script');
+                    s.src = 'common/scripts.js';
+                    s.onload = function () {
+                        if (window.initCommonFunctions) window.initCommonFunctions('reconciliation-owner.html');
+                        if (window.lucide) lucide.createIcons();
+                    };
+                    document.body.appendChild(s);
+                });
+        }
+        function initTabs() {
+            var btns = document.querySelectorAll('.owner-tab-btn');
+            btns.forEach(function (b) {
+                b.addEventListener('click', function () {
+                    var target = b.getAttribute('data-tab');
+                    btns.forEach(function (x) {
+                        x.classList.remove('active', 'border-primary', 'text-primary');
+                        x.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    b.classList.add('active', 'border-primary', 'text-primary');
+                    b.classList.remove('border-transparent', 'text-gray-500');
+                    document.querySelectorAll('.owner-tab-content').forEach(function (c) { c.classList.add('hidden'); });
+                    document.getElementById('tab-' + target).classList.remove('hidden');
+                });
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            loadSidebar();
+            initTabs();
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+    <link rel="stylesheet" href="common/prd-viewer.css">
+    <script src="common/prd-viewer.js"></script>
+</body>
+</html>

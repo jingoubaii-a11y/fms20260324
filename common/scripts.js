@@ -64,6 +64,24 @@ function initMenu() {
     });
 }
 
+// 二级可折叠子菜单 (submenu-header + submenu-content)
+function initSubmenu() {
+    const submenuHeaders = document.querySelectorAll('.submenu-header');
+    submenuHeaders.forEach(header => {
+        function handleToggle(e) {
+            e.stopPropagation();
+            const name = header.getAttribute('data-submenu');
+            const content = document.getElementById(`${name}-content`);
+            const icon = header.querySelector('.submenu-icon');
+            if (content && icon) {
+                content.classList.toggle('hidden');
+                icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+        }
+        header.addEventListener('click', handleToggle);
+    });
+}
+
 // 高亮当前页面的导航项
 function highlightCurrentPage() {
     const currentPath = window.location.pathname;
@@ -73,7 +91,18 @@ function highlightCurrentPage() {
         const href = item.getAttribute('href');
         if (href && currentPath.includes(href)) {
             item.classList.add('active');
-            
+
+            // 展开包含当前页面的二级子菜单
+            const submenuContent = item.closest('.submenu-content');
+            if (submenuContent) {
+                submenuContent.classList.remove('hidden');
+                const submenuHeader = submenuContent.previousElementSibling;
+                if (submenuHeader) {
+                    const subIcon = submenuHeader.querySelector('.submenu-icon');
+                    if (subIcon) subIcon.style.transform = 'rotate(180deg)';
+                }
+            }
+
             // 展开包含当前页面的菜单
             const menuContent = item.closest('.menu-content');
             if (menuContent) {
@@ -210,6 +239,7 @@ function initCommonFunctions() {
             initLucideIcons();
             initSidebar();
             initMenu();
+            initSubmenu();
             highlightCurrentPage();
             initDrawers();
             initAdvancedFilter();

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>对账规则配置 - 财务中台</title>
+    <script src="common/tailwind.js"></script>
+    <script src="common/lucide.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: { 'sm': '4px', 'md': '8px', 'lg': '12px', 'xl': '16px' },
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="common/styles.css">
+    <style>
+        .meta-cell { display:flex; flex-direction:column; gap:2px; }
+        .meta-cell .label { font-size:11px; color:#9ca3af; }
+        .meta-cell .value { font-size:13px; color:#374151; font-weight:500; }
+        .tag { display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; font-size:11px; line-height:16px; }
+        .tag-blue { background:#e6f0ff; color:#003eb3; }
+        .tag-green { background:#ecfdf5; color:#059669; }
+        .tag-gray { background:#f3f4f6; color:#4b5563; }
+        .tag-amber { background:#fffbeb; color:#b45309; }
+        .tag-purple { background:#f3e8ff; color:#7c3aed; }
+        .tag-red { background:#fef2f2; color:#dc2626; }
+        .locked-hint { display:inline-flex; align-items:center; gap:4px; font-size:11px; color:#9ca3af; }
+        .locked-hint i { width:12px; height:12px; }
+        .param-editable { background:#fffbeb; }
+        .fixed-readonly { background:#f9fafb; }
+        .segment-title { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:600; color:#111827; }
+        .segment-title .num { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; background:#003eb3; color:#fff; font-size:12px; }
+        .seg-badge-fixed { background:#f3f4f6; color:#6b7280; padding:2px 8px; border-radius:4px; font-size:11px; }
+        .seg-badge-param { background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:4px; font-size:11px; }
+    </style>
+</head>
+<body class="bg-neutral">
+    <div class="flex h-screen">
+        <div id="sidebar-container"></div>
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="space-y-6">
+                <!-- 页头 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h1 class="text-xl font-semibold text-gray-800">对账规则配置</h1>
+                            <p class="text-sm text-gray-500 mt-2 leading-relaxed">
+                                对账规则采用<strong class="text-gray-700">"预置为主 + 参数化调优"</strong>治理模式：规则骨架（数据源、取数逻辑、匹配主键、成因判据）由研发预置固化，运营侧仅对参数化项（匹配字段勾选与校验级别、组织过滤、执行频率、差异金额阈值等 11 项）进行调优。每条规则唯一归属一个<strong>对账场景组（R-001~R-008）</strong>与一个<strong>对账模式（过程对账 / 单笔对账，仅展示不可切换）</strong>。
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                            <span class="tag tag-gray"><i data-lucide="lock" class="w-3 h-3 mr-1"></i>固定项 只读</span>
+                            <span class="tag tag-amber"><i data-lucide="edit-3" class="w-3 h-3 mr-1"></i>参数化项 可编辑</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 规则列表视图 -->
+                <div id="list-view" class="space-y-4">
+                    <!-- 筛选与操作条 -->
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex-1 flex items-center space-x-2">
+                                <select id="filter-select" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                                    <option value="code">规则编号</option>
+                                    <option value="name">规则名称</option>
+                                    <option value="scene">所属场景组</option>
+                                    <option value="mode">对账模式</option>
+                                    <option value="owner">责任人</option>
+                                </select>
+                                <input type="text" id="filter-input" placeholder="按规则编号搜索"
+                                       class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="搜索">
+                                    <i data-lucide="search" class="w-4 h-4"></i>
+                                </button>
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="刷新">
+                                    <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                </button>
+                                <button id="advanced-filter-btn" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center">
+                                高级筛选 <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                </button>
+                            </div>
+                            <div class="flex space-x-3">
+                                <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-sm flex items-center" title="仅 COE 可见，每小时至多 1 次">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i> 手动即时刷新（COE 专用）
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 高级筛选（默认隐藏） -->
+                        <div id="advanced-filter" class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 hidden">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">所属场景组</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary">
+                                    <option value="">全部</option>
+                                    <option>R-001 材料收发与领用</option>
+                                    <option>R-003 工费与劳务</option>
+                                    <option>R-006 供应商采购结算</option>
+                                    <option>R-007 客户合同与回款</option>
+                                    <option>R-008 项目核算与结转</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">对账模式</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary">
+                                    <option value="">全部</option>
+                                    <option>过程对账（实体粒度收口）</option>
+                                    <option>单笔对账（规则粒度收口）</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">执行频率</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary">
+                                    <option value="">全部</option>
+                                    <option>近实时（分钟级）</option>
+                                    <option>日频（每日凌晨）</option>
+                                    <option>月频（月末结账前）</option>
+                                    <option>按需 / 事件触发</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">启用状态</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary">
+                                    <option value="">全部</option>
+                                    <option>启用</option>
+                                    <option>停用</option>
+                                    <option>灰度中</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 规则列表卡片（元数据 5 栏 + 双版本号 + 状态 + 手工触发） -->
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="p-6 border-b border-gray-100">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-base font-semibold text-gray-800">规则清单</h2>
+                                    <p class="text-xs text-gray-500 mt-1">共 8 条规则（P0 场景 R-001 ~ R-008）· 元数据 5 栏 = 规则编号 / 规则名称 / 所属场景组 / 对账模式 / 责任人默认层</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divide-y divide-gray-100">
+                            <!-- 规则卡片 1：R-006-01 采购订单对账 -->
+                            <div class="p-6 hover:bg-gray-50/60 transition-colors">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="flex-1 grid grid-cols-2 md:grid-cols-5 gap-4">
+                                        <div class="meta-cell">
+                                            <span class="label">规则编号</span>
+                                            <span class="value">R-006-01</span>
+                                        </div>
+                                        <div class="meta-cell">
+                                            <span class="label">规则名称</span>
+                                            <span class="value">采购订单对账</span>
+                                        </div>
+                                       <div class="meta-cell">
+                                            <span class="label">所属场景组</span>
+                                            <span class="value"><span class="tag tag-blue">R-006 供应商采购结算</span></span>
+                                        </div>
+                                        <div class="meta-cell">
+                                            <span class="label">对账模式</span>
+                                            <span class="value"><span class="tag tag-purple">单笔对账（规则粒度）</span></span>
+                                        </div>
+                                        <div class="meta-cell">
+                                            <span class="label">责任人（默认层）</span>
+                                            <span class="value">采购结算岗 · 张三</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-end gap-2 min-w-[220px]">
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <span class="tag tag-gray">固定项 v1.0</span>
+                                            <span class="tag tag-amber">参数化 v1.3.5</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="tag tag-green"><i data-lucide="check-circle-2" class="w-3 h-3 mr-1"></i>启用中</span>
+                                            <span class="text-xs text-gray-400">近实时</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <button onclick="showEdit()" class="px-3 py-1.5 text-xs bg-primary text-white rounded-md hover:bg-blue-700">查看/编辑</button>
+                                            <button onclick="openManualTrigger('R-006-01')" class="px-3 py-1.5 text-xs bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50" title="手工触发一次对账运行，需填≥10字理由，单日≤5次">
+                                                <i data-lucide="play-circle" class="w-3 h-3 mr-1 inline"></i>手工触发
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 规则卡片 2：R-003-01 在建项目工费对账 -->
+                            <div class="p-6 hover:bg-gray-50/60 transition-colors">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="flex-1 grid grid-cols-2 md:grid-cols-5 gap-4">
+                                        <div class="meta-cell"><span class="label">规则编号</span><span class="value">R-003-01</span></div>
+                                        <div class="meta-cell"><span class="label">规则名称</span><span class="value">在建项目工费对账</span></div>
+                                        <div class="meta-cell"><span class="label">所属场景组</span><span class="value"><span class="tag tag-blue">R-003 工费与劳务</span></span></div>
+                                        <div class="meta-cell"><span class="label">对账模式</span><span class="value"><span class="tag tag-purple">单笔对账（规则粒度）</span></span></div>
+                                        <div class="meta-cell"><span class="label">责任人（默认层）</span><span class="value">工程结算岗 · 李四</span></div>
+                                    </div>
+                                    <div class="flex flex-col items-end gap-2 min-w-[220px]">
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <span class="tag tag-gray">固定项 v1.0</span>
+                                            <span class="tag tag-amber">参数化 v1.2.0</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="tag tag-green"><i data-lucide="check-circle-2" class="w-3 h-3 mr-1"></i>启用中</span>
+                                            <span class="text-xs text-gray-400">月频</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <button onclick="showEdit()" class="px-3 py-1.5 text-xs bg-primary text-white rounded-md hover:bg-blue-700">查看/编辑</button>
+                                            <button onclick="openManualTrigger('R-003-01')" class="px-3 py-1.5 text-xs bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
+                                                <i data-lucide="play-circle" class="w-3 h-3 mr-1 inline"></i>手工触发
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 规则卡片 3：R-001-01 材料收发金额核对（过程对账示例） -->
+                            <div class="p-6 hover:bg-gray-50/60 transition-colors">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="flex-1 grid grid-cols-2 md:grid-cols-5 gap-4">
+                                        <div class="meta-cell"><span class="label">规则编号</span><span class="value">R-001-01</span></div>
+                                        <div class="meta-cell"><span class="label">规则名称</span><span class="value">材料收发金额核对</span></div>
+                                        <div class="meta-cell"><span class="label">所属场景组</span><span class="value"><span class="tag tag-blue">R-001 材料收发与领用</span></span></div>
+                                        <div class="meta-cell"><span class="label">对账模式</span><span class="value"><span class="tag tag-blue">过程对账（实体粒度）</span></span></div>
+                                        <div class="meta-cell"><span class="label">责任人（默认层）</span><span class="value">材料核算岗 · 王五</span></div>
+                                    </div>
+                                    <div class="flex flex-col items-end gap-2 min-w-[220px]">
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <span class="tag tag-gray">固定项 v1.0</span>
+                                            <span class="tag tag-amber">参数化 v1.0.0</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="tag tag-gray">停用</span>
+                                            <span class="text-xs text-gray-400">日频</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <button onclick="showEdit()" class="px-3 py-1.5 text-xs bg-primary text-white rounded-md hover:bg-blue-700">查看/编辑</button>
+                                            <button class="px-3 py-1.5 text-xs bg-gray-100 text-gray-400 rounded-md cursor-not-allowed" disabled title="停用中，需先启用">
+                                                <i data-lucide="play-circle" class="w-3 h-3 mr-1 inline"></i>手工触发
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 规则编辑视图 -->
+                <div id="edit-view" class="hidden space-y-6">
+                    <!-- 编辑头：返回 / 规则标识 / 双版本号 / 对账模式 / 责任人双层 / 保存动作 -->
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex items-start gap-3">
+                                <button onclick="showList()" class="p-2 rounded-md hover:bg-gray-100 mt-1"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></button>
+                                <div>
+                                    <h1 class="text-lg font-semibold text-gray-800">R-006-01 · 采购订单对账</h1>
+                                    <div class="flex flex-wrap items-center gap-2 mt-2 text-xs">
+                                        <span class="tag tag-blue">R-006 供应商采购结算</span>
+                                        <span class="tag tag-purple">单笔对账（规则粒度）</span>
+                                        <span class="tag tag-gray">固定项 v1.0 · 研发预置</span>
+                                        <span class="tag tag-amber">参数化 v1.3.5 · 运营调优</span>
+                                        <span class="tag tag-green"><i data-lucide="check-circle-2" class="w-3 h-3 mr-1"></i>启用中</span>
+                                    </div>
+                                    <p class="text-xs text-gray-400 mt-2">最近修改：2026-08-10 15:22 · 张三（采购结算岗）· 参数化项 v1.3.4→v1.3.5，调整税率容差 0.00→0.01</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="px-3 py-2 bg-white border border-gray-300 text-gray-700 rounded-md text-sm hover:bg-gray-50 flex items-center">
+                                    <i data-lucide="history" class="w-4 h-4 mr-1"></i>版本历史
+                                </button>
+                                <button onclick="openManualTrigger('R-006-01')" class="px-3 py-2 bg-white border border-gray-300 text-gray-700 rounded-md text-sm hover:bg-gray-50 flex items-center">
+                                    <i data-lucide="play-circle" class="w-4 h-4 mr-1"></i>手工触发
+                                </button>
+                                <button onclick="showList()" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm">取消</button>
+                                <button onclick="showList()" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm">保存参数化项</button>
+                            </div>
+                        </div>
+
+                        <!-- Tab 切换：配置视图 / 版本历史 -->
+                        <div class="mt-6 border-b border-gray-200 flex items-center gap-6 text-sm">
+                            <button onclick="switchTab('config')" id="tab-config" class="pb-3 border-b-2 border-primary text-primary font-medium">规则配置（七段）</button>
+                            <button onclick="switchTab('history')" id="tab-history" class="pb-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700">版本历史</button>
+                        </div>
+                    </div>
+
+                    <!-- 面板：规则配置（七段） -->
+                    <div id="panel-config" class="space-y-6">
+
+                    <!-- 责任人配置双层（PRD §1.4.2：默认层=上游岗位/角色 1 字段；覆盖层按成因分类细分） -->
+                    <div class="bg-white rounded-lg shadow-sm p-6 param-editable">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="segment-title">
+                                <span class="num"><i data-lucide="user-cog" class="w-4 h-4"></i></span>
+                                <span>责任人配置（默认层 + 覆盖层）</span>
+                            </div>
+                            <span class="seg-badge-param"><i data-lucide="edit-3" class="w-3 h-3 inline mr-1"></i>参数化项 · 运营调优</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="border border-gray-200 rounded-md p-4 bg-white">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-800">默认层（规则级兜底）</span>
+                                    <span class="text-xs text-gray-400">整条规则兜底</span>
+                                </div>
+                                <div class="mt-3 space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <label class="text-xs text-gray-500 w-20">岗位（角色）</label>
+                                        <select class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary bg-white">
+                                            <option>采购结算岗（对应上游供应链系统）</option>
+                                            <option>财务共享岗（对应上游凭证/资金系统）</option>
+                                            <option>业财 BP 岗（对应上游预算/成本系统）</option>
+                                        </select>
+                                    </div>
+                                    <p class="text-xs text-gray-400 leading-relaxed mt-2">默认层只维护"上游数据来源系统对应岗位"1 个字段；具体到人由岗位→用户的组织权限体系自动带出，不在此处配置。</p>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 rounded-md p-4 bg-white">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-800">覆盖层（按成因分类细分）</span>
+                                    <button class="px-2 py-1 text-xs bg-secondary text-primary rounded hover:bg-blue-100"><i data-lucide="plus" class="w-3 h-3 inline"></i> 新增覆盖项</button>
+                                </div>
+                                <table class="w-full mt-3 text-xs">
+                                    <thead class="text-gray-500">
+                                        <tr class="border-b border-gray-100"><th class="text-left py-2 font-normal w-36">成因分类</th><th class="text-left py-2 font-normal">承接岗位</th><th class="w-8"></th></tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 text-gray-700">
+                                        <tr><td class="py-2">漏推-源侧未同步</td><td class="py-2">供应链数据同步岗</td><td><button class="text-gray-400 hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button></td></tr>
+                                        <tr><td class="py-2">源侧删单</td><td class="py-2">采购结算岗</td><td><button class="text-gray-400 hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button></td></tr>
+                                        <tr><td class="py-2">主数据未对齐</td><td class="py-2">主数据治理岗</td><td><button class="text-gray-400 hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button></td></tr>
+                                        <tr><td class="py-2">规则参数误伤</td><td class="py-2">对账规则运营岗（COE）</td><td><button class="text-gray-400 hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button></td></tr>
+                                    </tbody>
+                                </table>
+                                <p class="text-xs text-gray-400 leading-relaxed mt-2">责任人在差异管理侧打标成因后，未闭环差异自动路由到对应岗位；未覆盖的成因回落默认层。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ① 数据源（固定项，只读） -->
+                    <div class="bg-white rounded-lg shadow-sm p-6 fixed-readonly">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="segment-title"><span class="num">1</span><span>数据源（双侧）</span></div>
+                            <span class="seg-badge-fixed"><i data-lucide="lock" class="w-3 h-3 inline mr-1"></i>固定项 · 研发预置</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="border border-gray-200 rounded-md p-4 bg-white">
+                                <div class="text-xs text-gray-500 mb-2">A 侧（源）</div>
+                                <div class="font-medium text-gray-800">积木云-供应链</div>
+                                <div class="mt-2 text-xs text-gray-500 leading-relaxed">范围：采购订单主表 + 明细行，含审核态与已作废态，取数按订单业务时间口径。</div>
+                            </div>
+                            <div class="border border-gray-200 rounded-md p-4 bg-white">
+                                <div class="text-xs text-gray-500 mb-2">B 侧（目标）</div>
+                                <div class="font-medium text-gray-800">金蝶 · 采购订单模块</div>
+                           <div class="mt-2 text-xs text-gray-500 leading-relaxed">范围：应付暂估底表对应的采购订单条目，含入账态与冲销态。</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ② 取数逻辑（固定项，只读） -->
+                    <div class="bg-white rounded-lg shadow-sm p-6 fixed-readonly">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="segment-title"><span class="num">2</span><span>取数逻辑</span></div>
+                            <span class="seg-badge-fixed"><i data-lucide="lock" class="w-3 h-3 inline mr-1"></i>固定项 · 研发预置</span>
+                        </div>
+                        <ul class="text-sm text-gray-700 space-y-2 leading-relaxed list-disc pl-5">
+                            <li>A 侧取数：以采购订单审核通过时间落在对账期间内为准；作废单按最终态识别，同期作废归位为"源侧删单"。</li>
+                            <li>B 侧取数：以金蝶采购订单入账日期落在对账期间内为准；冲销条目按最终净额归位。</li>
+                            <li>期间口径：按对账期间（如自然月）左闭右闭；跨月单据以最终态所在期间归位，避免重复计入。</li>
+                            <li>不参与取数：审核态未通过、暂存态、临时草稿、以及被业务标注"非结算范围"的条目。</li>
+                        </ul>
+                    </div>
+
+                    <!-- ③ 匹配主键（固定项，只读） -->
+                    <div class="bg-white rounded-lg shadow-sm p-6 fixed-readonly">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="segment-title"><span class="num">3</span><span>匹配主键</span></div>
+                            <span class="seg-badge-fixed"><i data-lucide="lock" class="w-3 h-3 inline mr-1"></i>固定项 · 研发预置</span>
+                        </div>
+                        <div class="border border-gray-200 rounded-md p-4 bg-white">
+                            <div class="text-sm font-medium text-gray-800">财务主体 + 采购订单号 + 物料编码</div>
+                            <p class="text-xs text-gray-500 mt-2 leading-relaxed">主键相同的两侧记录视为同一笔业务，进入匹配字段比对；主键在任一侧缺失将直接判为<strong>单边缺失</strong>差异并按"漏推-源侧未同步"或"源侧删单"归因。</p>
+                        </div>
+                    </div>
+
+                    <!-- ④ 匹配字段与校验级别（参数化项，可编辑） -->
+                    <div class="bg-white rounded-lg shadow-sm p-6 param-editable">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="segment-title"><span class="num">4</span><span>匹配字段与校验级别</span></div>
+                            <span class="seg-badge-param"><i data-lucide="edit-3" class="w-3 h-3 inline mr-1"></i>参数化项 · 运营调优</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full border border-gray-200 rounded-lg text-sm bg-white">
+                                <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left w-14">参与</th>
+                                        <th class="px-3 py-2 text-left">字段</th>
+                                        <th class="px-3 py-2 text-left">A 侧</th>
+                                        <th class="px-3 py-2 text-left">B 侧</th>
+                                        <th class="px-3 py-2 text-left w-40">校验级别</th>
+                                        <th class="px-3 py-2 text-left w-28">容差</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-3 py-2"><input type="checkbox" checked class="w-4 h-4 accent-primary"></td>
+                                        <td class="px-3 py-2">数量</td>
+                                        <td class="px-3 py-2 text-gray-500">采购数量</td>
+                                        <td class="px-3 py-2 text-gray-500">qty</td>
+                                        <td class="px-3 py-2"><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs"><option>精准匹配（强校验）</option><option>差异提示（弱校验）</option></select></td>
+                                      <td class="px-3 py-2"><input type="number" value="0" class="w-20 px-2 py-1.5 border border-gray-300 rounded-md text-xs"></td>
+                                    </tr>
+                                    <tr>
+                                      <td class="px-3 py-2"><input type="checkbox" checked class="w-4 h-4 accent-primary"></td>
+                                        <td class="px-3 py-2">税率</td>
+                                        <td class="px-3 py-2 text-gray-500">tax_rate</td>
+                                        <td class="px-3 py-2 text-gray-500">tax_rate</td>
+                                        <td class="px-3 py-2"><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs"><option>精准匹配（强校验）</option><option>差异提示（弱校验）</option></select></td>
+                                        <td class="px-3 py-2"><input type="number" value="0.01" step="0.01" class="w-20 px-2 py-1.5 border border-gray-300 rounded-md text-xs"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2"><input type="checkbox" checked class="w-4 h-4 accent-primary"></td>
+                                        <td class="px-3 py-2">价税合计</td>
+                                        <td class="px-3 py-2 text-gray-500">amount_tax</td>
+                                        <td class="px-3 py-2 text-gray-500">amount</td>
+                                        <td class="px-3 py-2"><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs"><option>精准匹配（强校验）</option><option>差异提示（弱校验）</option></select></td>
+                                        <td class="px-3 py-2"><input type="number" value="0.01" step="0.01" class="w-20 px-2 py-1.5 border border-gray-300 rounded-md text-xs"></td>
+                                    </tr>
+                                    <tr class="bg-amber-50/40">
+                                        <td class="px-3 py-2"><input type="checkbox" checked class="w-4 h-4 accent-primary"></td>
+                                        <td class="px-3 py-2">供应商</td>
+                                        <td class="px-3 py-2 text-gray-500">supplier_name</td>
+                                        <td class="px-3 py-2 text-gray-500">vendor_name</td>
+                                        <td class="px-3 py-2"><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs"><option selected>差异提示（弱校验）</option><option>精准匹配（强校验）</option></select></td>
+                                    <td class="px-3 py-2 text-xs text-gray-400">—</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 leading-relaxed">对账结论：所有<strong>强校验</strong>字段通过（含容差）→ 对账成功；任一强校验字段超容差 → 对账失败并生成差异明细；<strong>弱校验</strong>字段差异仅随明细标记，不计入差异金额、不触发金额预警。</p>
+                    </div>
+
+                    <!-- ⑤ 组织过滤（参数化项，可编辑） -->
+                    <div class="bg-white rounded-lg shadow-sm p-6 param-editable">
+                      <div class="flex items-center justify-between mb-4">
+                            <div class="segment-title"><span class="num">5</span><span>组织过滤</span></div>
+                            <div class="flex items-center gap-3">
+                                <span class="seg-badge-param"><i data-lucide="edit-3" class="w-3 h-3 inline mr-1"></i>参数化项 · 运营调优</span>
+                                <label class="flex items-center gap-2 text-sm text-gray-600"><input type="checkbox" checked class="w-4 h-4 accent-primary">启用组织过滤</label>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">组织维度</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary bg-white"><option>财务主体</option><option>法人</option><option>品牌</option><option>区域</option><option>门店</option></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">过滤方式</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary bg-white"><option>包含清单（白名单）</option><option>排除清单（黑名单）</option></select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs text-gray-500 mb-1">组织清单</label>
+                                <div class="flex items-center border border-gray-300 rounded-md px-2 py-2 bg-white">
+                                    <span class="tag tag-blue mr-2">华东-上海</span>
+                                    <span class="tag tag-blue mr-2">华南-深圳</span>
+                                    <input type="text" placeholder="模糊搜索/弹框选择组织" class="flex-1 text-sm outline-none bg-transparent">
+                                    <i data-lucide="search" class="w-4 h-4 text-gray-400 cursor-pointer"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ⑥ 执行配置（参数化项）：规则启用总开关 + 自动定时开关（联动频率档位）+ 业务时间过滤（相对区间选择器）+ 双阈值预警 + 推送人清单 -->
+                    <div class="bg-white rounded-lg shadow-sm p-6 param-editable">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="segment-title"><span class="num">6</span><span>执行配置</span></div>
+                          <span class="seg-badge-param"><i data-lucide="edit-3" class="w-3 h-3 inline mr-1"></i>参数化项 · 运营调优</span>
+                        </div>
+
+                        <!-- 6.1 规则启用/停用 + 自动定时（顶部总开关，覆盖 PRD §1.1.4 第 7 项 + §1.3.1） -->
+                        <div class="bg-gradient-to-r from-blue-50 to-white border border-blue-100 rounded-md p-4 mb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-medium text-gray-800">规则启用/停用</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" checked class="sr-only peer" id="sw-rule-enable">
+                                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                                        </label>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-2 leading-relaxed">启用=按下方配置调度；停用=停止一切执行来源，遗留未闭环差异按存量策略处置（取代原"生效期"概念）。</p>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-medium text-gray-800">自动定时执行</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" checked class="sr-only peer" id="sw-auto-cron">
+                                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                                        </label>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-2 leading-relaxed">开=按下方频率档位到点自动跑；关=规则仍在线，只等按需调用/手工触发，不自动跑。默认「关」，需 COE 明确开启。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-2">频率档位 <span class="text-gray-400">（仅当"自动定时执行=开"时可选）</span></label>
+                                    <div class="flex flex-col gap-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md p-3">
+                                        <label class="flex items-center gap-2"><input type="radio" name="freq" checked class="accent-primary">分钟级（每 10 分钟，资金类差异敏感场景）</label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="freq" class="accent-primary">每日凌晨（T+1，通用默认）</label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="freq" class="accent-primary">月末次日凌晨（结账收口场景）</label>
+                                    </div>
+                                    <p class="text-xs text-gray-400 mt-1">三档下拉不开放自定义时点；"自动定时=关"时此块灰化。</p>
+                                </div>
+                                <div class="bg-white border border-gray-200 rounded-md p-3 space-y-2">
+                                    <label class="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked class="w-4 h-4 accent-primary">启用双向对账（A→B 与 B→A 均检查单边缺失）</label>
+                                    <label class="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked class="w-4 h-4 accent-primary">启用闭环重对（差异闭环后自动再跑一次校验）</label>
+                                    <label class="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" class="w-4 h-4 accent-primary">允许手动重对（责任人可主动重跑单条对账单元）</label>
+                                </div>
+                                <div class="bg-white border border-gray-200 rounded-md p-3">
+                                    <div class="text-sm font-medium text-gray-800 mb-2">业务时间过滤</div>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center gap-2">
+                                            <label class="text-xs text-gray-500 w-20">时间字段</label>
+                                            <input type="text" value="订单业务日期（模板预置，不可改）" disabled class="flex-1 px-3 py-1.5 border border-gray-200 rounded-md text-sm bg-gray-50 text-gray-500">
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <label class="text-xs text-gray-500 w-20">时间区间</label>
+                                            <select class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary bg-white">
+                                                <option>本日</option>
+                                                <option>本周</option>
+                                                <option selected>本月</option>
+                                                <option>本季</option>
+                                                <option>本年</option>
+                                                <option>上月</option>
+                                                <option>上季</option>
+                                                <option>最近 N 天（默认 30）</option>
+                                                <option>滚动窗口（截止今日）</option>
+                                                <option>全量（一次性）</option>
+                                            </select>
+                                </div>
+                                    </div>
+                                    <p class="text-xs text-gray-400 mt-2">10 档相对区间预设，运营可切换；不再使用固定日期段"生效期"。</p>
+                                </div>
+                            </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="bg-white border border-gray-200 rounded-md p-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-medium text-gray-800">差异金额双阈值预警</span>
+                                        <label class="flex items-center gap-2 text-xs text-gray-600"><input type="checkbox" checked class="w-4 h-4 accent-primary">启用</label>
+                                    </div>
+                                    <div class="mt-3 space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">单条差异阈值（≥ 该金额立即推送）</label>
+                                            <div class="flex items-center gap-2"><input type="number" value="50000" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"><span class="text-xs text-gray-500">元</span></div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">当日累计阈值（当日新增差额合计≥ 该金额触发汇总推送）</label>
+                                            <div class="flex items-center gap-2"><input type="number" value="200000" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"><span class="text-xs text-gray-500">元</span></div>
+                                        </div>
+                                        <p class="text-xs text-gray-400">两阈值互相独立，命中任一即通过<strong>京 ME</strong> 推送指定人；预警不阻断对账执行。</p>
+                                    </div>
+                                </div>
+                                <div class="bg-white border border-gray-200 rounded-md p-3">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm font-medium text-gray-800">推送人清单</span>
+                                        <button class="text-xs text-primary hover:underline"><i data-lucide="plus" class="w-3 h-3 inline"></i> 新增</button>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="tag tag-blue">张三（默认责任人）<i data-lucide="x" class="w-3 h-3 ml-1 cursor-pointer"></i></span>
+                                        <span class="tag tag-blue">李四（业财 BP）<i data-lucide="x" class="w-3 h-3 ml-1 cursor-pointer"></i></span>
+                                        <span class="tag tag-blue">王五（业财 BP）<i data-lucide="x" class="w-3 h-3 ml-1 cursor-pointer"></i></span>
+                                    </div>
+                                    <p class="text-xs text-gray-400 mt-2">默认自动带入本规则责任人（默认层+覆盖层去重合并），可手工增删。</p>
+                                </div>
+                                <div class="bg-white border border-gray-200 rounded-md p-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-medium text-gray-800">噪声防控</span>
+                                        <label class="flex items-center gap-2 text-xs text-gray-600"><input type="checkbox" class="w-4 h-4 accent-primary">总开关（默认关闭）</label>
+                                    </div>
+                                    <ul class="mt-2 text-xs text-gray-500 space-y-1 list-disc pl-4 leading-relaxed">
+                                        <li>规则级总开关：默认关闭，运营侧上线新规则前不推送。</li>
+                                        <li>首次运行 3 天静默期：新启用规则的差异不触发预警，仅静默入库。</li>
+                                        <li>熔断机制：单日新增差异数 &gt; 阈值时自动进入观察态（一期不实施，二期评估）。</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ⑦ 成因判据（固定项，只读；6 项枚举展示，一期不做系统自动初判） -->
+                    <div class="bg-white rounded-lg shadow-sm p-6 fixed-readonly">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="segment-title"><span class="num">7</span><span>成因判据（6 项枚举）</span></div>
+                            <span class="seg-badge-fixed"><i data-lucide="lock" class="w-3 h-3 inline mr-1"></i>固定项 · 研发预置</span>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-100 rounded-md p-3 text-xs text-amber-800 leading-relaxed mb-3">
+                            <i data-lucide="info" class="w-3.5 h-3.5 inline mr-1"></i>
+                            一期<strong>不做系统自动初判</strong>：本表仅锁定统一术语与语义边界，成因由责任人在<strong>差异管理菜单</strong>逐条打标，系统不预填、不推断。
+                        </div>
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                                <tr>
+                                    <th class="px-3 py-2 text-left w-40">成因枚举</th>
+                                    <th class="px-3 py-2 text-left">语义边界（What）</th>
+                                    <th class="px-3 py-2 text-left">典型举例</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 text-gray-700">
+                                <tr><td class="px-3 py-2 font-medium">漏推-源侧未同步</td><td class="px-3 py-2 text-xs leading-relaxed">主键仅存在于目标侧、源侧无对应记录；责任人经排查确认源单据在业务系统已生成但未流转到目标侧。</td><td class="px-3 py-2 text-xs text-gray-500">供应链已生成审核态订单，凭证侧未落表</td></tr>
+                                <tr><td class="px-3 py-2 font-medium">源侧删单</td><td class="px-3 py-2 text-xs leading-relaxed">源侧记录已作废/删除，目标侧存留原条目；责任人经排查确认源侧作废动作未联动清理目标侧。</td><td class="px-3 py-2 text-xs text-gray-500">供应链撤销采购订单，凭证侧未反向冲销</td></tr>
+                                <tr><td class="px-3 py-2 font-medium">主数据未对齐</td><td class="px-3 py-2 text-xs leading-relaxed">双侧主键匹配，但组织/供应商/物料等主数据映射不一致；责任人经排查确认主数据侧映射未及时同步。</td><td class="px-3 py-2 text-xs text-gray-500">同一供应商在两侧编码不同</td></tr>
+                                <tr><td class="px-3 py-2 font-medium">规则参数误伤</td><td class="px-3 py-2 text-xs leading-relaxed">差异长期不闭环且差额稳定在容差临界值附近；责任人经排查确认容差/校验级别配置偏严。</td><td class="px-3 py-2 text-xs text-gray-500">税率四舍五入尾差被反复识别为差异</td></tr>
+                                <tr><td class="px-3 py-2 font-medium">跨期正常波动</td><td class="px-3 py-2 text-xs leading-relaxed">差异首次识别于对账期末、下期首日自动归零，属于期间切换正常时滞。</td><td class="px-3 py-2 text-xs text-gray-500">月末最后一日入库、次月首日冲对</td></tr>
+                                <tr><td class="px-3 py-2 font-medium">其他</td><td class="px-3 py-2 text-xs leading-relaxed">责任人在差异管理里选择"其他"并必填备注，用于沉淀二期规则演进的输入。</td><td class="px-3 py-2 text-xs text-gray-500">上游系统临时故障导致的偶发�差异</td></tr>
+                            </tbody>
+                        </table>
+                        <p class="text-xs text-gray-400 mt-3">成因枚举每季度由研发+业务复核一次，一期不开放运营侧自助修改（避免规则骨架漂移）。</p>
+                    </div>
+                    </div>
+
+                    <!-- 面板：版本历史（默认隐藏） -->
+                    <div id="panel-history" class="hidden bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-base font-semibold text-gray-800">版本历史</h2>
+                            <span class="text-xs text-gray-500">固定项 v1.0（未变更） · 参数化项已发布 4 版</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left">版本号</th>
+                                        <th class="px-3 py-2 text-left">类型</th>
+                                        <th class="px-3 py-2 text-left">变更摘要</th>
+                                        <th class="px-3 py-2 text-left">修改人</th>
+                                      <th class="px-3 py-2 text-left">发布时间</th>
+                                        <th class="px-3 py-2 text-left w-24">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 text-gray-700">
+                                    <tr><td class="px-3 py-2 font-medium">参数化 v1.3.5</td><td class="px-3 py-2"><span class="tag tag-amber">参数化</span></td><td class="px-3 py-2 text-xs">税率容差 0.00→0.01，减少税率四舍五入误伤</td><td class="px-3 py-2">张三</td><td class="px-3 py-2 text-xs text-gray-500">2026-08-10 15:22</td><td class="px-3 py-2"><button class="text-primary text-xs hover:underline">对比</button></td></tr>
+                                    <tr><td class="px-3 py-2">参数化 v1.3.4</td><td class="px-3 py-2"><span class="tag tag-amber">参数化</span></td><td class="px-3 py-2 text-xs">新增"华南-深圳"组织覆盖责任人为王五</td><td class="px-3 py-2">李四</td><td class="px-3 py-2 text-xs text-gray-500">2026-07-28 10:04</td><td class="px-3 py-2"><button class="text-primary text-xs hover:underline">对比</button></td></tr>
+                                    <tr><td class="px-3 py-2">参数化 v1.3.0</td><td class="px-3 py-2"><span class="tag tag-amber">参数化</span></td><td class="px-3 py-2 text-xs">差异金额单条阈值 10 万→5 万；启用双阈值预警</td><td class="px-3 py-2">张三</td><td class="px-3 py-2 text-xs text-gray-500">2026-06-15 09:11</td><td class="px-3 py-2"><button class="text-primary text-xs hover:underline">对比</button></td></tr>
+                                    <tr><td class="px-3 py-2">固定项 v1.0</td><td class="px-3 py-2"><span class="tag tag-gray">固定项</span></td><td class="px-3 py-2 text-xs">首次预置：数据源/取数逻辑/主键/成因判据全部锁定</td><td class="px-3 py-2">研发·COE</td><td class="px-3 py-2 text-xs text-gray-500">2026-05-01 00:00</td><td class="px-3 py-2"><button class="text-primary text-xs hover:underline">对比</button></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 手工触发弹窗 -->
+    <div id="manual-trigger-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-[480px] max-w-[92vw]">
+            <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="text-base font-semibold text-gray-800">手工触发对账运行</h3>
+                <button onclick="closeManualTrigger()" class="p-1 rounded hover:bg-gray-100"><i data-lucide="x" class="w-4 h-4 text-gray-500"></i></button>
+            </div>
+            <div class="p-5 space-y-3">
+                <div class="text-xs text-gray-500 leading-relaxed bg-amber-50 border border-amber-100 rounded-md p-3">
+                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5 inline text-amber-500 mr-1"></i>
+                    手工触发用于紧急核账场景，会产生一次独立执行批次并计入对账结果留痕。单日单规则最多 <strong>5 次</strong>，且不影响下一次定时执行窗口。
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">触发理由（必填，不少于 10 字）</label>
+                    <textarea rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary" placeholder="例如：月末结账临时补对 8 月 15 日发现的 3 笔材料入库异常"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">对账期间（可选，默认沿用规则口径）</label>
+                    <input type="text" placeholder="如 2026-08 或 2026-08-01 ~ 2026-08-15" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                </div>
+                <div class="text-xs text-gray-400">今日已触发 1 次，本次触发后剩余 3 次。</div>
+            </div>
+            <div class="p-5 border-t border-gray-100 flex justify-end gap-2">
+                <button onclick="closeManualTrigger()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200">取消</button>
+                <button onclick="closeManualTrigger()" class="px-4 py-2 bg-primary text-white rounded-md text-sm hover:bg-blue-700">确认触发</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showEdit() {
+            document.getElementById('list-view').classList.add('hidden');
+            document.getElementById('edit-view').classList.remove('hidden');
+            window.scrollTo(0, 0);
+            if (window.lucide) lucide.createIcons();
+        }
+        function showList() {
+            document.getElementById('edit-view').classList.add('hidden');
+            document.getElementById('list-view').classList.remove('hidden');
+        }
+        function switchTab(name) {
+            var map = { config: 'tab-config', history: 'tab-history' };
+            Object.keys(map).forEach(function (k) {
+                var el = document.getElementById(map[k]);
+                if (!el) return;
+                if (k === name) {
+                    el.className = 'pb-3 border-b-2 border-primary text-primary font-medium';
+                } else {
+                    el.className = 'pb-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700';
+                }
+            });
+            ['panel-config', 'panel-history'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            // 责任人卡片挂在 panel-config 内，随 panel-config 一起显隐
+            var target = document.getElementById('panel-' + name);
+            if (target) target.classList.remove('hidden');
+        }
+        function openManualTrigger(ruleCode) {
+            document.getElementById('manual-trigger-modal').classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
+        function closeManualTrigger() {
+            document.getElementById('manual-trigger-modal').classList.add('hidden');
+        }
+        document.getElementById('advanced-filter-btn').addEventListener('click', function () {
+            document.getElementById('advanced-filter').classList.toggle('hidden');
+        });
+
+        function loadSidebar() {
+            fetch('common/sidebar.html')
+                .then(function (res) { return res.text(); })
+                .then(function (html) {
+                    document.getElementById('sidebar-container').innerHTML = html;
+                    var s = document.createElement('script');
+                    s.src = 'common/scripts.js';
+                    s.onload = function () {
+                        if (window.initCommonFunctions) window.initCommonFunctions('reconciliation-rule.html');
+                        if (window.lucide) lucide.createIcons();
+                    };
+                    document.body.appendChild(s);
+                });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            loadSidebar();
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+
+    <link rel="stylesheet" href="common/prd-viewer.css">
+    <script src="common/prd-viewer.js"></script>
+</body>
+</html>

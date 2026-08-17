@@ -134,6 +134,39 @@
                     <i data-lucide="edit-3" class="sidebar-icon w-4 h-4 mr-3"></i>
                     <span class="sidebar-text">收入成本调整</span>
                 </a>
+
+                <!-- 售后维修计提（含子菜单） -->
+                <div class="sidebar-submenu">
+                    <div class="sidebar-item submenu-header flex items-center justify-between px-4 py-2 text-white/90 hover:text-white rounded-md cursor-pointer" data-submenu="after-sales-sub">
+                        <div class="flex items-center">
+                            <i data-lucide="wrench" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">售后维修计提</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="submenu-icon w-3.5 h-3.5 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="submenu-content pl-6" id="after-sales-sub-content">
+                        <a href="after-sales-accrual.html" class="sidebar-item flex items-center px-4 py-1.5 text-white/80 hover:text-white rounded-md text-sm">
+                            <i data-lucide="layout-dashboard" class="sidebar-icon w-3.5 h-3.5 mr-2"></i>
+                            <span class="sidebar-text">计提工作台</span>
+                        </a>
+                        <a href="accrual-rate.html" class="sidebar-item flex items-center px-4 py-1.5 text-white/80 hover:text-white rounded-md text-sm">
+                            <i data-lucide="percent" class="sidebar-icon w-3.5 h-3.5 mr-2"></i>
+                            <span class="sidebar-text">计提比例配置</span>
+                        </a>
+                        <a href="warranty-period.html" class="sidebar-item flex items-center px-4 py-1.5 text-white/80 hover:text-white rounded-md text-sm">
+                            <i data-lucide="shield-check" class="sidebar-icon w-3.5 h-3.5 mr-2"></i>
+                            <span class="sidebar-text">质保年限维护</span>
+                        </a>
+                        <a href="after-sales-balance.html" class="sidebar-item flex items-center px-4 py-1.5 text-white/80 hover:text-white rounded-md text-sm">
+                            <i data-lucide="wallet" class="sidebar-icon w-3.5 h-3.5 mr-2"></i>
+                            <span class="sidebar-text">预计负债余额表</span>
+                        </a>
+                        <a href="after-sales-init.html" class="sidebar-item flex items-center px-4 py-1.5 text-white/80 hover:text-white rounded-md text-sm">
+                            <i data-lucide="database" class="sidebar-icon w-3.5 h-3.5 mr-2"></i>
+                            <span class="sidebar-text">数据初始化</span>
+                  </a>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -165,6 +198,32 @@
                         <a href="receipt.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md" style="display: none;">
                             <i data-lucide="cash" class="sidebar-icon w-4 h-4 mr-3"></i>
                             <span class="sidebar-text">收款单</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 对账中心 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="reconciliation">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">对账中心</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="reconciliation-content">
+                        <a href="reconciliation-dashboard.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="layout-dashboard" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">对账看板</span>
+                        </a>
+                        <a href="reconciliation-diff.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="alert-triangle" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">差异管理</span>
+                        </a>
+                        <a href="reconciliation-result.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="clipboard-check" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">对账结果</span>
+                        </a>
+                        <a href="reconciliation-rule.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="settings-2" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">规则配置</span>
                         </a>
                     </div>
                 </div>

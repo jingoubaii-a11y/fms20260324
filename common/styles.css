@@ -66,6 +66,19 @@ body {
     color: rgba(255, 255, 255, 0.7);
 }
 
+/* 二级子菜单样式 */
+.submenu-content {
+    border-left: 1px solid rgba(255,255,255,0.15);
+    margin-left: 12px;
+    margin-top: 2px;
+}
+.submenu-header {
+    user-select: none;
+}
+.submenu-content .sidebar-item.active {
+    background: rgba(255,255,255,0.15);
+}
+
 .drawer {
     transition: transform 0.3s ease-in-out;
     transform: translateX(100%);

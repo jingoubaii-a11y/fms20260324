@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>差异明细 - 对账中心</title>
+    <script src="common/tailwind.js"></script>
+    <script src="common/lucide.min.js"></script>
+    <link rel="stylesheet" href="common/styles.css">
+    <script>
+        tailwind.config = { theme: { extend: { colors: { primary: '#003eb3', secondary: '#e6f0ff' } } } };
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div class="flex min-h-screen">
+        <div id="sidebar-container"></div>
+        <main class="flex-1 ml-64 p-6">
+            <!-- 页头工具条 -->
+            <div class="bg-white rounded-lg shadow-sm p-4 mb-6 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <a href="reconciliation-result.html" class="p-2 rounded-md hover:bg-gray-100"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></a>
+                    <div>
+                        <h1 class="text-lg font-semibold text-gray-800">差异明细 · DIFF-20260531-0012</h1>
+                        <p class="text-xs text-gray-500 mt-0.5">R-006 采购订单对账 · 规则 R-006-01 · 对账期间 2026-05</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm">退回来源系统修正</button>
+                    <button class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm">转派责任人</button>
+                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm">标记已解决</button>
+                </div>
+            </div>
+
+            <!-- 差异摘要 -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <div class="text-xs text-gray-500">校验级别</div>
+                    <div class="mt-1"><span class="px-2 py-0.5 rounded bg-red-50 text-red-600 text-sm font-medium">强校验（STRICT）</span></div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <div class="text-xs text-gray-500">差异类型</div>
+                    <div class="text-sm font-medium text-gray-800 mt-1">金额不一致</div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <div class="text-xs text-gray-500">差异额</div>
+                    <div class="text-sm font-bold text-red-600 mt-1">+20.00</div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <div class="text-xs text-gray-500">状态 / 责任人</div>
+                    <div class="text-sm font-medium text-gray-800 mt-1">待处理 · 采购-张伟</div>
+                </div>
+            </div>
+
+            <!-- 双侧逐字段比对 -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h2 class="text-base font-semibold text-gray-800 flex items-center mb-4"><span class="w-1 h-4 bg-primary rounded mr-2"></span>双侧逐字段比对</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-200 rounded-lg">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">匹配维度</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">校验级别</th>
+                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">A 侧（金蝶采购订单）</th>
+                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">B 侧（中台采购单）</th>
+                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">容差</th>
+                                <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">结果</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-4 py-3 text-sm text-gray-800">数量</td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-red-50 text-red-600 text-xs">强校验</span></td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-800">100</td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-800">100</td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-500">0</td>
+                                <td class="px-4 py-3 text-center"><i data-lucide="check" class="w-4 h-4 text-green-500 inline"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 text-sm text-gray-800">税率</td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-red-50 text-red-600 text-xs">强校验</span></td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-800">13%</td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-800">13%</td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-500">0</td>
+                                <td class="px-4 py-3 text-center"><i data-lucide="check" class="w-4 h-4 text-green-500 inline"></i></td>
+                            </tr>
+                            <tr class="bg-red-50/40">
+                                <td class="px-4 py-3 text-sm text-gray-800 font-medium">价税合计</td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-red-50 text-red-600 text-xs">强校验</span></td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-800 font-medium">12,600.00</td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-800 font-medium">12,580.00</td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-500">0.01</td>
+                                <td class="px-4 py-3 text-center"><i data-lucide="x" class="w-4 h-4 text-red-500 inline"></i></td>
+                            </tr>
+                            <tr class="bg-amber-50/40">
+                                <td class="px-4 py-3 text-sm text-gray-800">供应商名称</td>
+                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-amber-50 text-amber-600 text-xs">仅提示</span></td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-800">星辉建材</td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-800">星辉建材有限公司</td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-400">—</td>
+                                <td class="px-4 py-3 text-center"><i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500 inline"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs text-gray-500 mt-3">价税合计（STRICT）超容差 → 对账失败并暴露本差异明细；供应商名称（WARN）差异仅标记，不阻断闭环。</p>
+            </div>
+
+            <!-- 处理记录 -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-base font-semibold text-gray-800 flex items-center mb-4"><span class="w-1 h-4 bg-primary rounded mr-2"></span>处理记录</h2>
+                <ol class="relative border-l border-gray-200 ml-2 space-y-4">
+                    <li class="ml-4">
+                        <div class="absolute w-2 h-2 bg-primary rounded-full -left-1 mt-1.5"></div>
+                        <p class="text-sm text-gray-800">对账任务执行，识别价税合计差异 +20.00，暴露差异并路由至采购-张伟</p>
+                        <span class="text-xs text-gray-400">2026-05-31 02:15 · 系统</span>
+                    </li>
+                    <li class="ml-4">
+                        <div class="absolute w-2 h-2 bg-gray-300 rounded-full -left-1 mt-1.5"></div>
+                        <p class="text-sm text-gray-500">待责任人认领处理…</p>
+                    </li>
+                </ol>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function loadSidebar() {
+            fetch('common/sidebar.html')
+                .then(function (res) { return res.text(); })
+                .then(function (html) {
+                    document.getElementById('sidebar-container').innerHTML = html;
+                    var s = document.createElement('script');
+                    s.src = 'common/scripts.js';
+                    s.onload = function () {
+                        if (window.initCommonFunctions) window.initCommonFunctions('reconciliation-result.html');
+                        if (window.lucide) lucide.createIcons();
+                    };
+                    document.body.appendChild(s);
+                });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            loadSidebar();
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+    <link rel="stylesheet" href="common/prd-viewer.css">
+    <script src="common/prd-viewer.js"></script>
+</body>
+</html>

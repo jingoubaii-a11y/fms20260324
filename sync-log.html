@@ -62,11 +62,54 @@
                                 <option value="fail">失败</option>
                             </select>
                         </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs text-gray-500 mb-1">最后同步时间</label>
+                            <div class="flex items-center space-x-2">
+                                <input id="log-sync-time-start" type="date" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm" title="起始日期">
+                                <span class="text-gray-400 text-sm">~</span>
+                                <input id="log-sync-time-end" type="date" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm" title="结束日期">
+                            </div>
+                            <p class="mt-1 text-[11px] text-gray-500">默认展示近 1 个月数据；起止时间跨度不能超过 1 年。</p>
+                        </div>
                     </div>
                     <div class="flex justify-end mb-4 space-x-3">
                         <button class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm">重置</button>
                         <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm">查询</button>
                     </div>
+                    <script>
+                        (function () {
+                            var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+                            var fmt = function (d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+                            var end = new Date();
+                            var start = new Date();
+                            start.setMonth(start.getMonth() - 1);
+                            var elStart = document.getElementById('log-sync-time-start');
+                            var elEnd = document.getElementById('log-sync-time-end');
+                            if (elStart && elEnd) {
+                                elStart.value = fmt(start);
+                                elEnd.value = fmt(end);
+                                var validate = function () {
+                                    if (!elStart.value || !elEnd.value) return;
+                                    var s = new Date(elStart.value);
+                                    var e = new Date(elEnd.value);
+                                    if (e < s) {
+                                        alert('结束时间不能早于起始时间');
+                                        elEnd.value = fmt(s);
+                                        return;
+                                    }
+                                    var diffDays = (e - s) / (1000 * 60 * 60 * 24);
+                                    if (diffDays > 366) {
+                                        alert('最后同步时间跨度不能超过 1 年，请重新选择');
+                                        var maxEnd = new Date(s);
+                                        maxEnd.setFullYear(maxEnd.getFullYear() + 1);
+                                        elEnd.value = fmt(maxEnd);
+                                    }
+                                };
+                                elStart.addEventListener('change', validate);
+                                elEnd.addEventListener('change', validate);
+                            }
+                     })();
+                    </script>
 
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-white border border-gray-200 rounded-lg">
