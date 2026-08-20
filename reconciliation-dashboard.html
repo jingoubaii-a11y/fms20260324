@@ -14,111 +14,273 @@
 <body class="bg-gray-50">
     <div class="flex min-h-screen">
         <div id="sidebar-container"></div>
-        <main class="flex-1 ml-64 p-6">
+        <main class="flex-1 ml-64 p-6 h-screen overflow-y-auto">
             <!-- 页头 -->
-            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-4">
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-xl font-bold text-gray-800">对账看板</h1>
-                        <p class="text-sm text-gray-500 mt-1">监控各对账场景的执行进度、成功率与差异分布，快速下钻到差异管理处理未平项。</p>
+                        <p class="text-sm text-gray-500 mt-1">对账态势总览：闭环健康度 + 成因分布 + 金额阈值预警 + 风险监控。仅消费差异记录层数据、不承载差异操作，所有操作类动作在「差异管理」菜单（PRD §1.5）。</p>
                     </div>
                     <div class="flex items-center gap-3">
+                        <select class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary">
+                            <option>场景组：全部</option>
+                            <option>材料领用</option>
+                            <option>工费</option>
+                            <option>客户合同</option>
+                            <option>供应商采购</option>
+                            <option>项目核算</option>
+                        </select>
                         <select class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary">
                             <option>对账期间：2026-05</option>
                             <option>对账期间：2026-04</option>
                         </select>
-                        <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm flex items-center"><i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i>刷新</button>
+                        <button class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm flex items-center"><i data-lucide="download" class="w-4 h-4 mr-1"></i>导出</button>
+                        <button title="所有指标 T+1 凌晨随跑批刷新；手动即时刷新单人每小时限 1 次" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm flex items-center"><i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i>即时刷新</button>
                     </div>
                 </div>
+                <div class="mt-2 text-xs text-gray-400 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i>指标数据截至 2026-05-21 02:00（T+1 跑批同步）· 手动刷新剩余 1 次/小时</div>
             </div>
 
-            <!-- 指标卡 -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white rounded-lg shadow-sm p-5">
-                    <div class="flex items-center justify-between"><span class="text-sm text-gray-500">今日对账任务</span><i data-lucide="list-checks" class="w-5 h-5 text-primary"></i></div>
-                    <div class="text-2xl font-bold text-gray-800 mt-2">18</div>
-                    <div class="text-xs text-gray-400 mt-1">已完成 15 · 执行中 2 · 待执行 1</div>
-                </div>
-                <div class="bg-white rounded-lg shadow-sm p-5">
-                    <div class="flex items-center justify-between"><span class="text-sm text-gray-500">对账成功率</span><i data-lucide="check-circle-2" class="w-5 h-5 text-green-500"></i></div>
-                    <div class="text-2xl font-bold text-green-600 mt-2">96.3%</div>
-                    <div class="text-xs text-gray-400 mt-1">较昨日 +1.2%</div>
-                </div>
-                <div class="bg-white rounded-lg shadow-sm p-5">
-                    <div class="flex items-center justify-between"><span class="text-sm text-gray-500">强校验差异（STRICT）</span><i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i></div>
-                    <div class="text-2xl font-bold text-red-600 mt-2">42</div>
-                    <div class="text-xs text-gray-400 mt-1">阻断结账 · 需处理</div>
-                </div>
-                <div class="bg-white rounded-lg shadow-sm p-5">
-                    <div class="flex items-center justify-between"><span class="text-sm text-gray-500">提示差异（WARN）</span><i data-lucide="info" class="w-5 h-5 text-amber-500"></i></div>
-                    <div class="text-2xl font-bold text-amber-600 mt-2">137</div>
-                    <div class="text-xs text-gray-400 mt-1">不阻断 · 仅标记</div>
-                </div>
-            </div>
-
-            <!-- 对账任务列表 -->
-            <div class="bg-white rounded-lg shadow-sm p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-base font-semibold text-gray-800">对账任务</h2>
-                    <span class="text-xs text-gray-400">对账期间 2026-05</span>
+            <!-- §1.5.4 顶部风险监控预警栏 -->
+            <div class="bg-red-50 border border-red-200 rounded-lg shadow-sm mb-4">
+                <div class="flex items-center justify-between px-5 py-3 border-b border-red-100">
+                    <div class="flex items-center gap-2 text-red-600 font-semibold text-sm"><i data-lucide="alert-triangle" class="w-4 h-4"></i>风险监控预警栏 · 当日命中 4 项</div>
+                    <span class="text-xs text-red-400">金额阈值命中（§1.5.2）+ 超期未闭环（§1.5.1，超 T+3 自然日）</span>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">对账场景</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">规则</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">双侧数据源</th>
-                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">总笔数</th>
-                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">成功</th>
-                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">强校验差异</th>
-                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">提示差异</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                    <table class="min-w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-xs text-red-400">
+                                <th class="px-5 py-2 font-medium">规则编号</th>
+                                <th class="px-5 py-2 font-medium">命中类型</th>
+                                <th class="px-5 py-2 font-medium">命中金额 / 条数</th>
+                                <th class="px-5 py-2 font-medium">命中时刻</th>
+                                <th class="px-5 py-2 font-medium">操作</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 text-sm text-gray-800">R-006 采购订单对账</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">R-006-01</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">金蝶采购订单 ↔ 中台采购单</td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-800">1,208</td>
-                                <td class="px-4 py-3 text-sm text-right text-green-600">1,192</td>
-                                <td class="px-4 py-3 text-sm text-right text-red-600 font-medium">16</td>
-                                <td class="px-4 py-3 text-sm text-right text-amber-600">33</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-green-50 text-green-600 text-xs">已完成</span></td>
-                                <td class="px-4 py-3 text-sm"><a href="reconciliation-result.html" class="text-primary hover:underline">查看结果</a></td>
+                        <tbody class="divide-y divide-red-100">
+                            <tr>
+                                <td class="px-5 py-2.5 text-gray-800">R-001-01</td>
+                                <td class="px-5 py-2.5"><span class="px-2 py-0.5 rounded bg-red-100 text-red-600 text-xs">金额阈值-当日累计</span></td>
+                                <td class="px-5 py-2.5 text-red-600 font-medium">¥ 1,283,400</td>
+                                <td class="px-5 py-2.5 text-gray-500">2026-05-21 02:03</td>
+                                <td class="px-5 py-2.5"><a href="reconciliation-diff.html?ruleNo=R-001-01&status=unclosed" class="text-primary hover:underline">查看差异</a></td>
                             </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 text-sm text-gray-800">R-003 应收对账</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">R-003-01</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">中台应收单 ↔ 网销订单</td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-800">3,540</td>
-                                <td class="px-4 py-3 text-sm text-right text-green-600">3,514</td>
-                              <td class="px-4 py-3 text-sm text-right text-red-600 font-medium">18</td>
-                                <td class="px-4 py-3 text-sm text-right text-amber-600">78</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-green-50 text-green-600 text-xs">已完成</span></td>
-                                <td class="px-4 py-3 text-sm"><a href="reconciliation-result.html" class="text-primary hover:underline">查看结果</a></td>
+                            <tr>
+                                <td class="px-5 py-2.5 text-gray-800">R-004-01</td>
+                                <td class="px-5 py-2.5"><span class="px-2 py-0.5 rounded bg-red-100 text-red-600 text-xs">金额阈值-单条</span></td>
+                                <td class="px-5 py-2.5 text-red-600 font-medium">¥ 156,200</td>
+                                <td class="px-5 py-2.5 text-gray-500">2026-05-21 02:03</td>
+                                <td class="px-5 py-2.5"><a href="reconciliation-diff.html?ruleNo=R-004-01&status=unclosed" class="text-primary hover:underline">查看差异</a></td>
                             </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 text-sm text-gray-800">R-001 出入库对账</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">R-001-01</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">WMS 出库 ↔ 中台销售出库</td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-800">2,016</td>
-                                <td class="px-4 py-3 text-sm text-right text-green-600">2,008</td>
-                                <td class="px-4 py-3 text-sm text-right text-red-600 font-medium">8</td>
-                                <td class="px-4 py-3 text-sm text-right text-amber-600">26</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs">执行中</span></td>
-                                <td class="px-4 py-3 text-sm"><a href="reconciliation-result.html" class="text-primary hover:underline">查看结果</a></td>
-                   </tr>
+                            <tr>
+                                <td class="px-5 py-2.5 text-gray-800">R-006-02</td>
+                                <td class="px-5 py-2.5"><span class="px-2 py-0.5 rounded bg-orange-100 text-orange-600 text-xs">超期未闭环</span></td>
+                                <td class="px-5 py-2.5 text-orange-600 font-medium">23 条</td>
+                                <td class="px-5 py-2.5 text-gray-500">2026-05-21 02:03</td>
+                                <td class="px-5 py-2.5"><a href="reconciliation-diff.html?ruleNo=R-006-02&status=unclosed" class="text-primary hover:underline">查看差异</a></td>
+                            </tr>
+                            <tr>
+                                <td class="px-5 py-2.5 text-gray-800">R-008-04</td>
+                                <td class="px-5 py-2.5"><span class="px-2 py-0.5 rounded bg-orange-100 text-orange-600 text-xs">超期未闭环</span></td>
+                                <td class="px-5 py-2.5 text-orange-600 font-medium">11 条</td>
+                                <td class="px-5 py-2.5 text-gray-500">2026-05-21 02:03</td>
+                                <td class="px-5 py-2.5"><a href="reconciliation-diff.html?ruleNo=R-008-04&status=unclosed" class="text-primary hover:underline">查看差异</a></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <!-- §1.5.1 第一组：闭环健康度指标 -->
+            <h2 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1"><i data-lucide="activity" class="w-4 h-4 text-primary"></i>闭环健康度指标</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow-sm p-5">
+                    <div class="flex items-center justify-between"><span class="text-sm text-gray-500">超期未闭环差异数</span><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span></div>
+                    <div class="text-2xl font-bold text-red-600 mt-2">128 <span class="text-sm font-normal text-gray-400">条</span></div>
+                    <div class="text-xs text-gray-400 mt-1">差异产生 &gt; T+3 自然日且状态未闭环</div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-5">
+                    <div class="flex items-center justify-between"><span class="text-sm text-gray-500">平均闭环时长</span><i data-lucide="timer" class="w-5 h-5 text-primary"></i></div>
+                    <div class="text-2xl font-bold text-gray-800 mt-2">18 <span class="text-sm font-normal text-gray-400">小时</span></div>
+                    <div class="text-xs text-gray-400 mt-1">已闭环差异（不含忽略/自动关闭）· 按场景组分组</div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-5">
+                    <div class="flex items-center justify-between"><span class="text-sm text-gray-500">今日新增差异数</span><i data-lucide="trending-up" class="w-5 h-5 text-amber-500"></i></div>
+                    <div class="text-2xl font-bold text-gray-800 mt-2">42 <span class="text-sm font-normal text-gray-400">条</span></div>
+                    <div class="text-xs text-gray-400 mt-1">当日 00:00 至今新产生 · 按场景组分组</div>
+                </div>
+            </div>
+
+            <!-- §1.5.1 第二组：成因分布指标 -->
+            <h2 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1"><i data-lucide="pie-chart" class="w-4 h-4 text-primary"></i>成因分布指标</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                <!-- 各成因分类占比（场景组维度） -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-semibold text-gray-800">各成因分类占比</h3>
+                        <select class="px-2 py-1 border border-gray-300 rounded-md text-xs">
+                            <option>场景组：材料领用对账</option>
+                            <option>场景组：工费对账</option>
+                            <option>场景组：客户合同对账</option>
+                            <option>场景组：供应商采购对账</option>
+                            <option>场景组：项目核算对账</option>
+                        </select>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-3">当月已闭环差异，责任人闭环时手动打标 · 6 项成因枚举</p>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">漏推-源侧未同步</span><span class="text-gray-800 font-medium">62%</span></div>
+                            <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-primary h-2 rounded-full" style="width:62%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">规则参数误伤</span><span class="text-gray-800 font-medium">18%</span></div>
+                            <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-blue-400 h-2 rounded-full" style="width:18%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">主数据未对齐</span><span class="text-gray-800 font-medium">12%</span></div>
+                            <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-amber-400 h-2 rounded-full" style="width:12%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">跨期正常波动</span><span class="text-gray-800 font-medium">5%</span></div>
+                            <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-gray-400 h-2 rounded-full" style="width:5%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">源侧删单</span><span class="text-gray-800 font-medium">2%</span></div>
+                            <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-gray-300 h-2 rounded-full" style="width:2%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">其他</span><span class="text-gray-800 font-medium">1%</span></div>
+                            <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-gray-200 h-2 rounded-full" style="width:1%"></div></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-gray-100"><a href="#" onclick="toggleRulePanel();return false;" class="text-sm text-primary hover:underline flex items-center gap-1"><i data-lucide="chevrons-down" class="w-4 h-4"></i>下钻到规则维度成因分析</a></div>
+                </div>
+
+                <!-- 各责任人/角色待处理差异数 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-base font-semibold text-gray-800 mb-1">各责任人 / 角色待处理差异数</h3>
+                    <p class="text-xs text-gray-400 mb-3">「待处理 + 处理中」差异条数 · 仅识别积压分布，不做绩效排名</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-700">供应链研发负责人</span>
+                            <div class="flex items-center gap-2 w-1/2"><div class="flex-1 bg-gray-100 rounded-full h-2"><div class="bg-red-400 h-2 rounded-full" style="width:100%"></div></div><span class="text-sm font-medium text-gray-800 w-10 text-right">42</span></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-700">交付研发负责人</span>
+                            <div class="flex items-center gap-2 w-1/2"><div class="flex-1 bg-gray-100 rounded-full h-2"><div class="bg-amber-400 h-2 rounded-full" style="width:43%"></div></div><span class="text-sm font-medium text-gray-800 w-10 text-right">18</span></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-700">结算会计</span>
+                            <div class="flex items-center gap-2 w-1/2"><div class="flex-1 bg-gray-100 rounded-full h-2"><div class="bg-blue-400 h-2 rounded-full" style="width:36%"></div></div><span class="text-sm font-medium text-gray-800 w-10 text-right">15</span></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-700">金蝶研发负责人</span>
+                            <div class="flex items-center gap-2 w-1/2"><div class="flex-1 bg-gray-100 rounded-full h-2"><div class="bg-gray-400 h-2 rounded-full" style="width:24%"></div></div><span class="text-sm font-medium text-gray-800 w-10 text-right">10</span></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-700">财务负责人</span>
+                            <div class="flex items-center gap-2 w-1/2"><div class="flex-1 bg-gray-100 rounded-full h-2"><div class="bg-gray-300 h-2 rounded-full" style="width:19%"></div></div><span class="text-sm font-medium text-gray-800 w-10 text-right">8</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 二级：规则维度成因分析面板（默认收起） -->
+            <div id="rule-cause-panel" class="hidden bg-white rounded-lg shadow-sm p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-base font-semibold text-gray-800">规则成因分析（规则维度下钻）</h3>
+                    <button onclick="toggleRulePanel()" class="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"><i data-lucide="x" class="w-3 h-3"></i>收起</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr class="text-left text-xs text-gray-500">
+                                <th class="px-4 py-2 font-medium">规则编号</th>
+                                <th class="px-4 py-2 font-medium">漏推</th>
+                                <th class="px-4 py-2 font-medium">参数误伤</th>
+                                <th class="px-4 py-2 font-medium">主数据未对齐</th>
+                                <th class="px-4 py-2 font-medium">跨期波动</th>
+                                <th class="px-4 py-2 font-medium">其他</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 text-gray-700">
+                            <tr><td class="px-4 py-2.5">R-001-01</td><td class="px-4 py-2.5">55%</td><td class="px-4 py-2.5">25%</td><td class="px-4 py-2.5">15%</td><td class="px-4 py-2.5">0%</td><td class="px-4 py-2.5">5%</td></tr>
+                            <tr><td class="px-4 py-2.5">R-001-02</td><td class="px-4 py-2.5">70%</td><td class="px-4 py-2.5">10%</td><td class="px-4 py-2.5">12%</td><td class="px-4 py-2.5">5%</td><td class="px-4 py-2.5">3%</td></tr>
+                            <tr><td class="px-4 py-2.5">R-001-03</td><td class="px-4 py-2.5">48%</td><td class="px-4 py-2.5">30%</td><td class="px-4 py-2.5">10%</td><td class="px-4 py-2.5">8%</td><td class="px-4 py-2.5">4%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs text-gray-400 mt-3">辅助财务负责人判断该规则差异主要在漏推还是参数误伤，为下轮参数化调优提供依据（PRD §1.5.1）。</p>
+            </div>
         </main>
     </div>
 
+    <!-- §1.5.4 侧栏快捷入口触发按钮 -->
+    <button id="quick-entry-btn" onclick="toggleDrawer()" class="fixed right-0 top-1/3 z-40 bg-primary text-white px-2 py-4 rounded-l-lg shadow-lg hover:bg-blue-700 flex flex-col items-center gap-1" title="风险监控快捷入口">
+        <i data-lucide="shield-alert" class="w-5 h-5"></i>
+        <span class="text-xs" style="writing-mode:vertical-rl;">风险监控</span>
+    </button>
+
+    <!-- 侧栏快捷入口抽屉 -->
+    <div id="drawer-mask" onclick="toggleDrawer()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-40"></div>
+    <div id="quick-drawer" class="fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <h3 class="text-base font-semibold text-gray-800 flex items-center gap-2"><i data-lucide="shield-alert" class="w-4 h-4 text-primary"></i>风险监控快捷入口</h3>
+            <button onclick="toggleDrawer()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="p-5 space-y-4">
+            <!-- 卡片一：超期未闭环差异 -->
+            <div class="border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-semibold text-gray-800">超期未闭环差异</span>
+                    <span class="text-2xl font-bold text-red-600">128</span>
+                </div>
+                <p class="text-xs text-gray-400 mb-3">按场景组分组 Top 5 责任人</p>
+                <div class="space-y-1.5 text-sm">
+                    <div class="flex justify-between"><span class="text-gray-600">供应链研发负责人（采购）</span><span class="text-gray-800">38</span></div>
+                    <div class="flex justify-between"><span class="text-gray-600">交付研发负责人（工费）</span><span class="text-gray-800">31</span></div>
+                    <div class="flex justify-between"><span class="text-gray-600">结算会计（材料）</span><span class="text-gray-800">27</span></div>
+                    <div class="flex justify-between"><span class="text-gray-600">金蝶研发负责人（核算）</span><span class="text-gray-800">19</span></div>
+                    <div class="flex justify-between"><span class="text-gray-600">财务负责人（合同）</span><span class="text-gray-800">13</span></div>
+                </div>
+                <a href="reconciliation-diff.html?status=overdue" class="mt-3 inline-flex items-center gap-1 text-sm text-primary hover:underline">进入差异管理（预设超期未闭环筛选）<i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+            </div>
+            <!-- 卡片二：异常忽略行为 -->
+            <div class="border border-red-300 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-semibold text-gray-800">异常忽略行为</span>
+                    <span class="px-2 py-0.5 rounded bg-red-50 text-red-600 text-xs">近 7 天超阈值</span>
+                </div>
+                <p class="text-xs text-gray-400 mb-3">「忽略」闭环动作条数（默认阈值：近 7 天 &gt; 50 条）</p>
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <div><div class="text-lg font-bold text-gray-800">12</div><div class="text-xs text-gray-400">当日</div></div>
+                    <div><div class="text-lg font-bold text-red-600">63</div><div class="text-xs text-gray-400">近 7 天</div></div>
+                    <div><div class="text-lg font-bold text-gray-800">210</div><div class="text-xs text-gray-400">近 30 天</div></div>
+                </div>
+                <a href="reconciliation-diff.html?closeAction=ignore" class="mt-3 inline-flex items-center gap-1 text-sm text-primary hover:underline">进入差异管理（预设闭环动作=忽略）<i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+            </div>
+        </div>
+    </div>
+
     <script>
+        function toggleDrawer() {
+            var d = document.getElementById('quick-drawer');
+            var m = document.getElementById('drawer-mask');
+            if (d.classList.contains('translate-x-full')) {
+                d.classList.remove('translate-x-full');
+                m.classList.remove('hidden');
+            } else {
+                d.classList.add('translate-x-full');
+                m.classList.add('hidden');
+            }
+        }
+        function toggleRulePanel() {
+            var p = document.getElementById('rule-cause-panel');
+            p.classList.toggle('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
         function loadSidebar() {
             fetch('common/sidebar.html')
                 .then(function (res) { return res.text(); })

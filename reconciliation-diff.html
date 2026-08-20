@@ -14,11 +14,11 @@
 <body class="bg-gray-50">
     <div class="flex min-h-screen">
         <div id="sidebar-container"></div>
-        <main class="flex-1 ml-64 p-6">
+        <main class="flex-1 ml-64 p-6 h-screen overflow-y-auto">
             <!-- 页头 -->
             <div class="bg-white rounded-lg shadow-sm p-6 mb-4">
                 <h1 class="text-xl font-bold text-gray-800">差异管理</h1>
-                <p class="text-sm text-gray-500 mt-1">差异责任人的运营主界面：承载差异记录呈现、认领、成因打标、闭环追踪与知识库回流。与「对账看板」（态势总览）、「对账结果」（执行足迹核验）三者并列不重叠。字段总表见 PRD §1.4（F001~F028）+ §1.6.2 通用批次字段（R001~R004）。</p>
+                <p class="text-sm text-gray-500 mt-1">差异责任人的运营主界面：承载差异记录呈现、认领、成因打标、闭环追踪与知识库回流，是差异全生命周期的运营主界面。与「对账看板」（态势总览）、「对账结果」（执行足迹核验）三者并列不重叠。字段总表见 PRD §1.4（F001~F028）+ §1.6.2 通用批次字段（R001~R004）。</p>
             </div>
 
             <!-- 筛选组件（复用财务中台通用组件：下拉切筛选项 + 单输入框 + 高级筛选） -->
@@ -26,14 +26,13 @@
                 <div class="flex items-center gap-3 flex-wrap">
                     <div class="flex items-center border border-gray-300 rounded-md overflow-hidden">
                         <select id="filter-select" class="px-3 py-2 bg-gray-50 border-r border-gray-300 text-sm outline-none">
-                            <option value="diffKey">差异识别键</option>
+                            <option value="unitKey">对账单元主键</option>
                             <option value="ruleNo">规则编号</option>
                             <option value="scene">场景组</option>
                             <option value="owner">责任人</option>
                             <option value="batchNo">执行批次号</option>
-                            <option value="contract">项目合同号</option>
                         </select>
-                        <input id="filter-input" type="text" placeholder="请输入差异识别键" class="px-3 py-2 text-sm outline-none w-64">
+                        <input id="filter-input" type="text" placeholder="请输入对账单元主键" class="px-3 py-2 text-sm outline-none w-64">
                     </div>
                     <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm flex items-center"><i data-lucide="search" class="w-4 h-4 mr-1"></i>搜索</button>
                     <button class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm flex items-center"><i data-lucide="rotate-ccw" class="w-4 h-4 mr-1"></i>刷新</button>
@@ -43,116 +42,292 @@
                         <span class="px-2 py-0.5 rounded bg-red-50 text-red-600 text-xs">新差异 42</span>
                         <span class="px-2 py-0.5 rounded bg-orange-50 text-orange-600 text-xs">已推送-待处理 88</span>
                         <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs">认领-处理中 27</span>
-                        <span class="px-2 py-0.5 rounded bg-gray-100 text-gray-500 text-xs">已修复 156</span>
+                        <span class="px-2 py-0.5 rounded bg-teal-50 text-teal-600 text-xs">已修复(自动) 156</span>
                     </div>
                 </div>
+                <!-- 高级筛选：与 §1.4 字段总表「是否筛选=是」的 F 字段一一对齐 -->
                 <div id="advanced-filter-panel" class="hidden mt-4 bg-gray-50 border border-gray-200 rounded-md p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <div><label class="block text-xs text-gray-500 mb-1">场景组</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>材料领用</option><option>工费</option><option>客户合同</option><option>供应商采购</option><option>项目核算</option></select></div>
-                    <div><label class="block text-xs text-gray-500 mb-1">差异等级</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>强校验</option><option>仅提示</option></select></div>
-                    <div><label class="block text-xs text-gray-500 mb-1">差异状态</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>新差异</option><option>已推送-待处理</option><option>超时未处理-再提醒本人</option><option>认领-处理中</option><option>挂起-等待外部依赖</option><option>已修复(自动)</option><option>已修复(手动)</option><option>忽略关闭</option></select></div>
-                    <div><label class="block text-xs text-gray-500 mb-1">成因分类</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>上游漏推/延迟</option><option>源侧删单/回滚</option><option>主数据未对齐</option><option>规则参数误伤</option><option>跨期正常波动</option><option>其他-需 COE 复核</option></select></div>
-                    <div><label class="block text-xs text-gray-500 mb-1">批次类型</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>自动定时</option><option>手工触发</option><option>业务系统按需调用</option></select></div>
-                    <div><label class="block text-xs text-gray-500 mb-1">责任人</label><input type="text" placeholder="人员/岗位" class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"></div>
-                    <div><label class="block text-xs text-gray-500 mb-1">对账期间</label><input type="text" value="2026-05" class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"></div>
-                    <div><label class="block text-xs text-gray-500 mb-1">差异首次发现时间</label><input type="text" placeholder="起止日期" class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">规则编号（F002）</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>R-001-01</option><option>R-003-01</option><option>R-004-01</option><option>R-006-01</option><option>R-008-04</option></select></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">所属场景组（F004）</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>材料领用对账</option><option>工费对账</option><option>客户合同对账</option><option>供应商采购对账</option><option>项目核算对账</option></select></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">差异类型（F007）</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>一边有一边没有(源侧缺失)</option><option>一边有一边没有(目标侧缺失)</option><option>双侧金额不一致</option><option>双侧条数不一致</option></select></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">差异状态（F019）</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>新差异</option><option>已推送-待处理</option><option>超时未处理-再提醒本人</option><option>认领-处理中</option><option>挂起-等待外部依赖</option><option>已解决(手动)</option><option>已修复(自动)</option><option>忽略关闭</option></select></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">成因分类（F022）</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>漏推-源侧未同步</option><option>源侧删单</option><option>主数据未对齐</option><option>规则参数误伤</option><option>跨期正常波动</option><option>其他</option></select></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">闭环动作（F025）</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>已解决(手动)</option><option>忽略</option><option>已修复(自动)</option><option>成因补录</option></select></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">变化趋势（F011）</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>无变化</option><option>下降中</option><option>恶化中</option><option>反复</option></select></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">责任人（F020）</label><input type="text" placeholder="角色/用户" class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">已持续天数（F010）</label><div class="flex items-center gap-1"><input type="number" placeholder="≥" class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><span class="text-gray-400 text-xs">~</span><input type="number" placeholder="≤" class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"></div></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">差额（F015，绝对值）</label><div class="flex items-center gap-1"><input type="number" placeholder="≥" class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><span class="text-gray-400 text-xs">~</span><input type="number" placeholder="≤" class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"></div></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">首次识别日（F008）</label><input type="text" placeholder="起止日期" class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">闭环时间（F026）</label><input type="text" placeholder="起止日期" class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">批次类型（R002）</label><select class="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部</option><option>自动定时</option><option>手工触发</option><option>业务系统按需调用</option></select></div>
                 </div>
             </div>
 
-            <!-- 差异列表 -->
+            <!-- 差异列表：列字段对齐 §1.4 F 系列「展示定位=列表」 -->
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full whitespace-nowrap">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">差异识别键</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">场景组</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">规则编号</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">差异类型</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">差异等级</th>
-                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">A 侧值</th>
-                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">B 侧值</th>
-                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">差异额</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">责任人</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">差异状态</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">批次类型</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">对账单元主键<span class="text-gray-300">·F005</span></th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">场景组<span class="text-gray-300">·F004</span></th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">规则编号<span class="text-gray-300">·F002</span></th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">差异类型<span class="text-gray-300">·F007</span></th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">首次识别日<span class="text-gray-300">·F008</span></th>
+                                <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">已持续天数<span class="text-gray-300">·F010</span></th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">变化趋势<span class="text-gray-300">·F011</span></th>
+                                <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">源侧金额<span class="text-gray-300">·F013</span></th>
+                                <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">目标侧金额<span class="text-gray-300">·F014</span></th>
+                                <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">差额<span class="text-gray-300">·F015</span></th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">责任人<span class="text-gray-300">·F020</span></th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">差异状态<span class="text-gray-300">·F019</span></th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">成因分类<span class="text-gray-300">·F022</span></th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">批次类型<span class="text-gray-300">·R002</span></th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">操作</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
+                            <!-- S1 新差异 -->
                             <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 text-xs text-gray-800 font-mono">R-006-01#PO-20260501-0087#金额不一致</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">供应商采购</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">R-006-01</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">价税合计不等</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-red-50 text-red-600 text-xs">强校验</span></td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-800">12,600.00</td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-800">12,580.00</td>
-                                <td class="px-4 py-3 text-sm text-right text-red-600 font-medium">+20.00</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">供应链数据管理员</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-orange-50 text-orange-600 text-xs">已推送-待处理</span></td>
-                                <td class="px-4 py-3 text-sm text-gray-600">自动定时</td>
-                                <td class="px-4 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-primary hover:underline">认领</a><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
+                                <td class="px-3 py-3 text-xs text-gray-800 font-mono">合同 XH-2026-0555 / M-15012</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">材料领用对账</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">R-001-01</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">双侧金额不一致</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">2026-05-05</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">1</td>
+                                <td class="px-3 py-3 text-sm text-gray-400">无变化</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">24,000.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">22,400.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-red-600 font-medium">+1,600.00</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">供应链研发负责人</td>
+                                <td class="px-3 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-red-50 text-red-600 text-xs">新差异</span></td>
+                                <td class="px-3 py-3 text-sm text-gray-400">—</td>
+                                <td class="px-3 py-3 text-sm"><span class="px-1.5 py-0.5 rounded border border-purple-300 text-purple-600 text-xs">手工触发</span></td>
+                                <td class="px-3 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-primary hover:underline">认领</a><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
                             </tr>
+                            <!-- S2 已推送-待处理 · 恶化中 -->
                             <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 text-xs text-gray-800 font-mono">R-006-01#PO-20260501-0088#单边缺失</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">供应商采购</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">R-006-01</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">单边缺失（B 侧无）</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-red-50 text-red-600 text-xs">强校验</span></td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-800">8,900.00</td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-400">—</td>
-                                <td class="px-4 py-3 text-sm text-right text-red-600 font-medium">+8,900.00</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">集成-李娜（覆盖层）</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs">认领-处理中</span></td>
-                                <td class="px-4 py-3 text-sm text-gray-600">自动定时</td>
-                                <td class="px-4 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-primary hover:underline">处理</a><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
+                                <td class="px-3 py-3 text-xs text-gray-800 font-mono">PO-20260501-0087 / SKU-8842</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">供应商采购对账</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">R-006-01</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">双侧金额不一致</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">2026-05-03</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">5</td>
+                                <td class="px-3 py-3 text-sm text-red-600 flex items-center gap-0.5"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i>恶化中</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">12,600.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">12,580.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-red-600 font-medium">+20.00</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">供应链研发负责人</td>
+                                <td class="px-3 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-orange-50 text-orange-600 text-xs">已推送-待处理</span></td>
+                                <td class="px-3 py-3 text-sm text-gray-400">—</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">自动定时</td>
+                                <td class="px-3 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-primary hover:underline">认领</a><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
                             </tr>
-                            <tr class="hover:bg-gray-50 bg-amber-50/30">
-                                <td class="px-4 py-3 text-xs text-gray-800 font-mono">R-006-01#PO-20260501-0087#字段差异</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">供应商采购</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">R-006-01</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">供应商名称不一致</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-amber-50 text-amber-600 text-xs">仅提示</span></td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-800">星辉建材</td>
-                               <td class="px-4 py-3 text-sm text-right text-gray-800">星辉建材有限公司</td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-400">—</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">供应链数据管理员</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-gray-100 text-gray-500 text-xs">忽略关闭</span></td>
-                                <td class="px-4 py-3 text-sm text-gray-600">自动定时</td>
-                                <td class="px-4 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
+                            <!-- S3 超时未处理-再提醒本人 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-3 py-3 text-xs text-gray-800 font-mono">PO-20260428-0033 / SKU-1190</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">供应商采购对账</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">R-006-01</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">一边有一边没有(目标侧缺失)</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">2026-05-01</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">7</td>
+                                <td class="px-3 py-3 text-sm text-gray-400">无变化</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">8,900.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-400">—</td>
+                                <td class="px-3 py-3 text-sm text-right text-red-600 font-medium">+8,900.00</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">供应链研发负责人</td>
+                                <td class="px-3 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-amber-100 text-amber-700 text-xs">超时未处理-再提醒本人</span></td>
+                                <td class="px-3 py-3 text-sm text-gray-400">—</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">自动定时</td>
+                                <td class="px-3 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-primary hover:underline">认领</a><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
                             </tr>
+                            <!-- S4 认领-处理中 · 下降中 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-3 py-3 text-xs text-gray-800 font-mono">合同 XH-2026-0421 / 财务主体 A</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">客户合同对账</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">R-004-01</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">双侧金额不一致</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">2026-05-04</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">3</td>
+                                <td class="px-3 py-3 text-sm text-green-600 flex items-center gap-0.5"><i data-lucide="trending-down" class="w-3.5 h-3.5"></i>下降中</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">320,000.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">319,000.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-red-600 font-medium">+1,000.00</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">交付研发负责人</td>
+                                <td class="px-3 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs">认领-处理中</span></td>
+                                <td class="px-3 py-3 text-sm text-gray-400">—</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">自动定时</td>
+                                <td class="px-3 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-primary hover:underline">处理</a><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
+                            </tr>
+                            <!-- S5 挂起-等待外部依赖 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-3 py-3 text-xs text-gray-800 font-mono">合同 XH-2026-0398 / 财务主体 A</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">项目核算对账</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">R-008-04</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">双侧金额不一致</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">2026-05-02</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">4</td>
+                                <td class="px-3 py-3 text-sm text-amber-600 flex items-center gap-0.5"><i data-lucide="repeat" class="w-3.5 h-3.5"></i>反复</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">5,200.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-800">5,180.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-red-600 font-medium">+20.00</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">金蝶研发负责人</td>
+                                <td class="px-3 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-purple-50 text-purple-600 text-xs">挂起-等待外部依赖</span></td>
+                                <td class="px-3 py-3 text-sm text-gray-400">—</td>
+                                <td class="px-3 py-3 text-sm text-gray-600">自动定时</td>
+                                <td class="px-3 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-primary hover:underline">处理</a><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
+                            </tr>
+                            <!-- S6 已解决(手动) · 已闭环带成因 -->
+                            <tr class="hover:bg-gray-50 bg-green-50/30">
+                                <td class="px-3 py-3 text-xs text-gray-600 font-mono">合同 XH-2026-0300 / 工人 3302** 交付</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">工费对账</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">R-003-01</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">双侧金额不一致</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">2026-04-28</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">10</td>
+                                <td class="px-3 py-3 text-sm text-gray-400">下降中</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">15,000.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">14,980.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">+20.00</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">交付研发负责人</td>
+                                <td class="px-3 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-green-50 text-green-600 text-xs">已解决(手动)</span></td>
+                                <td class="px-3 py-3 text-sm text-gray-600">漏推-源侧未同步</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">自动定时</td>
+                                <td class="px-3 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
+                            </tr>
+                            <!-- S7 已修复(自动) · 已归因 -->
                             <tr class="hover:bg-gray-50 bg-gray-50/60">
-                                <td class="px-4 py-3 text-xs text-gray-500 font-mono line-through">R-003-01#合同 XH-2026-0421#金额不一致</td>
-                                <td class="px-4 py-3 text-sm text-gray-500">工费</td>
-                                <td class="px-4 py-3 text-sm text-gray-500">R-003-01</td>
-                                <td class="px-4 py-3 text-sm text-gray-500">金额差 ≤ 容差</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-red-50 text-red-500 text-xs">强校验</span></td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-500">15,000.00</td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-500">14,999.98</td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-500">+0.02</td>
-                                <td class="px-4 py-3 text-sm text-gray-500">劳务数据管理员</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-gray-100 text-gray-500 text-xs">已修复(自动)</span></td>
-                                <td class="px-4 py-3 text-sm text-gray-500">自动定时</td>
-                                <td class="px-4 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
+                                <td class="px-3 py-3 text-xs text-gray-500 font-mono line-through">PO-20260430-0021 / SKU-7761</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">供应商采购对账</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">R-006-01</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">双侧金额不一致</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">2026-04-30</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">8</td>
+                                <td class="px-3 py-3 text-sm text-gray-400">无变化</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">15,000.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">14,999.98</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">+0.02</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">供应链研发负责人</td>
+                                <td class="px-3 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-teal-50 text-teal-600 text-xs">已修复(自动)</span><span class="ml-1 px-1.5 py-0.5 rounded border border-teal-300 text-teal-600 text-xs">已归因</span></td>
+                                <td class="px-3 py-3 text-sm text-gray-500">跨期正常波动</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">自动定时</td>
+                                <td class="px-3 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
                             </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 text-xs text-gray-800 font-mono">R-001-01#合同 XH-2026-0555#数量不一致</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">材料领用</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">R-001-01</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">数量差异 8 件</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-red-50 text-red-600 text-xs">强校验</span></td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-800">120 件</td>
-                                <td class="px-4 py-3 text-sm text-right text-gray-800">112 件</td>
-                                <td class="px-4 py-3 text-sm text-right text-red-600 font-medium">+8 件</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">供应链数据管理员</td>
-                                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-red-50 text-red-600 text-xs">新差异</span></td>
-                                <td class="px-4 py-3 text-sm"><span class="px-1.5 py-0.5 rounded border border-purple-300 text-purple-600 text-xs">手工触发</span></td>
-                                <td class="px-4 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-primary hover:underline">认领</a><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
+                            <!-- S7 已修复(自动) · 未归因（补录窗口内待补） -->
+                            <tr class="hover:bg-gray-50 bg-gray-50/60">
+                                <td class="px-3 py-3 text-xs text-gray-500 font-mono line-through">PO-20260429-0012 / SKU-3320</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">供应商采购对账</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">R-006-01</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">一边有一边没有(源侧缺失)</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">2026-04-29</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">6</td>
+                                <td class="px-3 py-3 text-sm text-gray-400">无变化</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-400">—</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">6,300.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">-6,300.00</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">供应链研发负责人</td>
+                                <td class="px-3 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-teal-50 text-teal-600 text-xs">已修复(自动)</span><span class="ml-1 px-1.5 py-0.5 rounded border border-gray-300 text-gray-500 text-xs">未归因·待补录</span></td>
+                                <td class="px-3 py-3 text-sm text-gray-400">待补录</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">自动定时</td>
+                                <td class="px-3 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-primary hover:underline">补录成因</a><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
+                            </tr>
+                            <!-- S8 忽略关闭 -->
+                            <tr class="hover:bg-gray-50 bg-gray-50/60">
+                                <td class="px-3 py-3 text-xs text-gray-500 font-mono">PO-20260501-0087 / 供应商名称</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">供应商采购对账</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">R-006-01</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">双侧金额不一致</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">2026-04-27</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">2</td>
+                                <td class="px-3 py-3 text-sm text-gray-400">无变化</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">3,100.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">3,080.00</td>
+                                <td class="px-3 py-3 text-sm text-right text-gray-500">+20.00</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">供应链研发负责人</td>
+                                <td class="px-3 py-3 text-sm"><span class="px-2 py-0.5 rounded bg-gray-100 text-gray-500 text-xs">忽略关闭</span></td>
+                                <td class="px-3 py-3 text-sm text-gray-500">跨期正常波动</td>
+                                <td class="px-3 py-3 text-sm text-gray-500">自动定时</td>
+                                <td class="px-3 py-3 text-sm space-x-2"><a href="reconciliation-result-detail.html" class="text-gray-400 hover:underline">明细</a></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <p class="text-xs text-gray-500 mt-4">差异识别键 = ⟨规则编号 + 匹配主键值 + 差异类型标签⟩，跨执行状态延续（同一识别键在多次执行间去重合并）。差异管理菜单承接的动作：认领、跟进备注、成因打标（6 项枚举）、退回来源系统修正、责任人转派、标记已解决、忽略闭环。对账中心不生成差异单/调整单，实际修复在源系统完成后回写状态；「已修复(自动)」代表本次执行未再出现历史差异，系统自动关闭并回写。批次类型「手工触发/业务系统按需调用」用异形标签区分自动定时，避免与差异等级颜色混淆。</p>
+                <p class="text-xs text-gray-500 mt-4 leading-relaxed">
+                    差异识别键 = ⟨规则编号 + 差异识别键（通常等于匹配主键组合）⟩，跨执行状态延续：同一识别键在多次执行间去重合并，一条持续未闭环差异在整个持续期内始终占据<strong>一行</strong>，「已持续天数」每日 T+1 跑批后自增、「最近一次识别日」刷新到跑批当日，不因每天命中产生新行（§1.4.1 持续性度量）。「源侧金额/目标侧金额/差额」为<strong>本次跑批快照</strong>，不保留每日历史（历史沉淀在差异变更历史内）。差异管理菜单承接的动作：认领、成因打标（6 项枚举）、【已解决】手动销项、【忽略】、责任人转派、自动关闭差异的成因补录。对账中心<strong>不主动感知源系统修数动作</strong>，「已修复(自动)」代表下次跑批差异自然消失后系统自动关闭。批次类型「手工触发/业务系统按需调用」用异形标签区分自动定时。
+                </p>
+            </div>
+
+            <!-- §1.4.2 差异状态机（S1~S8 单一真相源） -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mt-4">
+                <h2 class="text-base font-bold text-gray-800 mb-1">差异状态机（§1.4.2 单一真相源，主状态 S1~S8）</h2>
+                <p class="text-xs text-gray-500 mb-4">术语约定：「已解决」专指责任人手动销项通道、「已修复」专指下次跑批自动关闭通道，全文不混用。</p>
+                <div class="flex items-center flex-wrap gap-2 text-xs">
+                    <span class="px-2 py-1 rounded bg-red-50 text-red-600">S1 新差异</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 text-gray-400"></i>
+                    <span class="px-2 py-1 rounded bg-orange-50 text-orange-600">S2 已推送-待处理</span>
+                    <i data-lucide="arrow-left-right" class="w-4 h-4 text-gray-400"></i>
+                    <span class="px-2 py-1 rounded bg-amber-100 text-amber-700">S3 超时未处理-再提醒本人</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 text-gray-400"></i>
+                    <span class="px-2 py-1 rounded bg-blue-50 text-blue-600">S4 认领-处理中</span>
+                    <i data-lucide="arrow-left-right" class="w-4 h-4 text-gray-400"></i>
+                    <span class="px-2 py-1 rounded bg-purple-50 text-purple-600">S5 挂起-等待外部依赖</span>
+                </div>
+                <div class="flex items-center flex-wrap gap-2 text-xs mt-3">
+                    <span class="text-gray-400">终态：</span>
+                    <span class="px-2 py-1 rounded bg-green-50 text-green-600">S6 已解决(手动)</span>
+                    <span class="text-gray-400">·【已解决】必填成因分类+解决办法</span>
+                    <span class="px-2 py-1 rounded bg-teal-50 text-teal-600">S7 已修复(自动)</span>
+                    <span class="px-1.5 py-0.5 rounded border border-teal-300 text-teal-600">已归因</span>
+                    <span class="px-1.5 py-0.5 rounded border border-gray-300 text-gray-500">未归因</span>
+                    <span class="text-gray-400">·3 自然日内补录成功=已归因，超期固化=未归因</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 text-gray-500">S8 忽略关闭</span>
+                    <span class="text-gray-400">·【忽略】必填忽略理由+成因分类</span>
+                </div>
+            </div>
+
+            <!-- 底部：三类闭环操作 + 6 项成因枚举 + 责任人关注人 + 知识库回流 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <!-- 三类闭环操作 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-base font-bold text-gray-800 mb-3">三类闭环操作（§1.4.2）</h2>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex gap-2"><span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 text-xs shrink-0">认领</span><span>责任人接手，状态置「处理中」，挂到本人待办队列；后续可手动点【已解决】立即销项，或等下次跑批自然消失（自动通道），二选一，不强制源系统回写。</span></li>
+                        <li class="flex gap-2"><span class="px-1.5 py-0.5 rounded bg-green-50 text-green-600 text-xs shrink-0">已解决</span><span>手动销项通道。必填①成因分类（6 项单选）②解决办法（50 字内），随差异快照沉淀差异知识库。</span></li>
+                        <li class="flex gap-2"><span class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 text-xs shrink-0">忽略</span><span>业务可容忍（历史遗留/跨期正常波动），必填忽略理由 + 成因分类，入「差异容忍库」作后续参考（一期不做自动忽略）。</span></li>
+                        <li class="flex gap-2"><span class="px-1.5 py-0.5 rounded bg-teal-50 text-teal-600 text-xs shrink-0">自动关闭</span><span>下次跑批差异消失自动置「已修复(自动)」。关闭前未认领的，T+1 推一次京 ME 提醒，3 自然日内可补录成因；超期固化「未归因」，不再提醒、不再允许补录。</span></li>
+                    </ul>
+                </div>
+                <!-- 6 项成因枚举 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-base font-bold text-gray-800 mb-3">成因分类 6 项枚举（§1.4.1 · F022）</h2>
+                    <p class="text-xs text-gray-500 mb-2">一期<strong>不做系统自动初判</strong>，由责任人在【已解决】/【忽略】闭环时手动单选，看板「各成因占比」只统计已闭环差异。</p>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="px-2 py-1 rounded bg-gray-50 border border-gray-200 text-gray-600">漏推-源侧未同步</span>
+                        <span class="px-2 py-1 rounded bg-gray-50 border border-gray-200 text-gray-600">源侧删单</span>
+                        <span class="px-2 py-1 rounded bg-gray-50 border border-gray-200 text-gray-600">主数据未对齐</span>
+                        <span class="px-2 py-1 rounded bg-gray-50 border border-gray-200 text-gray-600">规则参数误伤</span>
+                        <span class="px-2 py-1 rounded bg-gray-50 border border-gray-200 text-gray-600">跨期正常波动</span>
+                        <span class="px-2 py-1 rounded bg-gray-50 border border-gray-200 text-gray-600">其他<span class="text-gray-400">（前端强提示在解决办法字段简述实际成因）</span></span>
+                    </div>
+                </div>
+                <!-- 责任人 & 关注人 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-base font-bold text-gray-800 mb-3">责任人 &amp; 关注人（§1.4.2 · 配置在规则详情页）</h2>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li><span class="font-medium text-gray-800">责任人</span>：负责推动闭环。扁平清单，角色/用户多选混选，研发按上游数据来源系统预置初值、财务负责人可在规则详情页直编；不区分默认层/覆盖层、不按成因分类细分（F020/F021）。</li>
+                        <li><span class="font-medium text-gray-800">关注人</span>：不承担闭环义务，负责知悉与阈值预警。默认为空；「差异产生时抄送关注人」总开关默认<strong>关闭</strong>，阈值预警强推送<strong>不受此开关约束</strong>。</li>
+                        <li><span class="font-medium text-gray-800">推送节奏</span>：差异产生瞬间首次推京 ME 责任人；未处理满 T+1 自动再推一次（F027 累计推送次数）。统一走京 ME。</li>
+                    </ul>
+                </div>
+                <!-- 差异知识库回流 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-base font-bold text-gray-800 mb-3">差异知识库回流（§1.4.3）</h2>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li><span class="font-medium text-gray-800">同主键复现提示</span>：同一 (规则编号, 匹配主键) 再次产生差异时，在差异详情带出上一次成因分类与解决办法（F028），仅作参考提示，不做自动处置。</li>
+                        <li><span class="font-medium text-gray-800">规则维度成因分布</span>：对账看板（§1.5）按规则维度聚合各成因占比，辅助财务负责人判断规则调优方向。</li>
+                        <li class="text-xs text-gray-400">知识库以 (规则编号, 匹配主键, 成因分类, 解决办法, 处理人, 处理时间) 结构落库，不对外开放导出，一期仅供对账中心内部消费。</li>
+                    </ul>
+                </div>
             </div>
         </main>
     </div>
@@ -178,7 +353,7 @@
             if (btn && panel) btn.addEventListener('click', function () { panel.classList.toggle('hidden'); });
             var sel = document.getElementById('filter-select');
             var input = document.getElementById('filter-input');
-            var ph = { diffKey: '请输入差异识别键', ruleNo: '请输入规则编号', scene: '请选择场景组', owner: '请输入责任人', batchNo: '请输入执行批次号', contract: '请输入项目合同号' };
+            var ph = { unitKey: '请输入对账单元主键', ruleNo: '请输入规则编号', scene: '请选择场景组', owner: '请输入责任人（角色/用户）', batchNo: '请输入执行批次号' };
             if (sel && input) sel.addEventListener('change', function () { input.placeholder = ph[sel.value] || '请输入'; });
         }
         document.addEventListener('DOMContentLoaded', function () {

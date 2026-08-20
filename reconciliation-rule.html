@@ -90,8 +90,8 @@
                                 </button>
                             </div>
                             <div class="flex space-x-3">
-                                <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-sm flex items-center" title="仅 COE 可见，每小时至多 1 次">
-                                    <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i> 手动即时刷新（COE 专用）
+                                <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-sm flex items-center" title="每小时至多 1 次">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i> 手动即时刷新
                                 </button>
                             </div>
                         </div>
@@ -145,7 +145,7 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <h2 class="text-base font-semibold text-gray-800">规则清单</h2>
-                                    <p class="text-xs text-gray-500 mt-1">共 8 条规则（P0 场景 R-001 ~ R-008）· 元数据 5 栏 = 规则编号 / 规则名称 / 所属场景组 / 对账模式 / 责任人默认层</p>
+                                    <p class="text-xs text-gray-500 mt-1">共 8 条规则（P0 场景 R-001 ~ R-008）· 元数据 5 栏 = 规则编号 / 规则名称 / 所属场景组 / 对账模式 / 责任人</p>
                                 </div>
                             </div>
                         </div>
@@ -172,8 +172,8 @@
                                             <span class="value"><span class="tag tag-purple">单笔对账（规则粒度）</span></span>
                                         </div>
                                         <div class="meta-cell">
-                                            <span class="label">责任人（默认层）</span>
-                                            <span class="value">采购结算岗 · 张三</span>
+                                            <span class="label">责任人</span>
+                                            <span class="value">结算会计 · 张三</span>
                                         </div>
                                     </div>
                                     <div class="flex flex-col items-end gap-2 min-w-[220px]">
@@ -203,7 +203,7 @@
                                         <div class="meta-cell"><span class="label">规则名称</span><span class="value">在建项目工费对账</span></div>
                                         <div class="meta-cell"><span class="label">所属场景组</span><span class="value"><span class="tag tag-blue">R-003 工费与劳务</span></span></div>
                                         <div class="meta-cell"><span class="label">对账模式</span><span class="value"><span class="tag tag-purple">单笔对账（规则粒度）</span></span></div>
-                                        <div class="meta-cell"><span class="label">责任人（默认层）</span><span class="value">工程结算岗 · 李四</span></div>
+                                        <div class="meta-cell"><span class="label">责任人</span><span class="value">结算会计 · 李四</span></div>
                                     </div>
                                     <div class="flex flex-col items-end gap-2 min-w-[220px]">
                                         <div class="flex items-center gap-2 text-xs">
@@ -232,7 +232,7 @@
                                         <div class="meta-cell"><span class="label">规则名称</span><span class="value">材料收发金额核对</span></div>
                                         <div class="meta-cell"><span class="label">所属场景组</span><span class="value"><span class="tag tag-blue">R-001 材料收发与领用</span></span></div>
                                         <div class="meta-cell"><span class="label">对账模式</span><span class="value"><span class="tag tag-blue">过程对账（实体粒度）</span></span></div>
-                                        <div class="meta-cell"><span class="label">责任人（默认层）</span><span class="value">材料核算岗 · 王五</span></div>
+                                        <div class="meta-cell"><span class="label">责任人</span><span class="value">结算会计 · 王五</span></div>
                                     </div>
                                     <div class="flex flex-col items-end gap-2 min-w-[220px]">
                                         <div class="flex items-center gap-2 text-xs">
@@ -258,7 +258,7 @@
 
                 <!-- 规则编辑视图 -->
                 <div id="edit-view" class="hidden space-y-6">
-                    <!-- 编辑头：返回 / 规则标识 / 双版本号 / 对账模式 / 责任人双层 / 保存动作 -->
+                    <!-- 编辑头：返回 / 规则标识 / 双版本号 / 对账模式 / 责任人 / 保存动作 -->
                     <div class="bg-white rounded-lg shadow-sm p-6">
                         <div class="flex items-start justify-between gap-4">
                             <div class="flex items-start gap-3">
@@ -272,7 +272,7 @@
                                         <span class="tag tag-amber">参数化 v1.3.5 · 运营调优</span>
                                         <span class="tag tag-green"><i data-lucide="check-circle-2" class="w-3 h-3 mr-1"></i>启用中</span>
                                     </div>
-                                    <p class="text-xs text-gray-400 mt-2">最近修改：2026-08-10 15:22 · 张三（采购结算岗）· 参数化项 v1.3.4→v1.3.5，调整税率容差 0.00→0.01</p>
+                                    <p class="text-xs text-gray-400 mt-2">最近修改：2026-08-10 15:22 · 张三（结算会计）· 参数化项 v1.3.4→v1.3.5，调整税率容差 0.00→0.01</p>
                                 </div>
                             </div>
                             <div class="flex gap-2">
@@ -297,50 +297,43 @@
                     <!-- 面板：规则配置（七段） -->
                     <div id="panel-config" class="space-y-6">
 
-                    <!-- 责任人配置双层（PRD §1.4.2：默认层=上游岗位/角色 1 字段；覆盖层按成因分类细分） -->
+                    <!-- 责任人 & 关注人配置（PRD §1.4.2）：责任人=差异推送需解决人；关注人=差异预警推送人 -->
                     <div class="bg-white rounded-lg shadow-sm p-6 param-editable">
                         <div class="flex items-center justify-between mb-4">
                             <div class="segment-title">
                                 <span class="num"><i data-lucide="user-cog" class="w-4 h-4"></i></span>
-                                <span>责任人配置（默认层 + 覆盖层）</span>
+                                <span>责任人 &amp; 关注人配置</span>
                             </div>
                             <span class="seg-badge-param"><i data-lucide="edit-3" class="w-3 h-3 inline mr-1"></i>参数化项 · 运营调优</span>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="border border-gray-200 rounded-md p-4 bg-white">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-800">默认层（规则级兜底）</span>
-                                    <span class="text-xs text-gray-400">整条规则兜底</span>
+                               <span class="text-sm font-medium text-gray-800 flex items-center gap-1.5"><i data-lucide="user-check" class="w-4 h-4 text-primary"></i>责任人</span>
+                                    <span class="text-xs text-gray-400">差异推送需解决人</span>
                                 </div>
                                 <div class="mt-3 space-y-2">
-                                    <div class="flex items-center gap-2">
-                                        <label class="text-xs text-gray-500 w-20">岗位（角色）</label>
-                                        <select class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary bg-white">
-                                            <option>采购结算岗（对应上游供应链系统）</option>
-                                            <option>财务共享岗（对应上游凭证/资金系统）</option>
-                                            <option>业财 BP 岗（对应上游预算/成本系统）</option>
-                                        </select>
+                                    <div class="flex flex-wrap gap-2 min-h-[36px] px-2 py-1.5 border border-gray-300 rounded-md items-center">
+                                        <span class="tag tag-blue">角色：结算会计<i data-lucide="x" class="w-3 h-3 ml-1 cursor-pointer"></i></span>
+                                        <span class="tag tag-blue">用户：李四<i data-lucide="x" class="w-3 h-3 ml-1 cursor-pointer"></i></span>
+                                        <button class="text-xs text-primary hover:underline"><i data-lucide="plus" class="w-3 h-3 inline"></i> 添加</button>
                                     </div>
-                                    <p class="text-xs text-gray-400 leading-relaxed mt-2">默认层只维护"上游数据来源系统对应岗位"1 个字段；具体到人由岗位→用户的组织权限体系自动带出，不在此处配置。</p>
+                                    <p class="text-xs text-gray-400 leading-relaxed mt-2">默认由研发预置为"上游数据来源系统对应角色"（本规则=结算会计）；财务负责人可在此按角色或用户混选、多选，扁平一份清单，不区分默认层/覆盖层。差异产生首次京 ME 推送 + T+1 未闭环再推一次。</p>
                                 </div>
                             </div>
                             <div class="border border-gray-200 rounded-md p-4 bg-white">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-800">覆盖层（按成因分类细分）</span>
-                                    <button class="px-2 py-1 text-xs bg-secondary text-primary rounded hover:bg-blue-100"><i data-lucide="plus" class="w-3 h-3 inline"></i> 新增覆盖项</button>
+                                    <span class="text-sm font-medium text-gray-800 flex items-center gap-1.5"><i data-lucide="eye" class="w-4 h-4 text-amber-500"></i>关注人</span>
+                                    <span class="text-xs text-gray-400">差异预警推送人</span>
                                 </div>
-                                <table class="w-full mt-3 text-xs">
-                                    <thead class="text-gray-500">
-                                        <tr class="border-b border-gray-100"><th class="text-left py-2 font-normal w-36">成因分类</th><th class="text-left py-2 font-normal">承接岗位</th><th class="w-8"></th></tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-100 text-gray-700">
-                                        <tr><td class="py-2">漏推-源侧未同步</td><td class="py-2">供应链数据同步岗</td><td><button class="text-gray-400 hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button></td></tr>
-                                        <tr><td class="py-2">源侧删单</td><td class="py-2">采购结算岗</td><td><button class="text-gray-400 hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button></td></tr>
-                                        <tr><td class="py-2">主数据未对齐</td><td class="py-2">主数据治理岗</td><td><button class="text-gray-400 hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button></td></tr>
-                                        <tr><td class="py-2">规则参数误伤</td><td class="py-2">对账规则运营岗（COE）</td><td><button class="text-gray-400 hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button></td></tr>
-                                    </tbody>
-                                </table>
-                                <p class="text-xs text-gray-400 leading-relaxed mt-2">责任人在差异管理侧打标成因后，未闭环差异自动路由到对应岗位；未覆盖的成因回落默认层。</p>
+                                <div class="mt-3 space-y-2">
+                                    <div class="flex flex-wrap gap-2 min-h-[36px] px-2 py-1.5 border border-gray-300 rounded-md items-center">
+                                        <span class="tag tag-amber">角色：财务负责人<i data-lucide="x" class="w-3 h-3 ml-1 cursor-pointer"></i></span>
+                                        <span class="tag tag-amber">用户：王五（业财 BP）<i data-lucide="x" class="w-3 h-3 ml-1 cursor-pointer"></i></span>
+                                        <button class="text-xs text-primary hover:underline"><i data-lucide="plus" class="w-3 h-3 inline"></i> 添加</button>
+                                    </div>
+                                    <p class="text-xs text-gray-400 leading-relaxed mt-2">默认为空，财务负责人按需增删角色/用户；多选。触达时机：① 每条差异产生时抄送京 ME（可关，见 ⑥ 段总开关）；② 命中 ⑥ 段双阈值预警时京 ME 强推送（不受抄送开关影响）。</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -477,7 +470,7 @@
                         </div>
                     </div>
 
-                    <!-- ⑥ 执行配置（参数化项）：规则启用总开关 + 自动定时开关（联动频率档位）+ 业务时间过滤（相对区间选择器）+ 双阈值预警 + 推送人清单 -->
+                    <!-- ⑥ 执行配置（参数化项）：规则启用总开关 + 自动定时开关（联动频率档位）+ 业务时间过滤（相对区间选择器）+ 双阈值预警（推送人 = 顶部关注人清单） -->
                     <div class="bg-white rounded-lg shadow-sm p-6 param-editable">
                         <div class="flex items-center justify-between mb-4">
                             <div class="segment-title"><span class="num">6</span><span>执行配置</span></div>
@@ -505,7 +498,7 @@
                                             <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
                                         </label>
                                     </div>
-                                    <p class="text-xs text-gray-500 mt-2 leading-relaxed">开=按下方频率档位到点自动跑；关=规则仍在线，只等按需调用/手工触发，不自动跑。默认「关」，需 COE 明确开启。</p>
+                                    <p class="text-xs text-gray-500 mt-2 leading-relaxed">开=按下方频率档位到点自动跑；关=规则仍在线，只等按需调用/手工触发，不自动跑。默认「关」，需财务负责人明确开启。</p>
                                 </div>
                             </div>
                         </div>
@@ -525,6 +518,7 @@
                                     <label class="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked class="w-4 h-4 accent-primary">启用双向对账（A→B 与 B→A 均检查单边缺失）</label>
                                     <label class="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked class="w-4 h-4 accent-primary">启用闭环重对（差异闭环后自动再跑一次校验）</label>
                                     <label class="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" class="w-4 h-4 accent-primary">允许手动重对（责任人可主动重跑单条对账单元）</label>
+                                    <label class="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" class="w-4 h-4 accent-primary">差异产生时抄送<strong>关注人</strong>（默认关；关闭时关注人仅在阈值预警命中时触达）</label>
                                 </div>
                                 <div class="bg-white border border-gray-200 rounded-md p-3">
                                     <div class="text-sm font-medium text-gray-800 mb-2">业务时间过滤</div>
@@ -571,17 +565,14 @@
                                         <p class="text-xs text-gray-400">两阈值互相独立，命中任一即通过<strong>京 ME</strong> 推送指定人；预警不阻断对账执行。</p>
                                     </div>
                                 </div>
-                                <div class="bg-white border border-gray-200 rounded-md p-3">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-sm font-medium text-gray-800">推送人清单</span>
-                                        <button class="text-xs text-primary hover:underline"><i data-lucide="plus" class="w-3 h-3 inline"></i> 新增</button>
+                                <div class="bg-blue-50 border border-blue-200 rounded-md p-3">
+                                    <div class="flex items-start gap-2">
+                                        <i data-lucide="link-2" class="w-4 h-4 text-blue-600 mt-0.5"></i>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-blue-900">推送人 = 关注人（已在顶部"责任人 &amp; 关注人配置"卡片统一维护）</p>
+                                            <p class="text-xs text-blue-700 mt-1 leading-relaxed">阈值预警命中时，直接向该规则配置的<strong>关注人</strong>清单京 ME 强推送，此处不再单独维护推送人；关注人调整请回到顶部卡片编辑。</p>
+                                        </div>
                                     </div>
-                                    <div class="flex flex-wrap gap-2">
-                                        <span class="tag tag-blue">张三（默认责任人）<i data-lucide="x" class="w-3 h-3 ml-1 cursor-pointer"></i></span>
-                                        <span class="tag tag-blue">李四（业财 BP）<i data-lucide="x" class="w-3 h-3 ml-1 cursor-pointer"></i></span>
-                                        <span class="tag tag-blue">王五（业财 BP）<i data-lucide="x" class="w-3 h-3 ml-1 cursor-pointer"></i></span>
-                                    </div>
-                                    <p class="text-xs text-gray-400 mt-2">默认自动带入本规则责任人（默认层+覆盖层去重合并），可手工增删。</p>
                                 </div>
                                 <div class="bg-white border border-gray-200 rounded-md p-3">
                                     <div class="flex items-center justify-between">
@@ -651,7 +642,7 @@
                                     <tr><td class="px-3 py-2 font-medium">参数化 v1.3.5</td><td class="px-3 py-2"><span class="tag tag-amber">参数化</span></td><td class="px-3 py-2 text-xs">税率容差 0.00→0.01，减少税率四舍五入误伤</td><td class="px-3 py-2">张三</td><td class="px-3 py-2 text-xs text-gray-500">2026-08-10 15:22</td><td class="px-3 py-2"><button class="text-primary text-xs hover:underline">对比</button></td></tr>
                                     <tr><td class="px-3 py-2">参数化 v1.3.4</td><td class="px-3 py-2"><span class="tag tag-amber">参数化</span></td><td class="px-3 py-2 text-xs">新增"华南-深圳"组织覆盖责任人为王五</td><td class="px-3 py-2">李四</td><td class="px-3 py-2 text-xs text-gray-500">2026-07-28 10:04</td><td class="px-3 py-2"><button class="text-primary text-xs hover:underline">对比</button></td></tr>
                                     <tr><td class="px-3 py-2">参数化 v1.3.0</td><td class="px-3 py-2"><span class="tag tag-amber">参数化</span></td><td class="px-3 py-2 text-xs">差异金额单条阈值 10 万→5 万；启用双阈值预警</td><td class="px-3 py-2">张三</td><td class="px-3 py-2 text-xs text-gray-500">2026-06-15 09:11</td><td class="px-3 py-2"><button class="text-primary text-xs hover:underline">对比</button></td></tr>
-                                    <tr><td class="px-3 py-2">固定项 v1.0</td><td class="px-3 py-2"><span class="tag tag-gray">固定项</span></td><td class="px-3 py-2 text-xs">首次预置：数据源/取数逻辑/主键/成因判据全部锁定</td><td class="px-3 py-2">研发·COE</td><td class="px-3 py-2 text-xs text-gray-500">2026-05-01 00:00</td><td class="px-3 py-2"><button class="text-primary text-xs hover:underline">对比</button></td></tr>
+                                    <tr><td class="px-3 py-2">固定项 v1.0</td><td class="px-3 py-2"><span class="tag tag-gray">固定项</span></td><td class="px-3 py-2 text-xs">首次预置：数据源/取数逻辑/主键/成因判据全部锁定</td><td class="px-3 py-2">研发·财务负责人</td><td class="px-3 py-2 text-xs text-gray-500">2026-05-01 00:00</td><td class="px-3 py-2"><button class="text-primary text-xs hover:underline">对比</button></td></tr>
                                 </tbody>
                             </table>
                         </div>

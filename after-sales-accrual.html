@@ -29,6 +29,7 @@
         .stat-success { border-color: #10b981; }
         .stat-warning { border-color: #f59e0b; }
         .stat-danger { border-color: #ef4444; }
+        .stat-info { border-color: #6366f1; }
     </style>
 </head>
 <body class="bg-neutral">
@@ -43,13 +44,67 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h1 class="text-xl font-semibold text-gray-800">售后维修计提工作台</h1>
-                            <p class="text-sm text-gray-500 mt-1">当前会计期间：<span class="font-medium text-gray-700">2026-08</span> · 期末日 2026-08-31 23:00 自动执行月末补提 + 质保期满转回跑批</p>
+                            <p class="text-sm text-gray-500 mt-1">当前会计期间：<span class="font-medium text-gray-700">2026-08</span></p>
                         </div>
                         <div class="flex items-center gap-2">
+                            <!-- 消息通知（财务中台站内消息 + 未读） -->
+                            <div class="relative" id="msg-wrap">
+                                <button id="msg-bell" class="relative px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50" title="消息通知（财务中台站内消息）：跑批完成/异常/EBS 同步失败等在此汇总，红点为未读，可跳转对应处理页。">
+                                    <i data-lucide="bell" class="w-4 h-4"></i>
+                                    <span class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 text-[10px] leading-4 text-white bg-red-500 rounded-full text-center">3</span>
+                                </button>
+                                <div id="msg-panel" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                                    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                                        <span class="text-sm font-semibold text-gray-800">消息通知</span>
+                                        <span class="text-xs text-primary cursor-pointer hover:underline">全部标记已读</span>
+                                    </div>
+                                    <div class="max-h-80 overflow-y-auto divide-y divide-gray-50">
+                                        <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer bg-blue-50/40">
+                                            <div class="flex items-start gap-2">
+                                                <span class="mt-1 w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
+                                                <div>
+                                                   <p class="text-sm text-gray-800">月度跑批完成：成功 <b>328</b> 笔，跳过 <b>3</b> 笔（已挂异常清单）</p>
+                                                    <p class="text-xs text-gray-400 mt-0.5">2026-09-01 00:12 · 前往查看 →</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer bg-blue-50/40">
+                                            <div class="flex items-start gap-2">
+                                                <span class="mt-1 w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
+                                                <div>
+                                                    <p class="text-sm text-gray-800">1 张计提单 EBS 同步失败，请前往异常单据处理</p>
+                                                    <p class="text-xs text-gray-400 mt-0.5">2026-09-01 00:15 · 前往处理 →</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer bg-blue-50/40">
+                                            <div class="flex items-start gap-2">
+                                                <span class="mt-1 w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
+                                                <div>
+                                                    <p class="text-sm text-gray-800">3 个合同因缺配被跳过，关账前请补配后重跑清零</p>
+                                                    <p class="text-xs text-gray-400 mt-0.5">2026-09-01 00:12 · 前往处理 →</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer">
+                                            <div class="flex items-start gap-2">
+                                                <span class="mt-1 w-2 h-2 rounded-full bg-gray-200 shrink-0"></span>
+                                                <div>
+                                                    <p class="text-sm text-gray-600">质保期满转回跑批完成：转回 42 笔</p>
+                                                    <p class="text-xs text-gray-400 mt-0.5">2026-09-01 00:10</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="px-4 py-2 border-t border-gray-100 text-center">
+                                        <span class="text-xs text-gray-500 cursor-pointer hover:text-primary">查看全部消息</span>
+                                    </div>
+                                </div>
+                            </div>
                             <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-1 text-sm">
                                 <i data-lucide="download" class="w-4 h-4"></i> 导出跑批日报
                             </button>
-                            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center gap-1 text-sm">
+                             <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center gap-1 text-sm" title="全量跑批（覆盖所有财务主体的在保合同，不分主体）。按序执行：补扫竣工计提 → 月末补提 → 质保期满转回（系统保证补提先于转回）。按合同隔离：逐合同校验，存在异常的合同自动跳过并挂入异常单据清单，其余合同正常入账、不阻断整批；跳过合同补配后重跑可补齐。任务串行——有进行中的跑批时本按钮置灰，需等其完成后再发起。">
                                 <i data-lucide="play" class="w-4 h-4"></i> 手工发起跑批
                             </button>
                         </div>
@@ -57,7 +112,7 @@
                 </div>
 
                 <!-- 概览卡片 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div class="bg-white rounded-lg shadow-sm p-4 stat-card stat-primary">
                         <p class="text-xs text-gray-500">本月计提金额</p>
                         <h3 class="text-2xl font-bold text-gray-800 mt-1">¥ 1,286,540.28</h3>
@@ -68,16 +123,53 @@
                         <h3 class="text-2xl font-bold text-gray-800 mt-1">¥ 428,910.00</h3>
                         <p class="text-xs text-gray-500 mt-1">材料 208,442 · 工费 220,468</p>
                     </div>
+                    <div class="bg-white rounded-lg shadow-sm p-4 stat-card stat-info">
+                        <p class="text-xs text-gray-500">本月转回金额</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1">¥ 96,320.00</h3>
+                        <p class="text-xs text-gray-500 mt-1">转回合同 <span class="text-indigo-600 font-medium">42</span> 个 · 转回单 <span class="text-indigo-600 font-medium">42</span> 张</p>
+                    </div>
                     <div class="bg-white rounded-lg shadow-sm p-4 stat-card stat-warning">
-                        <p class="text-xs text-gray-500">待补提合同数</p>
-                        <h3 class="text-2xl font-bold text-gray-800 mt-1">17</h3>
-                        <p class="text-xs text-gray-500 mt-1">预估补提金额 <span class="text-amber-600 font-medium">¥ 82,110</span></p>
+                        <p class="text-xs text-gray-500">本月补提金额</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1">¥ 82,110.00</h3>
+                        <p class="text-xs text-gray-500 mt-1">待补提合同 <span class="text-amber-600 font-medium">17</span> 个 · 补提单 <span class="text-amber-600 font-medium">17</span> 张</p>
                     </div>
                     <div class="bg-white rounded-lg shadow-sm p-4 stat-card stat-danger">
                         <p class="text-xs text-gray-500">异常单据 / EBS 同步失败</p>
                         <h3 class="text-2xl font-bold text-gray-800 mt-1">3 <span class="text-base font-normal text-gray-500">/</span> 1</h3>
                         <p class="text-xs text-red-500 mt-1 cursor-pointer hover:underline">前往处理 →</p>
                     </div>
+                </div>
+
+                <!-- 本月跑批进度 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-gray-800">本月跑批进度</h3>
+                        <span class="text-xs text-gray-400">按合同隔离：异常合同自动跳过、其余正常入账；跳过合同需在关账前补跑清零</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs text-gray-600">竣工计提</span>
+                                <span class="text-xs font-medium text-gray-800">328 / 330 · 99%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-primary h-2 rounded-full" style="width:99%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs text-gray-600">月末补提</span>
+                                <span class="text-xs font-medium text-gray-800">63 / 80 · 79%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-amber-500 h-2 rounded-full" style="width:79%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs text-gray-600">质保期满转回</span>
+                                <span class="text-xs font-medium text-gray-800">42 / 45 · 93%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-indigo-500 h-2 rounded-full" style="width:93%"></div></div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-3">进度分母为本月应处理合同数、分子为已成功入账数；差额即被跳过（挂异常清单）或待处理的合同。</p>
                 </div>
 
                 <!-- Tab 导航 -->
@@ -88,7 +180,7 @@
                             <button class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 py-3 px-1 text-sm font-medium whitespace-nowrap" data-tab="tab-writeoff">核销明细</button>
                             <button class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 py-3 px-1 text-sm font-medium whitespace-nowrap" data-tab="tab-supplement">月末补提</button>
                             <button class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 py-3 px-1 text-sm font-medium whitespace-nowrap" data-tab="tab-reversal">质保期满转回</button>
-                            <button class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 py-3 px-1 text-sm font-medium whitespace-nowrap" data-tab="tab-exception">异常单据 <span class="ml-1 text-[10px] bg-red-500 text-white rounded-full px-1.5 py-0.5">3</span></button>
+                            <button class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 py-3 px-1 text-sm font-medium whitespace-nowrap" data-tab="tab-exception">异常单据 <span class="ml-1 text-[10px] bg-red-500 text-white rounded-full px-1.5 py-0.5">14</span></button>
                             <button class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 py-3 px-1 text-sm font-medium whitespace-nowrap" data-tab="tab-warning">质保期到期预警</button>
                         </nav>
                     </div>
@@ -97,24 +189,35 @@
                     <div id="tab-accrual" class="tab-content mt-6">
                         <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                             <div class="flex items-center space-x-2">
-                                <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                                    <option>合同号</option><option>客户名称</option><option>单据号</option>
+                                <select class="filter-select px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                                    <option value="doc">计提单号</option>
+                                    <option value="contract">合同号</option>
                                 </select>
-                                <input type="text" placeholder="按合同号搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md text-sm">
-                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"><i data-lucide="search" class="w-4 h-4"></i></button>
-                                <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                                    <option>核算期间：2026-08</option><option>2026-07</option><option>2026-06</option>
-                                </select>
-                                <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                                    <option>全部项目类型</option><option>整装</option><option>软装</option>
-                                </select>
-                                <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                                    <option>全部单据状态</option><option>已生成</option><option>已同步 EBS</option><option>同步失败</option>
-                                </select>
+                                <input type="text" class="filter-input w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="按计提单号搜索">
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="搜索"><i data-lucide="search" class="w-4 h-4"></i></button>
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="刷新"><i data-lucide="refresh-ccw" class="w-4 h-4"></i></button>
+                                <button class="advanced-filter-btn px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center text-sm">高级筛选<i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i></button>
                             </div>
                             <div class="flex items-center gap-2">
                                 <button class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm flex items-center gap-1"><i data-lucide="download" class="w-4 h-4"></i>导出</button>
-                                <button class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm flex items-center gap-1"><i data-lucide="refresh-cw" class="w-4 h-4"></i>手工重跑</button>
+                            </div>
+                        </div>
+                        <div class="advanced-filter mb-4 grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                                <div class="relative entity-filter">
+                                    <button type="button" class="entity-filter-toggle w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-left flex items-center justify-between bg-white">
+                                        <span class="entity-filter-label text-gray-500">全部</span>
+                                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                    <div class="entity-filter-panel hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg p-2 max-h-60 overflow-auto">
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm font-medium border-b border-gray-100 mb-1"><input type="checkbox" class="entity-filter-all"><span>全选 / 取消全选</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="北京家装"><span>北京家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="上海家装"><span>上海家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="广州家装"><span>广州家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="成都家装"><span>成都家装</span></label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
@@ -122,75 +225,85 @@
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">计提单号</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">合同号</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">财务主体</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">客户</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">合同号</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">项目类型</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">竣工日</th>
-                                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase whitespace-nowrap">不含税收入基数</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">质保期满日</th>
+                                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase whitespace-nowrap">合同收入金额</th>
                                         <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase whitespace-nowrap">计提比例</th>
                                         <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase whitespace-nowrap">计提金额</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">单据状态</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">EBS 状态</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">数据来源</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">生成时间</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">EBS 同步状态</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 text-sm">
                                     <tr>
                                         <td class="px-3 py-2 text-primary font-medium">SHJT202608000128</td>
+                                        <td class="px-3 py-2">HT-JZ-2024-00821</td>
                                         <td class="px-3 py-2">北京家装</td>
                                         <td class="px-3 py-2">张先生</td>
-                                        <td class="px-3 py-2">HT-JZ-2024-00821</td>
                                         <td class="px-3 py-2">整装</td>
                                         <td class="px-3 py-2">2026-08-12</td>
+                                        <td class="px-3 py-2">2028-08-12</td>
                                         <td class="px-3 py-2 text-right">148,290.12</td>
                                         <td class="px-3 py-2 text-right">2.00%</td>
                                         <td class="px-3 py-2 text-right font-medium">2,965.80</td>
-                                        <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">已生成</span></td>
+                                        <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">系统生成</span></td>
+                                        <td class="px-3 py-2">2026-08-12 03:12:08</td>
                                         <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">已同步</span></td>
-                                        <td class="px-3 py-2"><button class="text-primary hover:underline mr-2 btn-accrual-detail" data-doc="SHJT202608000128" data-entity="北京家装" data-customer="张先生" data-contract="HT-JZ-2024-00821" data-project-type="整装" data-finish-date="2026-08-12" data-warranty="2 年" data-warranty-end="2028-08-12" data-receivable="167,567.84" data-tax-rate="13%" data-base="148,290.12" data-rate="2.00%" data-amount="2,965.80" data-doc-status="已生成" data-ebs-status="已同步" data-ebs-voucher="EBS-2026-08-000871" data-ebs-scene="家装售后维修 / 计提" data-created-at="2026-08-12 03:12:08" data-created-by="系统">详情</button><button class="text-primary hover:underline">单据</button></td>
+                                        <td class="px-3 py-2"><button class="text-primary hover:underline btn-accrual-detail" data-doc="SHJT202608000128" data-entity="北京家装" data-customer="张先生" data-contract="HT-JZ-2024-00821" data-project-type="整装" data-finish-date="2026-08-12" data-warranty="2 年" data-warranty-end="2028-08-12" data-receivable="167,567.84" data-tax-rate="13%" data-base="148,290.12" data-rate="2.00%" data-amount="2,965.80" data-doc-status="已生成" data-ebs-status="已同步" data-ebs-scene="家装售后维修 / 计提" data-created-at="2026-08-12 03:12:08" data-created-by="系统">详情</button></td>
                                     </tr>
                                     <tr>
                                         <td class="px-3 py-2 text-primary font-medium">SHJT202608000129</td>
+                                        <td class="px-3 py-2">HT-JZ-2024-00822</td>
                                         <td class="px-3 py-2">上海家装</td>
                                         <td class="px-3 py-2">李女士</td>
-                                        <td class="px-3 py-2">HT-JZ-2024-00822</td>
                                         <td class="px-3 py-2">整装</td>
                                         <td class="px-3 py-2">2026-08-14</td>
+                                        <td class="px-3 py-2">2028-08-14</td>
                                         <td class="px-3 py-2 text-right">96,428.30</td>
                                         <td class="px-3 py-2 text-right">2.00%</td>
                                         <td class="px-3 py-2 text-right font-medium">1,928.57</td>
-                                        <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">已生成</span></td>
+                                        <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-700">期初导入</span></td>
+                                        <td class="px-3 py-2">2026-08-14 03:07:41</td>
                                         <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">同步中</span></td>
-                                        <td class="px-3 py-2"><button class="text-primary hover:underline mr-2 btn-accrual-detail" data-doc="SHJT202608000129" data-entity="上海家装" data-customer="李女士" data-contract="HT-JZ-2024-00822" data-project-type="整装" data-finish-date="2026-08-14" data-warranty="2 年" data-warranty-end="2028-08-14" data-receivable="108,963.98" data-tax-rate="13%" data-base="96,428.30" data-rate="2.00%" data-amount="1,928.57" data-doc-status="已生成" data-ebs-status="同步中" data-ebs-voucher="—" data-ebs-scene="家装售后维修 / 计提" data-created-at="2026-08-14 03:07:41" data-created-by="系统">详情</button><button class="text-primary hover:underline">单据</button></td>
+                                        <td class="px-3 py-2"><button class="text-primary hover:underline btn-accrual-detail" data-doc="SHJT202608000129" data-entity="上海家装" data-customer="李女士" data-contract="HT-JZ-2024-00822" data-project-type="整装" data-finish-date="2026-08-14" data-warranty="2 年" data-warranty-end="2028-08-14" data-receivable="108,963.98" data-tax-rate="13%" data-base="96,428.30" data-rate="2.00%" data-amount="1,928.57" data-doc-status="已生成" data-ebs-status="同步中" data-ebs-scene="家装售后维修 / 计提" data-created-at="2026-08-14 03:07:41" data-created-by="系统">详情</button></td>
                                     </tr>
                                     <tr>
                                         <td class="px-3 py-2 text-primary font-medium">SHJT202608000130</td>
+                                        <td class="px-3 py-2">HT-JZ-2024-00845</td>
                                         <td class="px-3 py-2">广州家装</td>
                                         <td class="px-3 py-2">王先生</td>
-                                        <td class="px-3 py-2">HT-JZ-2024-00845</td>
                                         <td class="px-3 py-2">软装</td>
                                         <td class="px-3 py-2">2026-08-18</td>
+                                        <td class="px-3 py-2">2028-08-18</td>
                                         <td class="px-3 py-2 text-right">42,105.66</td>
                                         <td class="px-3 py-2 text-right">2.00%</td>
                                         <td class="px-3 py-2 text-right font-medium">842.11</td>
-                                        <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">已生成</span></td>
+                                        <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">系统生成</span></td>
+                                        <td class="px-3 py-2">2026-08-18 03:04:12</td>
                                         <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-800">失败</span></td>
-                                        <td class="px-3 py-2"><button class="text-primary hover:underline mr-2 btn-accrual-detail" data-doc="SHJT202608000130" data-entity="广州家装" data-customer="王先生" data-contract="HT-JZ-2024-00845" data-project-type="软装" data-finish-date="2026-08-18" data-warranty="2 年" data-warranty-end="2028-08-18" data-receivable="47,579.40" data-tax-rate="13%" data-base="42,105.66" data-rate="2.00%" data-amount="842.11" data-doc-status="已生成" data-ebs-status="失败" data-ebs-voucher="—" data-ebs-scene="家装售后维修 / 计提" data-created-at="2026-08-18 03:04:12" data-created-by="系统" data-ebs-error="EBS 接口 3 次重试失败：主子场景映射未匹配，请检查【子功能 1.3】配置">详情</button><button class="text-primary hover:underline">重推</button></td>
+                                        <td class="px-3 py-2"><button class="text-primary hover:underline btn-accrual-detail" data-doc="SHJT202608000130" data-entity="广州家装" data-customer="王先生" data-contract="HT-JZ-2024-00845" data-project-type="软装" data-finish-date="2026-08-18" data-warranty="2 年" data-warranty-end="2028-08-18" data-receivable="47,579.40" data-tax-rate="13%" data-base="42,105.66" data-rate="2.00%" data-amount="842.11" data-doc-status="已生成" data-ebs-status="失败" data-ebs-scene="家装售后维修 / 计提" data-created-at="2026-08-18 03:04:12" data-created-by="系统" data-ebs-error="EBS 接口 3 次重试失败：主子场景映射未匹配，请检查【异常单据】页签处理">详情</button></td>
                                     </tr>
                                     <tr>
                                         <td class="px-3 py-2 text-primary font-medium">SHJT202608000131</td>
+                                        <td class="px-3 py-2">HT-JZ-2024-00891</td>
                                         <td class="px-3 py-2">成都家装</td>
                                         <td class="px-3 py-2">刘女士</td>
-                                        <td class="px-3 py-2">HT-JZ-2024-00891</td>
                                         <td class="px-3 py-2">整装</td>
                                         <td class="px-3 py-2">2026-08-20</td>
+                                        <td class="px-3 py-2">2028-08-20</td>
                                         <td class="px-3 py-2 text-right">208,466.90</td>
                                         <td class="px-3 py-2 text-right">2.00%</td>
                                         <td class="px-3 py-2 text-right font-medium">4,169.34</td>
-                                        <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">已生成</span></td>
+                                        <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">系统生成</span></td>
+                                        <td class="px-3 py-2">2026-08-20 03:11:57</td>
                                         <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">已同步</span></td>
-                                        <td class="px-3 py-2"><button class="text-primary hover:underline mr-2 btn-accrual-detail" data-doc="SHJT202608000131" data-entity="成都家装" data-customer="刘女士" data-contract="HT-JZ-2024-00891" data-project-type="整装" data-finish-date="2026-08-20" data-warranty="2 年" data-warranty-end="2028-08-20" data-receivable="235,567.60" data-tax-rate="13%" data-base="208,466.90" data-rate="2.00%" data-amount="4,169.34" data-doc-status="已生成" data-ebs-status="已同步" data-ebs-voucher="EBS-2026-08-000904" data-ebs-scene="家装售后维修 / 计提" data-created-at="2026-08-20 03:11:57" data-created-by="系统">详情</button><button class="text-primary hover:underline">单据</button></td>
+                                        <td class="px-3 py-2"><button class="text-primary hover:underline btn-accrual-detail" data-doc="SHJT202608000131" data-entity="成都家装" data-customer="刘女士" data-contract="HT-JZ-2024-00891" data-project-type="整装" data-finish-date="2026-08-20" data-warranty="2 年" data-warranty-end="2028-08-20" data-receivable="235,567.60" data-tax-rate="13%" data-base="208,466.90" data-rate="2.00%" data-amount="4,169.34" data-doc-status="已生成" data-ebs-status="已同步" data-ebs-scene="家装售后维修 / 计提" data-created-at="2026-08-20 03:11:57" data-created-by="系统">详情</button></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -214,13 +327,32 @@
                             <span>核销由业务系统单据 → 金蝶 → EBS 完成入账，财务中台<strong>不生成核销单</strong>，此处仅记录明细用于合同预计负债余额计算。</span>
                         </div>
                         <div class="flex items-center space-x-2 mb-4">
-                            <input type="text" placeholder="合同号 / 单据号" class="w-64 px-3 py-2 border border-gray-300 rounded-md text-sm">
-                            <select class="px-3 py-2 border border-gray-300 rounded-md text-sm"><option>核销类型：全部</option><option>材料</option><option>工费</option></select>
-                            <select class="px-3 py-2 border border-gray-300 rounded-md text-sm"><option>来源：全部</option><option>金蝶</option><option>SVI</option><option>供应链平台</option></select>
-                        <input type="date" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                            <span class="text-gray-400">至</span>
-                            <input type="date" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                            <button class="px-3 py-2 bg-primary text-white rounded-md text-sm">查询</button>
+                            <select class="filter-select px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                                <option value="doc">来源单据号</option>
+                                <option value="contract">合同号</option>
+                            </select>
+                            <input type="text" class="filter-input w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="按来源单据号搜索">
+                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="搜索"><i data-lucide="search" class="w-4 h-4"></i></button>
+                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="刷新"><i data-lucide="refresh-ccw" class="w-4 h-4"></i></button>
+                            <button class="advanced-filter-btn px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center text-sm">高级筛选<i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i></button>
+                        </div>
+                        <div class="advanced-filter mb-4 grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                                <div class="relative entity-filter">
+                                    <button type="button" class="entity-filter-toggle w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-left flex items-center justify-between bg-white">
+                                        <span class="entity-filter-label text-gray-500">全部</span>
+                                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                    <div class="entity-filter-panel hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg p-2 max-h-60 overflow-auto">
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm font-medium border-b border-gray-100 mb-1"><input type="checkbox" class="entity-filter-all"><span>全选 / 取消全选</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="北京家装"><span>北京家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="上海家装"><span>上海家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="广州家装"><span>广州家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="成都家装"><span>成都家装</span></label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
@@ -228,18 +360,21 @@
                                     <tr>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">来源单据号</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">客户</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">核销类型</th>
                                         <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">核销金额</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">业务日期</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">来源系统</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务中台接收日</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">期段标记</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <tr><td class="px-3 py-2 text-primary">KD-WO-20260810-00214</td><td class="px-3 py-2">HT-JZ-2024-00512</td><td class="px-3 py-2">陈先生</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800">材料</span></td><td class="px-3 py-2 text-right">1,285.00</td><td class="px-3 py-2">2026-08-10</td><td class="px-3 py-2">金蝶</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">已入账</span></td></tr>
-                                    <tr><td class="px-3 py-2 text-primary">SVI-WO-20260812-00088</td><td class="px-3 py-2">HT-JZ-2024-00512</td><td class="px-3 py-2">陈先生</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-cyan-100 text-cyan-800">工费</span></td><td class="px-3 py-2 text-right">680.00</td><td class="px-3 py-2">2026-08-12</td><td class="px-3 py-2">SVI 交付域</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">已入账</span></td></tr>
-                                    <tr><td class="px-3 py-2 text-primary">KD-WO-20260813-00445</td><td class="px-3 py-2">HT-JZ-2024-00618</td><td class="px-3 py-2">周女士</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800">材料</span></td><td class="px-3 py-2 text-right">2,140.00</td><td class="px-3 py-2">2026-08-13</td><td class="px-3 py-2">金蝶</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-800">合同缺失-挂起</span></td></tr>
+                                    <tr><td class="px-3 py-2 text-primary">KD-WO-20260810-00214</td><td class="px-3 py-2">HT-JZ-2024-00512</td><td class="px-3 py-2">北京家装</td><td class="px-3 py-2">陈先生</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800">材料</span></td><td class="px-3 py-2 text-right">1,285.00</td><td class="px-3 py-2">2026-08-10</td><td class="px-3 py-2">金蝶</td><td class="px-3 py-2">2026-08-10 02:15:33</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">质保期内</span></td><td class="px-3 py-2"><button class="text-primary hover:underline btn-accrual-detail" data-kind="核销" data-doc="KD-WO-20260810-00214" data-entity="北京家装" data-customer="陈先生" data-contract="HT-JZ-2024-00512" data-project-type="材料" data-amount="1,285.00" data-wo-no="KD-WO-20260810-00214" data-wo-source="金蝶" data-wo-material="1,285.00" data-wo-labor="0.00" data-wo-amount="1,285.00" data-doc-status="已回写" data-ebs-status="已同步" data-ebs-scene="家装售后维修 / 核销" data-created-at="2026-08-10 02:15:33" data-created-by="金蝶">详情</button></td></tr>
+                                    <tr><td class="px-3 py-2 text-primary">SVI-WO-20260812-00088</td><td class="px-3 py-2">HT-JZ-2024-00512</td><td class="px-3 py-2">北京家装</td><td class="px-3 py-2">陈先生</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-cyan-100 text-cyan-800">工费</span></td><td class="px-3 py-2 text-right">680.00</td><td class="px-3 py-2">2026-08-12</td><td class="px-3 py-2">SVI 交付域</td><td class="px-3 py-2">2026-08-12 02:18:07</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">质保期内</span></td><td class="px-3 py-2"><button class="text-primary hover:underline btn-accrual-detail" data-kind="核销" data-doc="SVI-WO-20260812-00088" data-entity="北京家装" data-customer="陈先生" data-contract="HT-JZ-2024-00512" data-project-type="工费" data-amount="680.00" data-wo-no="SVI-WO-20260812-00088" data-wo-source="SVI 交付域" data-wo-material="0.00" data-wo-labor="680.00" data-wo-amount="680.00" data-doc-status="已回写" data-ebs-status="已同步" data-ebs-scene="家装售后维修 / 核销" data-created-at="2026-08-12 02:18:07" data-created-by="SVI 交付域">详情</button></td></tr>
+                                    <tr><td class="px-3 py-2 text-primary">KD-WO-20260813-00445</td><td class="px-3 py-2">HT-JZ-2024-00618</td><td class="px-3 py-2">上海家装</td><td class="px-3 py-2">周女士</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800">材料</span></td><td class="px-3 py-2 text-right">2,140.00</td><td class="px-3 py-2">2026-08-13</td><td class="px-3 py-2">金蝶</td><td class="px-3 py-2">2026-08-13 02:16:52</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">质保期后</span></td><td class="px-3 py-2"><button class="text-primary hover:underline btn-accrual-detail" data-kind="核销" data-doc="KD-WO-20260813-00445" data-entity="上海家装" data-customer="周女士" data-contract="HT-JZ-2024-00618" data-project-type="材料" data-amount="2,140.00" data-wo-no="KD-WO-20260813-00445" data-wo-source="金蝶" data-wo-material="2,140.00" data-wo-labor="0.00" data-wo-amount="2,140.00" data-doc-status="已回写" data-ebs-status="已同步" data-ebs-scene="家装售后维修 / 核销" data-created-at="2026-08-13 02:16:52" data-created-by="金蝶">详情</button></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -249,33 +384,55 @@
                     <div id="tab-supplement" class="tab-content mt-6 hidden">
                         <div class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm text-amber-800 flex items-start gap-2">
                             <i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
-                            <span>补提规则：每月最后一日 23:00 自动跑批。扫描所有"计提中"合同，若预计负债余额出现<strong>借方赤字</strong>（余额 < 0），按 |余额| 生成补提单并同步 EBS。同一合同同月只能补提一次。</span>
+                            <span>补提规则：<strong>次月首日凌晨</strong>由系统自动跑批（含质保期满月，不单独设延迟档），也可由核算会计在右上角「手工发起跑批」触发。扫描所有"计提中"合同，若预计负债余额出现<strong>借方赤字</strong>（余额 < 0），按 |余额| 生成补提单并同步 EBS；同时对合同金额被事后修正的合同做计提基数复核。同一合同同月只能补提一次。</span>
                         </div>
                         <div class="flex items-center space-x-2 mb-4">
-                            <input type="text" placeholder="合同号 / 客户" class="w-64 px-3 py-2 border border-gray-300 rounded-md text-sm">
-                            <select class="px-3 py-2 border border-gray-300 rounded-md text-sm"><option>期间：2026-08</option></select>
-                            <button class="px-3 py-2 bg-primary text-white rounded-md text-sm">查询</button>
-                            <button class="ml-auto px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm flex items-center gap-1"><i data-lucide="play" class="w-4 h-4"></i>试算</button>
-                     <button class="px-3 py-2 bg-primary text-white rounded-md text-sm flex items-center gap-1"><i data-lucide="check" class="w-4 h-4"></i>正式跑批</button>
+                            <select class="filter-select px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                                <option value="doc">补提单号</option>
+                                <option value="contract">合同号</option>
+                            </select>
+                            <input type="text" class="filter-input w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="按补提单号搜索">
+                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="搜索"><i data-lucide="search" class="w-4 h-4"></i></button>
+                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="刷新"><i data-lucide="refresh-ccw" class="w-4 h-4"></i></button>
+                            <button class="advanced-filter-btn px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center text-sm">高级筛选<i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i></button>
+                        </div>
+                        <div class="advanced-filter mb-4 grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                                <div class="relative entity-filter">
+                                    <button type="button" class="entity-filter-toggle w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-left flex items-center justify-between bg-white">
+                                        <span class="entity-filter-label text-gray-500">全部</span>
+                                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                    <div class="entity-filter-panel hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg p-2 max-h-60 overflow-auto">
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm font-medium border-b border-gray-100 mb-1"><input type="checkbox" class="entity-filter-all"><span>全选 / 取消全选</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="北京家装"><span>北京家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="上海家装"><span>上海家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="广州家装"><span>广州家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="成都家装"><span>成都家装</span></label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">客户</th>
-                                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">累计计提</th>
-                                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">累计补提</th>
-                                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">累计核销</th>
-                                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">当前余额</th>
-                                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">应补提金额</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">补提单号</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">客户</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">项目类型</th>
+                                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">补提金额</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">期段标记</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">生成时间</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">EBS 同步状态</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <tr><td class="px-3 py-2">HT-JZ-2024-00218</td><td class="px-3 py-2">吴先生</td><td class="px-3 py-2 text-right">3,282.10</td><td class="px-3 py-2 text-right">0.00</td><td class="px-3 py-2 text-right">4,180.00</td><td class="px-3 py-2 text-right text-red-600 font-medium">-897.90</td><td class="px-3 py-2 text-right font-medium">897.90</td><td class="px-3 py-2 text-primary">SHBT202608000012</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">试算</span></td></tr>
-                                    <tr><td class="px-3 py-2">HT-JZ-2024-00325</td><td class="px-3 py-2">郑女士</td><td class="px-3 py-2 text-right">2,486.00</td><td class="px-3 py-2 text-right">120.00</td><td class="px-3 py-2 text-right">3,915.00</td><td class="px-3 py-2 text-right text-red-600 font-medium">-1,309.00</td><td class="px-3 py-2 text-right font-medium">1,309.00</td><td class="px-3 py-2 text-primary">SHBT202608000013</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">试算</span></td></tr>
+                                    <tr><td class="px-3 py-2 text-primary">SHBT202608000012</td><td class="px-3 py-2">HT-JZ-2024-00218</td><td class="px-3 py-2">北京家装</td><td class="px-3 py-2">吴先生</td><td class="px-3 py-2">整装</td><td class="px-3 py-2 text-right font-medium">897.90</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">质保期内</span></td><td class="px-3 py-2">2026-08-31 23:05:12</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">已同步</span></td><td class="px-3 py-2"><button class="text-primary hover:underline btn-accrual-detail" data-kind="补提" data-doc="SHBT202608000012" data-entity="北京家装" data-customer="吴先生" data-contract="HT-JZ-2024-00218" data-project-type="整装" data-cum-accrual="4,000.00" data-cum-supp="0.00" data-cum-writeoff="3,600.00" data-cum-reverse="1,297.90" data-liability-balance="-897.90" data-hookup-amount="897.90" data-doc-status="已生成" data-ebs-status="已同步" data-ebs-scene="家装售后维修 / 补提" data-created-at="2026-08-31 23:05:12" data-created-by="系统">详情</button></td></tr>
+                                    <tr><td class="px-3 py-2 text-primary">SHBT202608000013</td><td class="px-3 py-2">HT-JZ-2024-00325</td><td class="px-3 py-2">上海家装</td><td class="px-3 py-2">郑女士</td><td class="px-3 py-2">软装</td><td class="px-3 py-2 text-right font-medium">1,309.00</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">质保期后</span></td><td class="px-3 py-2">2026-08-31 23:05:14</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">同步中</span></td><td class="px-3 py-2"><button class="text-primary hover:underline btn-accrual-detail" data-kind="补提" data-doc="SHBT202608000013" data-entity="上海家装" data-customer="郑女士" data-contract="HT-JZ-2024-00325" data-project-type="软装" data-cum-accrual="5,000.00" data-cum-supp="0.00" data-cum-writeoff="4,200.00" data-cum-reverse="2,109.00" data-liability-balance="-1,309.00" data-hookup-amount="1,309.00" data-doc-status="已生成" data-ebs-status="同步中" data-ebs-scene="家装售后维修 / 补提" data-created-at="2026-08-31 23:05:14" data-created-by="系统">详情</button></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -287,24 +444,54 @@
                             <i data-lucide="check-circle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
                             <span>转回规则：<strong>先执行补提检查</strong>，再判断质保期满月合同的预计负债余额 > 0（贷方余额）时按余额转回。合同状态置为"计提结束"。</span>
                         </div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <select class="filter-select px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                                <option value="doc">转回单号</option>
+                                <option value="contract">合同号</option>
+                            </select>
+                            <input type="text" class="filter-input w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="按转回单号搜索">
+                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="搜索"><i data-lucide="search" class="w-4 h-4"></i></button>
+                            <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="刷新"><i data-lucide="refresh-ccw" class="w-4 h-4"></i></button>
+                            <button class="advanced-filter-btn px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center text-sm">高级筛选<i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i></button>
+                        </div>
+                        <div class="advanced-filter mb-4 grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                                <div class="relative entity-filter">
+                                    <button type="button" class="entity-filter-toggle w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-left flex items-center justify-between bg-white">
+                                        <span class="entity-filter-label text-gray-500">全部</span>
+                                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                    <div class="entity-filter-panel hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg p-2 max-h-60 overflow-auto">
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm font-medium border-b border-gray-100 mb-1"><input type="checkbox" class="entity-filter-all"><span>全选 / 取消全选</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="北京家装"><span>北京家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="上海家装"><span>上海家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="广州家装"><span>广州家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="成都家装"><span>成都家装</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
                                 <thead class="bg-gray-50">
                                     <tr>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">转回单号</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">财务主体</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">客户</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">项目类型</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">竣工日</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">质保期满日</th>
-                                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">期末余额</th>
                                         <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">转回金额</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">转回单号</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">生成时间</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">EBS 同步状态</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <tr><td class="px-3 py-2">HT-JZ-2024-00058</td><td class="px-3 py-2">高女士</td><td class="px-3 py-2">2024-08-15</td><td class="px-3 py-2">2026-08-15</td><td class="px-3 py-2 text-right text-green-700 font-medium">2,180.00</td><td class="px-3 py-2 text-right font-medium">2,180.00</td><td class="px-3 py-2 text-primary">SHZH202608000001</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">已入账</span></td></tr>
-                                    <tr><td class="px-3 py-2">HT-JZ-2024-00072</td><td class="px-3 py-2">徐先生</td><td class="px-3 py-2">2024-08-22</td><td class="px-3 py-2">2026-08-22</td><td class="px-3 py-2 text-right text-green-700 font-medium">1,485.60</td><td class="px-3 py-2 text-right font-medium">1,485.60</td><td class="px-3 py-2 text-primary">SHZH202608000002</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">同步中</span></td></tr>
-                                    <tr><td class="px-3 py-2">HT-JZ-2024-00081</td><td class="px-3 py-2">马女士</td><td class="px-3 py-2">2024-08-28</td><td class="px-3 py-2">2026-08-28</td><td class="px-3 py-2 text-right text-gray-500">0.00</td><td class="px-3 py-2 text-right text-gray-500">0.00（已耗尽）</td><td class="px-3 py-2">-</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">计提结束</span></td></tr>
+                                    <tr><td class="px-3 py-2 text-primary">SHZH202608000001</td><td class="px-3 py-2">HT-JZ-2024-00058</td><td class="px-3 py-2">北京家装</td><td class="px-3 py-2">高女士</td><td class="px-3 py-2">整装</td><td class="px-3 py-2">2024-08-15</td><td class="px-3 py-2">2026-08-15</td><td class="px-3 py-2 text-right font-medium text-red-600">-2,180.00</td><td class="px-3 py-2">2026-08-31 23:10:06</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">已同步</span></td><td class="px-3 py-2"><button class="text-primary hover:underline btn-accrual-detail" data-kind="转回" data-doc="SHZH202608000001" data-entity="北京家装" data-customer="高女士" data-contract="HT-JZ-2024-00058" data-project-type="整装" data-finish-date="2024-08-15" data-warranty-end="2026-08-15" data-cum-accrual="5,000.00" data-cum-supp="180.00" data-cum-writeoff="3,000.00" data-cum-reverse="0.00" data-liability-balance="2,180.00" data-hookup-amount="2,180.00" data-doc-status="已生成" data-ebs-status="已同步" data-ebs-scene="家装售后维修 / 转回" data-created-at="2026-08-31 23:10:06" data-created-by="系统">详情</button></td></tr>
+                                    <tr><td class="px-3 py-2 text-primary">SHZH202608000002</td><td class="px-3 py-2">HT-JZ-2024-00072</td><td class="px-3 py-2">上海家装</td><td class="px-3 py-2">徐先生</td><td class="px-3 py-2">软装</td><td class="px-3 py-2">2024-08-22</td><td class="px-3 py-2">2026-08-22</td><td class="px-3 py-2 text-right font-medium text-red-600">-1,485.60</td><td class="px-3 py-2">2026-08-31 23:10:08</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">同步中</span></td><td class="px-3 py-2"><button class="text-primary hover:underline btn-accrual-detail" data-kind="转回" data-doc="SHZH202608000002" data-entity="上海家装" data-customer="徐先生" data-contract="HT-JZ-2024-00072" data-project-type="软装" data-finish-date="2024-08-22" data-warranty-end="2026-08-22" data-cum-accrual="4,000.00" data-cum-supp="85.60" data-cum-writeoff="2,600.00" data-cum-reverse="0.00" data-liability-balance="1,485.60" data-hookup-amount="1,485.60" data-doc-status="已生成" data-ebs-status="同步中" data-ebs-scene="家装售后维修 / 转回" data-created-at="2026-08-31 23:10:08" data-created-by="系统">详情</button></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -312,29 +499,105 @@
 
                     <!-- Tab 5: 异常单据 -->
                     <div id="tab-exception" class="tab-content mt-6 hidden">
-                        <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-800 flex items-start gap-2">
-                            <i data-lucide="alert-circle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
-                            <span>以下单据因主数据缺失或配置未就绪被挂起。请补齐后点击"重跑"。</span>
+                        <!-- 顶部按类型汇总 -->
+                        <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-4">
+                            <div class="p-3 bg-gray-50 border border-gray-200 rounded-md">
+                                <p class="text-xs text-gray-500">待处理异常总数</p>
+                                <p class="text-xl font-semibold text-red-600">14</p>
+                            </div>
+                            <div class="p-3 bg-white border border-gray-200 rounded-md">
+                                <p class="text-xs text-gray-500">计提比例缺配</p>
+                                <p class="text-lg font-semibold text-gray-800">4</p>
+                            </div>
+                            <div class="p-3 bg-white border border-gray-200 rounded-md">
+                                <p class="text-xs text-gray-500">质保年限缺配</p>
+                                <p class="text-lg font-semibold text-gray-800">3</p>
+                            </div>
+                            <div class="p-3 bg-white border border-gray-200 rounded-md">
+                                <p class="text-xs text-gray-500">主数据未同步</p>
+                                <p class="text-lg font-semibold text-gray-800">4</p>
+                            </div>
+                            <div class="p-3 bg-white border border-gray-200 rounded-md">
+                                <p class="text-xs text-gray-500">EBS 同步失败</p>
+                                <p class="text-lg font-semibold text-gray-800">3</p>
+                            </div>
+                            <div class="p-3 bg-white border border-gray-200 rounded-md">
+                                <p class="text-xs text-gray-500">已处理(近30天)</p>
+                                <p class="text-lg font-semibold text-green-600">126</p>
+                            </div>
+                        </div>
+                        <!-- 筛选(财务中台统一筛选组件) -->
+                        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                            <div class="flex items-center space-x-2">
+                                <select class="filter-select px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                                    <option value="contract">合同号</option>
+                                    <option value="customer">客户</option>
+                                </select>
+                                <input type="text" class="filter-input w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="按合同号搜索">
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="搜索"><i data-lucide="search" class="w-4 h-4"></i></button>
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="刷新"><i data-lucide="refresh-ccw" class="w-4 h-4"></i></button>
+                                <button class="advanced-filter-btn px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center text-sm">高级筛选<i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i></button>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-400" id="exc-selected-count">已选 0 项</span>
+                                <button id="exc-batch-retry-btn" class="px-3 py-2 bg-primary text-white rounded-md hover:opacity-90 text-sm flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed" disabled><i data-lucide="refresh-cw" class="w-4 h-4"></i>批量重试</button>
+                            </div>
+                        </div>
+                        <div class="advanced-filter mb-4 grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                                <div class="relative entity-filter">
+                                    <button type="button" class="entity-filter-toggle w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-left flex items-center justify-between bg-white">
+                                        <span class="entity-filter-label text-gray-500">全部</span>
+                                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                                   </button>
+                                    <div class="entity-filter-panel hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg p-2 max-h-60 overflow-auto">
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm font-medium border-b border-gray-100 mb-1"><input type="checkbox" class="entity-filter-all"><span>全选 / 取消全选</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="北京家装"><span>北京家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="上海家装"><span>上海家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="广州家装"><span>广州家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="成都家装"><span>成都家装</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">异常类型</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white">
+                                    <option>全部异常类型</option>
+                                    <option>计提比例缺配</option>
+                                    <option>质保年限缺配</option>
+                                    <option>主数据未同步</option>
+                                    <option>EBS 同步失败</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">来源单据</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                        <th class="px-3 py-2 text-left w-10"><input type="checkbox" id="exc-check-all"></th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">异常类型</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">单据类型</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">合同号</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">客户</th>
+                                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">金额</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">异常原因</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">发生时间</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
                                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
-                                    </tr>
+                                   </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <tr><td class="px-3 py-2 text-primary">竣工事件-JG20260814-208</td><td class="px-3 py-2">HT-JZ-2024-00888</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">无计提比例</span></td><td class="px-3 py-2">2026-08-14 生效的比例未配置</td><td class="px-3 py-2">2026-08-14 03:12</td><td class="px-3 py-2"><a href="accrual-rate.html" class="text-primary hover:underline mr-2">去配置</a><button class="text-primary hover:underline">重跑</button></td></tr>
-                                    <tr><td class="px-3 py-2 text-primary">竣工事件-JG20260815-311</td><td class="px-3 py-2">HT-JZ-2024-00901</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">无质保年限</span></td><td class="px-3 py-2">财务主体+合同需求类型未配置</td><td class="px-3 py-2">2026-08-15 03:14</td><td class="px-3 py-2"><a href="warranty-period.html" class="text-primary hover:underline mr-2">去配置</a><button class="text-primary hover:underline">重跑</button></td></tr>
-                                    <tr><td class="px-3 py-2 text-primary">核销回传-KD20260813-445</td><td class="px-3 py-2">HT-JZ-2024-00618</td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-700">合同缺失</span></td><td class="px-3 py-2">金蝶单据未带合同号</td><td class="px-3 py-2">2026-08-13 22:41</td><td class="px-3 py-2"><button class="text-primary hover:underline mr-2">通知业务</button><button class="text-primary hover:underline">补录</button></td></tr>
+                                    <tr><td class="px-3 py-2"><input type="checkbox" class="exc-row-check"></td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">计提比例缺配</span></td><td class="px-3 py-2">竣工计提单</td><td class="px-3 py-2">HT-JZ-2024-00888</td><td class="px-3 py-2">李先生</td><td class="px-3 py-2 text-right">—</td><td class="px-3 py-2">2026-08-14 生效的比例未配置</td><td class="px-3 py-2">2026-08-14 03:12</td><td class="px-3 py-2"><span class="text-red-600">待处理</span></td><td class="px-3 py-2"><button class="text-primary hover:underline">重试</button></td></tr>
+                                    <tr><td class="px-3 py-2"><input type="checkbox" class="exc-row-check"></td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">质保年限缺配</span></td><td class="px-3 py-2">竣工计提单</td><td class="px-3 py-2">HT-JZ-2024-00901</td><td class="px-3 py-2">周女士</td><td class="px-3 py-2 text-right">—</td><td class="px-3 py-2">财务主体+合同需求类型未配置</td><td class="px-3 py-2">2026-08-15 03:14</td><td class="px-3 py-2"><span class="text-red-600">待处理</span></td><td class="px-3 py-2"><button class="text-primary hover:underline">重试</button></td></tr>
+                                    <tr><td class="px-3 py-2"><input type="checkbox" class="exc-row-check"></td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-700">主数据未同步</span></td><td class="px-3 py-2">核销明细单</td><td class="px-3 py-2">HT-JZ-2024-00618</td><td class="px-3 py-2">—</td><td class="px-3 py-2 text-right">3,200.00</td><td class="px-3 py-2">金蝶单据未带客户+合同</td><td class="px-3 py-2">2026-08-13 22:41</td><td class="px-3 py-2"><span class="text-red-600">待处理</span></td><td class="px-3 py-2"><button class="text-primary hover:underline">重试</button></td></tr>
+                                    <tr><td class="px-3 py-2"><input type="checkbox" class="exc-row-check"></td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-700">主数据未同步</span></td><td class="px-3 py-2">竣工计提单</td><td class="px-3 py-2">HT-JZ-2024-00655</td><td class="px-3 py-2">—</td><td class="px-3 py-2 text-right">—</td><td class="px-3 py-2">合同在中台未同步，已触发主数据补拉</td><td class="px-3 py-2">2026-08-15 03:15</td><td class="px-3 py-2"><span class="text-red-600">待处理</span></td><td class="px-3 py-2"><button class="text-primary hover:underline">重试</button></td></tr>
+                                    <tr><td class="px-3 py-2"><input type="checkbox" class="exc-row-check"></td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-orange-100 text-orange-700">EBS 同步失败</span></td><td class="px-3 py-2">竣工计提单</td><td class="px-3 py-2">HT-JZ-2024-00712</td><td class="px-3 py-2">吴先生</td><td class="px-3 py-2 text-right">1,540.00</td><td class="px-3 py-2">重试 3 次仍失败，EBS 场景映射校验未通过</td><td class="px-3 py-2">2026-08-16 02:08</td><td class="px-3 py-2"><span class="text-red-600">待处理</span></td><td class="px-3 py-2"><button class="text-primary hover:underline">重试</button></td></tr>
+                                    <tr class="bg-gray-50 text-gray-400"><td class="px-3 py-2"></td><td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-gray-200 text-gray-600">计提比例缺配</span></td><td class="px-3 py-2">竣工计提单</td><td class="px-3 py-2">HT-JZ-2024-00801</td><td class="px-3 py-2">郑女士</td><td class="px-3 py-2 text-right">1,980.00</td><td class="px-3 py-2">已补配比例并重跑成功</td><td class="px-3 py-2">2026-08-12 03:10</td><td class="px-3 py-2"><span class="text-green-600">已处理</span></td><td class="px-3 py-2">—</td></tr>
                                 </tbody>
                             </table>
                         </div>
+                        <p class="text-xs text-gray-400 mt-3">说明：先按异常原因补齐配置或主数据后点"重试"，系统重新执行原动作（生成计提单/回写核销/推送 EBS），成功后自动置"已处理"（幂等，不重复生成）；支持勾选多条后点"批量重试"批量提交，单次最多 50 条（性能保护），超出请分批处理。</p>
                     </div>
 
                     <!-- Tab 6: 质保期到期预警 -->
@@ -342,6 +605,45 @@
                         <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-800 flex items-start gap-2">
                             <i data-lucide="bell" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
                             <span>未来 3 个月内质保期满合同清单，请提前复核余额与预计转回金额。</span>
+                        </div>
+                        <!-- 筛选(财务中台统一筛选组件) -->
+                        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                            <div class="flex items-center space-x-2">
+                                <select class="filter-select px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                                    <option value="contract">合同号</option>
+                                    <option value="customer">客户</option>
+                                </select>
+                                <input type="text" class="filter-input w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="按合同号搜索">
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="搜索"><i data-lucide="search" class="w-4 h-4"></i></button>
+                                <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="刷新"><i data-lucide="refresh-ccw" class="w-4 h-4"></i></button>
+                                <button class="advanced-filter-btn px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center text-sm">高级筛选<i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i></button>
+                            </div>
+                        </div>
+                        <div class="advanced-filter mb-4 grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                                <div class="relative entity-filter">
+                                    <button type="button" class="entity-filter-toggle w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-left flex items-center justify-between bg-white">
+                                        <span class="entity-filter-label text-gray-500">全部</span>
+                                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                    <div class="entity-filter-panel hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg p-2 max-h-60 overflow-auto">
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm font-medium border-b border-gray-100 mb-1"><input type="checkbox" class="entity-filter-all"><span>全选 / 取消全选</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="北京家装"><span>北京家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="上海家装"><span>上海家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="广州家装"><span>广州家装</span></label>
+                                        <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50"><input type="checkbox" class="entity-filter-item" value="成都家装"><span>成都家装</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">质保期满日</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                    <span class="text-gray-400 text-sm">至</span>
+                                    <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                </div>
+                            </div>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
@@ -388,22 +690,22 @@
                         <div><dt class="text-gray-500">客户</dt><dd class="font-medium" id="d-customer">—</dd></div>
                         <div><dt class="text-gray-500">合同号</dt><dd class="font-medium" id="d-contract">—</dd></div>
                         <div><dt class="text-gray-500">项目类型</dt><dd class="font-medium" id="d-project-type">—</dd></div>
-                        <div><dt class="text-gray-500">竣工日</dt><dd class="font-medium" id="d-finish-date">—</dd></div>
-                        <div><dt class="text-gray-500">质保年限</dt><dd class="font-medium" id="d-warranty">—</dd></div>
-                        <div class="col-span-2"><dt class="text-gray-500">质保期满日</dt><dd class="font-medium" id="d-warranty-end">—</dd></div>
+                    <div id="d-finish-date-wrap"><dt class="text-gray-500">竣工日</dt><dd class="font-medium" id="d-finish-date">—</dd></div>
+                        <div id="d-warranty-wrap"><dt class="text-gray-500">质保年限</dt><dd class="font-medium" id="d-warranty">—</dd></div>
+                        <div class="col-span-2" id="d-warranty-end-wrap"><dt class="text-gray-500">质保期满日</dt><dd class="font-medium" id="d-warranty-end">—</dd></div>
                     </dl>
                 </section>
-                <section>
+                <section id="d-accrual-params-section">
                     <h4 class="text-sm font-semibold text-gray-700 mb-3">计提参数快照</h4>
                     <dl class="grid grid-cols-2 gap-x-6 gap-y-2">
                         <div><dt class="text-gray-500">应收总额（不含设计费）</dt><dd class="font-medium" id="d-receivable">—</dd></div>
                         <div><dt class="text-gray-500">合同税率</dt><dd class="font-medium" id="d-tax-rate">—</dd></div>
-                        <div><dt class="text-gray-500">不含税收入基数</dt><dd class="font-medium" id="d-base">—</dd></div>
+                        <div><dt class="text-gray-500">合同收入金额</dt><dd class="font-medium" id="d-base">—</dd></div>
                         <div><dt class="text-gray-500">计提比例</dt><dd class="font-medium" id="d-rate">—</dd></div>
                         <div class="col-span-2"><dt class="text-gray-500">计提金额</dt><dd class="font-semibold text-primary text-base" id="d-amount">—</dd></div>
                     </dl>
                     <div class="mt-3 rounded-md bg-gray-50 border border-gray-200 px-3 py-2 text-xs text-gray-600">
-                        计算逻辑：不含税收入基数 = 应收总额 / (1 + 合同税率)；计提金额 = 不含税收入基数 × 计提比例
+                        计算逻辑：合同收入金额 = 应收总额 / (1 + 合同税率)；计提金额 = 合同收入金额 × 计提比例
                     </div>
                 </section>
                 <section>
@@ -412,7 +714,6 @@
                         <div><dt class="text-gray-500">单据状态</dt><dd class="font-medium" id="d-doc-status">—</dd></div>
                         <div><dt class="text-gray-500">EBS 同步状态</dt><dd class="font-medium" id="d-ebs-status">—</dd></div>
                         <div><dt class="text-gray-500">EBS 主子场景</dt><dd class="font-medium" id="d-ebs-scene">—</dd></div>
-                        <div><dt class="text-gray-500">EBS 凭证号</dt><dd class="font-medium" id="d-ebs-voucher">—</dd></div>
                         <div><dt class="text-gray-500">生成时间</dt><dd class="font-medium" id="d-created-at">—</dd></div>
                         <div><dt class="text-gray-500">生成人</dt><dd class="font-medium" id="d-created-by">—</dd></div>
                     </dl>
@@ -420,22 +721,32 @@
                         <span class="font-medium">同步失败原因：</span><span id="d-ebs-error"></span>
                     </div>
                 </section>
-                <section>
-                    <h4 class="text-sm font-semibold text-gray-700 mb-3">参考会计分录（EBS 侧生成）</h4>
-                    <table class="min-w-full border border-gray-200 text-xs">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-3 py-2 text-left text-gray-500">方向</th>
-                                <th class="px-3 py-2 text-left text-gray-500">科目</th>
-                                <th class="px-3 py-2 text-right text-gray-500">金额</th>
-                                <th class="px-3 py-2 text-left text-gray-500">辅助核算</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <tr><td class="px-3 py-2">借</td><td class="px-3 py-2">6401.10 主营业务成本-售后维修成本</td><td class="px-3 py-2 text-right" id="d-entry-amount-1">—</td><td class="px-3 py-2" id="d-entry-aux-1">—</td></tr>
-                            <tr><td class="px-3 py-2">贷</td><td class="px-3 py-2">280102 预计负债-售后维修成本</td><td class="px-3 py-2 text-right" id="d-entry-amount-2">—</td><td class="px-3 py-2" id="d-entry-aux-2">—</td></tr>
-                        </tbody>
-                    </table>
+                <section id="d-hookup-section" class="hidden">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3">金额来源钩稽</h4>
+                    <dl class="grid grid-cols-2 gap-x-6 gap-y-2">
+                        <div><dt class="text-gray-500">累计计提</dt><dd class="font-medium" id="d-cum-accrual">—</dd></div>
+                        <div><dt class="text-gray-500">累计补提</dt><dd class="font-medium" id="d-cum-supp">—</dd></div>
+                        <div><dt class="text-gray-500">累计核销</dt><dd class="font-medium" id="d-cum-writeoff">—</dd></div>
+                        <div><dt class="text-gray-500">累计转回</dt><dd class="font-medium" id="d-cum-reverse">—</dd></div>
+                        <div class="col-span-2"><dt class="text-gray-500">预计负债余额</dt><dd class="font-medium" id="d-liability-balance">—</dd></div>
+                        <div class="col-span-2"><dt class="text-gray-500" id="d-hookup-amount-label">本次金额</dt><dd class="font-semibold text-primary text-base" id="d-hookup-amount">—</dd></div>
+                    </dl>
+                    <div class="mt-3 rounded-md bg-gray-50 border border-gray-200 px-3 py-2 text-xs text-gray-600" id="d-hookup-logic">
+                        预计负债余额 = 累计计提 + 累计补提 − 累计核销 − 累计转回
+                    </div>
+                </section>
+                <section id="d-writeoff-section" class="hidden">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3">核销工单信息</h4>
+                    <dl class="grid grid-cols-2 gap-x-6 gap-y-2">
+                        <div><dt class="text-gray-500">来源工单号</dt><dd class="font-medium" id="d-wo-no">—</dd></div>
+                        <div><dt class="text-gray-500">来源系统</dt><dd class="font-medium" id="d-wo-source">—</dd></div>
+                        <div><dt class="text-gray-500">材料成本</dt><dd class="font-medium" id="d-wo-material">—</dd></div>
+                        <div><dt class="text-gray-500">工费成本</dt><dd class="font-medium" id="d-wo-labor">—</dd></div>
+                        <div class="col-span-2"><dt class="text-gray-500">本次核销金额</dt><dd class="font-semibold text-primary text-base" id="d-wo-amount">—</dd></div>
+                    </dl>
+                    <div class="mt-3 rounded-md bg-gray-50 border border-gray-200 px-3 py-2 text-xs text-gray-600">
+                        本次核销金额 = 材料成本 + 工费成本；核销时冲减对应财务主体的预计负债余额
+                    </div>
                 </section>
             </div>
             <div class="px-6 py-3 border-t bg-gray-50 flex justify-end gap-2">
@@ -482,36 +793,80 @@
         function closeAccrualDrawer() { drawer.classList.add('hidden'); }
         window.closeAccrualDrawer = closeAccrualDrawer;
         function openAccrualDetail(btn) {
-            const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
-            setText('drawer-doc-no', '单据号：' + btn.dataset.doc);
-            setText('d-entity', btn.dataset.entity);
-            setText('d-customer', btn.dataset.customer);
-            setText('d-contract', btn.dataset.contract);
-            setText('d-project-type', btn.dataset.projectType);
-            setText('d-finish-date', btn.dataset.finishDate);
-            setText('d-warranty', btn.dataset.warranty);
-            setText('d-warranty-end', btn.dataset.warrantyEnd);
-            setText('d-receivable', btn.dataset.receivable);
-            setText('d-tax-rate', btn.dataset.taxRate);
-            setText('d-base', btn.dataset.base);
-            setText('d-rate', btn.dataset.rate);
-            setText('d-amount', btn.dataset.amount);
-            setText('d-doc-status', btn.dataset.docStatus);
-            setText('d-ebs-status', btn.dataset.ebsStatus);
-            setText('d-ebs-scene', btn.dataset.ebsScene);
-            setText('d-ebs-voucher', btn.dataset.ebsVoucher);
-            setText('d-created-at', btn.dataset.createdAt);
-            setText('d-created-by', btn.dataset.createdBy);
-            const aux = btn.dataset.customer + ' / ' + btn.dataset.contract;
-            setText('d-entry-amount-1', btn.dataset.amount);
-            setText('d-entry-amount-2', btn.dataset.amount);
-            setText('d-entry-aux-1', aux);
-            setText('d-entry-aux-2', aux);
+            const d = btn.dataset;
+            const kind = d.kind || '计提';
+            const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = (val && val !== '') ? val : '—'; };
+            const show = (id, on) => { const el = document.getElementById(id); if (el) el.classList.toggle('hidden', !on); };
+
+            // 通用：合同与项目 + 单据与 EBS 同步（各单据都有）
+            setText('drawer-doc-no', '单据号：' + d.doc);
+            setText('d-entity', d.entity);
+            setText('d-customer', d.customer);
+            setText('d-contract', d.contract);
+            setText('d-project-type', d.projectType);
+            setText('d-finish-date', d.finishDate);
+            setText('d-warranty', d.warranty);
+            setText('d-warranty-end', d.warrantyEnd);
+            setText('d-doc-status', d.docStatus);
+            setText('d-ebs-status', d.ebsStatus);
+            setText('d-ebs-scene', d.ebsScene);
+            setText('d-created-at', d.createdAt);
+            setText('d-created-by', d.createdBy);
+
+            // 标题
+            const titleEl = document.querySelector('#accrual-detail-drawer h3');
+            if (titleEl) titleEl.textContent = kind === '补提' ? '月末补提单详情' : kind === '转回' ? '质保期满转回单详情' : kind === '核销' ? '核销明细单详情' : '计提单详情';
+
+            // 竣工日/质保年限/质保期满日：仅计提、转回展示（核销/补提无此维度）
+            const showWarranty = (kind === '计提' || kind === '转回');
+            show('d-finish-date-wrap', showWarranty);
+            show('d-warranty-wrap', kind === '计提');
+            show('d-warranty-end-wrap', showWarranty);
+
+            // 计提参数快照：仅计提展示
+            const isAccrual = (kind === '计提');
+            show('d-accrual-params-section', isAccrual);
+            if (isAccrual) {
+                setText('d-receivable', d.receivable);
+                setText('d-tax-rate', d.taxRate);
+                setText('d-base', d.base);
+                setText('d-rate', d.rate);
+                setText('d-amount', d.amount);
+            }
+
+            // 金额来源钩稽：仅补提、转回展示
+            const isHookup = (kind === '补提' || kind === '转回');
+            show('d-hookup-section', isHookup);
+            if (isHookup) {
+                setText('d-cum-accrual', d.cumAccrual);
+                setText('d-cum-supp', d.cumSupp);
+                setText('d-cum-writeoff', d.cumWriteoff);
+                setText('d-cum-reverse', d.cumReverse);
+                setText('d-liability-balance', d.liabilityBalance);
+                setText('d-hookup-amount', d.hookupAmount);
+                setText('d-hookup-amount-label', kind === '补提' ? '本次补提金额' : '本次转回金额');
+                const logicEl = document.getElementById('d-hookup-logic');
+                if (logicEl) logicEl.textContent = kind === '补提'
+           ? '预计负债余额 = 累计计提 + 累计补提 − 累计核销 − 累计转回；余额小于 0 时按其绝对值补提，使余额归零'
+                    : '预计负债余额 = 累计计提 + 累计补提 − 累计核销 − 累计转回；质保期满月余额大于 0 时按余额全额转回';
+            }
+
+            // 核销工单信息：仅核销展示
+            const isWriteoff = (kind === '核销');
+            show('d-writeoff-section', isWriteoff);
+            if (isWriteoff) {
+                setText('d-wo-no', d.woNo);
+                setText('d-wo-source', d.woSource);
+                setText('d-wo-material', d.woMaterial);
+                setText('d-wo-labor', d.woLabor);
+                setText('d-wo-amount', d.woAmount || d.amount);
+            }
+
             const errWrap = document.getElementById('d-ebs-error-wrap');
-            if (btn.dataset.ebsError) {
-                document.getElementById('d-ebs-error').textContent = btn.dataset.ebsError;
+            if (d.ebsError) {
+                document.getElementById('d-ebs-error').textContent = d.ebsError;
                 errWrap.classList.remove('hidden');
-       } else {
+            } else {
                 errWrap.classList.add('hidden');
             }
             drawer.classList.remove('hidden');
@@ -520,10 +875,106 @@
         document.addEventListener('click', function(e) {
             const btn = e.target.closest('.btn-accrual-detail');
             if (btn) { e.preventDefault(); openAccrualDetail(btn); return; }
+            // 消息通知面板开关
+            const bell = e.target.closest('#msg-bell');
+            const panel = document.getElementById('msg-panel');
+            if (panel) {
+                if (bell) { panel.classList.toggle('hidden'); return; }
+                if (!e.target.closest('#msg-panel')) panel.classList.add('hidden');
+            }
         });
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && !drawer.classList.contains('hidden')) closeAccrualDrawer();
         });
+
+        // 财务主体多选筛选：展开/收起 + 全选/取消全选 + 汇总回显
+        document.addEventListener('click', function(e) {
+            const toggle = e.target.closest('.entity-filter-toggle');
+            document.querySelectorAll('.entity-filter').forEach(function(box) {
+                const panel = box.querySelector('.entity-filter-panel');
+                if (!panel) return;
+                if (toggle && box.contains(toggle)) {
+                    panel.classList.toggle('hidden');
+                } else if (!box.contains(e.target)) {
+                    panel.classList.add('hidden');
+                }
+            });
+        });
+        document.addEventListener('change', function(e) {
+            const box = e.target.closest('.entity-filter');
+            if (!box) return;
+            const all = box.querySelector('.entity-filter-all');
+            const items = Array.from(box.querySelectorAll('.entity-filter-item'));
+            const label = box.querySelector('.entity-filter-label');
+            if (e.target.classList.contains('entity-filter-all')) {
+                items.forEach(function(it) { it.checked = all.checked; });
+            } else if (e.target.classList.contains('entity-filter-item')) {
+                all.checked = items.every(function(it) { return it.checked; });
+            }
+            const checked = items.filter(function(it) { return it.checked; });
+            if (checked.length === 0) label.textContent = '财务主体：全部';
+            else if (checked.length === items.length) label.textContent = '财务主体：全部（' + items.length + '）';
+            else label.textContent = '财务主体：已选 ' + checked.length + ' 项';
+        });
+
+        // 高级筛选面板展开/收起（同页签内定位 advanced-filter）
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.advanced-filter-btn');
+            if (!btn) return;
+            const scope = btn.closest('.tab-content') || document;
+            const panel = scope.querySelector('.advanced-filter');
+            if (panel) panel.classList.toggle('hidden');
+            const icon = btn.querySelector('[data-lucide="chevron-down"]');
+            if (icon) icon.classList.toggle('rotate-180');
+        });
+
+        // 快筛下拉切换：同步单输入框 placeholder
+        document.addEventListener('change', function(e) {
+            const sel = e.target.closest('.filter-select');
+            if (!sel) return;
+            const wrap = sel.closest('.flex') || document;
+            const input = wrap.querySelector('.filter-input');
+            if (!input) return;
+            const label = sel.options[sel.selectedIndex].textContent.trim();
+            input.placeholder = '按' + label + '搜索';
+        });
+
+        // 异常单据批量重试：单选/全选联动 + 已选数量 + 单次上限校验
+        (function () {
+            const BATCH_LIMIT = 50; // 单次批量重试上限（性能保护）
+            const checkAll = document.getElementById('exc-check-all');
+            const batchBtn = document.getElementById('exc-batch-retry-btn');
+            const countEl = document.getElementById('exc-selected-count');
+            if (!checkAll || !batchBtn) return;
+            const rowChecks = () => Array.from(document.querySelectorAll('.exc-row-check'));
+
+            function refresh() {
+                const boxes = rowChecks();
+                const checked = boxes.filter(b => b.checked);
+                if (countEl) countEl.textContent = '已选 ' + checked.length + ' 项';
+                batchBtn.disabled = checked.length === 0;
+                checkAll.checked = boxes.length > 0 && checked.length === boxes.length;
+                checkAll.indeterminate = checked.length > 0 && checked.length < boxes.length;
+            }
+
+            checkAll.addEventListener('change', function () {
+                rowChecks().forEach(b => { b.checked = checkAll.checked; });
+                refresh();
+            });
+            document.addEventListener('change', function (e) {
+                if (e.target.classList && e.target.classList.contains('exc-row-check')) refresh();
+            });
+            batchBtn.addEventListener('click', function () {
+                const checked = rowChecks().filter(b => b.checked);
+                if (checked.length === 0) return;
+                if (checked.length > BATCH_LIMIT) {
+                    alert('单次批量重试最多 ' + BATCH_LIMIT + ' 条（性能保护），当前已选 ' + checked.length + ' 条，请分批处理。');
+                    return;
+                }
+                alert('已提交 ' + checked.length + ' 条异常单据批量重试，系统将按各单据类型重新执行原动作，成功后自动置为已处理。');
+            });
+            refresh();
+        })();
     </script>
 </body>
 </html>
