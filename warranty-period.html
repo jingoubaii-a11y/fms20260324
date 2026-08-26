@@ -21,7 +21,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h1 class="text-xl font-semibold text-gray-800">质保年限维护</h1>
-                            <p class="text-sm text-gray-500 mt-1">按<strong>财务主体 + 合同需求类型</strong>维护默认质保年限，用于计算合同"质保期满日"（竣工日 + N 年 - 1 日）。</p>
+                            <p class="text-sm text-gray-500 mt-1">按<strong>合同需求类型 + 财务主体</strong>维护默认质保年限，用于计算合同"质保期满日"（竣工日 + N 年）。<strong>过渡方案</strong>——业务系统结构化承接质保年限之前由财务中台维护。</p>
                         </div>
                         <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center gap-1 text-sm" onclick="openWarrantyModal('add')">
                             <i data-lucide="plus" class="w-4 h-4"></i> 新增
@@ -35,26 +35,69 @@
                         <p><strong>业务规则：</strong></p>
                         <ul class="list-disc pl-5 space-y-0.5">
                             <li>合同签订时业务系统按此配置写入默认质保年限，业务侧可基于合同条款单独调整。</li>
-                            <li>取哪条质保年限：按<strong>项目签单日</strong>落入生效开始日~结束日区间匹配（与计提比例同一套口径）。</li>
-                            <li>质保期满日 = 竣工日 + N 年 − 1 日（例：2024-08-15 竣工 + 2 年 = 2026-08-14）。</li>
-                            <li>期满次月起停止计提，若余额 > 0 则质保期满月执行转回。</li>
+                            <li>取哪条规则：按<strong>项目签单日</strong>落入<strong>启用中</strong>规则的生效开始日~结束日区间匹配（与计提比例同一套口径），且合同所属财务主体须在该规则适用范围内。</li>
+                            <li>质保期满日 = 竣工日 + N 年（例：2024-08-15 竣工 + 2 年 = 2026-08-15）；期满次月起停止计提，若余额 &gt; 0 则质保期满月执行转回。</li>
+                            <li><strong>唯一性校验</strong>：以合同需求类型为配置基准，按"需求类型 + 每个被勾选的财务主体"逐一校验时间段不重叠；<strong>已禁用行不占唯一性名额</strong>，允许历史留痕。</li>
+                            <li><strong>规则调整</strong>采用"手工调整旧规则的生效结束日 + 新增新规则"两步流程（不做自动截断）：先编辑旧行填生效结束日，再新增新行、生效开始日 = 旧结束日次日；旧规则的质保年限值不允许直接改。</li>
+                            <li><strong>禁用 vs 调整生效结束日</strong>：日常"到期换规则 / 计划性下线"用<strong>编辑生效结束日</strong>；"这条建错了 / 立即整条作废"用<strong>禁用</strong>，禁用即刻不参与匹配、可再启用。</li>
+                            <li><strong>唯一性校验时机</strong>：新增保存、编辑保存（针对启用中的行）、启用动作均触发；已禁用行编辑保存不校验。</li>
+                            <li><strong>期满日双态语义</strong>——修改配置不回滚已入账凭证，但期满日按合同状态区分：<strong>计提中</strong>合同的期满日是<strong>动态推导值</strong>（每次跑批按当下启用中规则重算），改配置即刻在下次转回跑批生效；<strong>计提结束</strong>合同的期满日已在触发转回时<strong>凝固为转回单快照</strong>，之后永不变动。</li>
                         </ul>
                     </div>
                 </div>
 
+                <!-- 搜索条件和按钮（对齐 financial-entity 标准筛选组件） -->
                 <div class="bg-white rounded-lg shadow-sm p-4">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                            <option>全部财务主体</option><option>北京家装</option><option>上海家装</option><option>广州家装</option>
-                        </select>
-                        <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                            <option>全部合同需求类型</option><option>整装-精装</option><option>整装-简装</option><option>软装</option>
-                        </select>
-                        <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                            <option>全部状态</option><option>生效中</option><option>未生效</option><option>已失效</option>
-                        </select>
-                        <button class="px-3 py-2 bg-primary text-white rounded-md text-sm">查询</button>
-                        <button class="ml-auto px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm flex items-center gap-1"><i data-lucide="download" class="w-4 h-4"></i>导出</button>
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex-1 flex items-center flex-wrap gap-2">
+                            <select id="filter-select" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                                <option value="requirementType">合同需求类型</option>
+                                <option value="entity">财务主体</option>
+                                <option value="operator">操作员</option>
+                            </select>
+                            <input type="text" id="filter-input" placeholder="按合同需求类型搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                            <button onclick="applyFilter()" class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                <i data-lucide="search" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="resetFilter()" class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                            </button>
+                            <button id="advanced-filter-btn" onclick="toggleAdvancedFilter()" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center text-sm">
+                                高级筛选
+                                <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                            </button>
+                            <label class="flex items-center gap-1 text-sm text-gray-600 ml-2"><input type="checkbox" id="show-disabled" onchange="toggleDisabledRows(this)" class="rounded border-gray-300"> 含已禁用</label>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button onclick="openWarrantyModal('add')" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center text-sm">
+                                <i data-lucide="plus" class="w-4 h-4 mr-2"></i>新增
+                            </button>
+                            <button class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm flex items-center gap-1"><i data-lucide="download" class="w-4 h-4"></i>导出</button>
+                        </div>
+                    </div>
+
+                    <!-- 高级筛选条件 -->
+                    <div id="advanced-filter" class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 hidden">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">合同需求类型</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                <option value="">全部</option><option>整装-精装</option><option>整装-简装</option><option>软装</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                <option value="">全部</option><option>北京家装</option><option>上海家装</option><option>广州家装</option><option>成都家装</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">生效开始日（起）</label>
+                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">生效开始日（止）</label>
+                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                        </div>
                     </div>
                 </div>
 
@@ -69,8 +112,11 @@
                                   <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">质保年限（年）</th>
                                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">生效开始日</th>
                                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">生效结束日</th>
-                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
-                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">最后修改</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用状态</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建人</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">创建日期</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">最后修改人</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">最后修改日期</th>
                                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
                                 </tr>
                             </thead>
@@ -82,9 +128,12 @@
                                     <td class="px-3 py-2 text-right font-medium text-primary">2</td>
                                     <td class="px-3 py-2">2026-01-01</td>
                                     <td class="px-3 py-2 text-gray-400">-</td>
-                                    <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">生效中</span></td>
-                                    <td class="px-3 py-2 text-gray-500">李丽 · 2025-12-28</td>
-                                        <td class="px-3 py-2"><button class="text-primary hover:underline mr-2" onclick="openWarrantyModal('edit')">编辑</button><button class="text-red-600 hover:underline" onclick="disableWarranty(this)">失效</button></td>
+                                    <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">启用中</span></td>
+                                    <td class="px-3 py-2 text-gray-600">李丽</td>
+                                    <td class="px-3 py-2 text-gray-600">2025-12-28</td>
+                                    <td class="px-3 py-2 text-gray-400">-</td>
+                                    <td class="px-3 py-2 text-gray-400">-</td>
+                                    <td class="px-3 py-2"><button class="text-primary hover:underline mr-2" onclick="openWarrantyModal('edit','active')">编辑</button><button class="text-red-600 hover:underline" onclick="disableWarranty(this)">禁用</button></td>
                                 </tr>
                                 <tr>
                                     <td class="px-3 py-2">2</td>
@@ -93,9 +142,12 @@
                                     <td class="px-3 py-2 text-right font-medium text-primary">2</td>
                                     <td class="px-3 py-2">2026-01-01</td>
                                     <td class="px-3 py-2 text-gray-400">-</td>
-                                    <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">生效中</span></td>
-                                    <td class="px-3 py-2 text-gray-500">李丽 · 2025-12-28</td>
-                                    <td class="px-3 py-2"><button class="text-primary hover:underline mr-2" onclick="openWarrantyModal('edit')">编辑</button><button class="text-red-600 hover:underline" onclick="disableWarranty(this)">失效</button></td>
+                                    <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">启用中</span></td>
+                                    <td class="px-3 py-2 text-gray-600">李丽</td>
+                                    <td class="px-3 py-2 text-gray-600">2025-12-28</td>
+                                    <td class="px-3 py-2 text-gray-400">-</td>
+                                    <td class="px-3 py-2 text-gray-400">-</td>
+                                    <td class="px-3 py-2"><button class="text-primary hover:underline mr-2" onclick="openWarrantyModal('edit','active')">编辑</button><button class="text-red-600 hover:underline" onclick="disableWarranty(this)">禁用</button></td>
                                 </tr>
                                 <tr>
                                     <td class="px-3 py-2">3</td>
@@ -104,20 +156,26 @@
                                     <td class="px-3 py-2 text-right font-medium text-primary">1</td>
                                     <td class="px-3 py-2">2026-01-01</td>
                                     <td class="px-3 py-2 text-gray-400">-</td>
-                                    <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">生效中</span></td>
-                                    <td class="px-3 py-2 text-gray-500">李丽 · 2025-12-28</td>
-                                    <td class="px-3 py-2"><button class="text-primary hover:underline mr-2" onclick="openWarrantyModal('edit')">编辑</button><button class="text-red-600 hover:underline" onclick="disableWarranty(this)">失效</button></td>
+                                    <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">启用中</span></td>
+                                    <td class="px-3 py-2 text-gray-600">李丽</td>
+                                    <td class="px-3 py-2 text-gray-600">2025-12-28</td>
+                                    <td class="px-3 py-2 text-gray-400">-</td>
+                                    <td class="px-3 py-2 text-gray-400">-</td>
+                                    <td class="px-3 py-2"><button class="text-primary hover:underline mr-2" onclick="openWarrantyModal('edit','active')">编辑</button><button class="text-red-600 hover:underline" onclick="disableWarranty(this)">禁用</button></td>
                                 </tr>
-                                          <tr>
+                                <tr class="bg-gray-50 text-gray-500">
                                     <td class="px-3 py-2">4</td>
                                     <td class="px-3 py-2">整装-精装</td>
-                                    <td class="px-3 py-2"><span class="inline-block px-2 py-0.5 mr-1 mb-1 text-xs rounded bg-blue-50 text-blue-700">广州家装</span></td>
+                                    <td class="px-3 py-2"><span class="inline-block px-2 py-0.5 mr-1 mb-1 text-xs rounded bg-gray-100 text-gray-500">广州家装</span></td>
                                     <td class="px-3 py-2 text-right font-medium text-primary">3</td>
                                     <td class="px-3 py-2">2026-01-01</td>
                                     <td class="px-3 py-2 text-gray-400">-</td>
-                                    <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">生效中</span></td>
-                                    <td class="px-3 py-2 text-gray-500">王强 · 2025-12-30</td>
-                                    <td class="px-3 py-2"><button class="text-primary hover:underline mr-2" onclick="openWarrantyModal('edit')">编辑</button><button class="text-red-600 hover:underline" onclick="disableWarranty(this)">失效</button></td>
+                                    <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-gray-200 text-gray-700">已禁用</span></td>
+                                    <td class="px-3 py-2 text-gray-600">王强</td>
+                                    <td class="px-3 py-2 text-gray-600">2025-12-30</td>
+                                    <td class="px-3 py-2 text-gray-600">王强</td>
+                                    <td class="px-3 py-2 text-gray-600">2026-03-10</td>
+                                    <td class="px-3 py-2"><button class="text-primary hover:underline mr-2" onclick="openWarrantyModal('edit','disabled')">编辑</button><button class="text-green-600 hover:underline" onclick="enableWarranty(this)">启用</button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -136,13 +194,13 @@
             <div class="p-6 space-y-4 text-sm">
                 <div>
                     <label class="block text-gray-700 mb-1">合同需求类型 <span class="text-red-500">*</span><span class="text-xs text-gray-400 font-normal ml-1">（配置基准，单选）</span></label>
-                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <select id="wf-demand-type" class="w-full px-3 py-2 border border-gray-300 rounded-md">
                         <option>请选择</option><option>整装-精装</option><option>整装-简装</option><option>软装</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-gray-700 mb-1">适用财务主体 <span class="text-red-500">*</span><span class="text-xs text-gray-400 font-normal ml-1">（多选，可勾选一个或多个）</span></label>
-                    <div class="border border-gray-300 rounded-md p-3 grid grid-cols-2 gap-2">
+                    <div id="wf-entity-box" class="border border-gray-300 rounded-md p-3 grid grid-cols-2 gap-2">
                         <label class="flex items-center gap-2"><input type="checkbox" class="rounded border-gray-300"> 北京家装</label>
                         <label class="flex items-center gap-2"><input type="checkbox" class="rounded border-gray-300"> 上海家装</label>
                         <label class="flex items-center gap-2"><input type="checkbox" class="rounded border-gray-300"> 广州家装</label>
@@ -150,47 +208,139 @@
                 </div>
                 <div>
                     <label class="block text-gray-700 mb-1">质保年限（年） <span class="text-red-500">*</span></label>
-                    <input type="number" min="1" max="10" step="1" placeholder="例：2" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <input id="wf-years" type="number" min="1" max="10" step="1" placeholder="例：2" class="w-full px-3 py-2 border border-gray-300 rounded-md">
                     <p class="text-xs text-gray-500 mt-1">整数，1-10 年</p>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-gray-700 mb-1">生效开始日 <span class="text-red-500">*</span></label>
-                        <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <input id="wf-start" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md">
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-1">生效结束日</label>
-                        <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <input id="wf-end" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md">
                     </div>
                 </div>
                 <div class="p-3 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800 flex items-start gap-2">
                     <i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
                     <span>保存时按"需求类型 + 每个被勾选的财务主体"逐一校验唯一性：同一需求类型下、同一财务主体生效期不重叠（多选中任一主体冲突即拦截并提示冲突主体）。存量合同的质保期满日不追溯调整。</span>
                 </div>
+                <div class="p-3 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800 flex items-start gap-2">
+                    <i data-lucide="info" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                    <span><strong>如需让一条规则不再适用：</strong>请<strong>先新增</strong>覆盖新粒度的替代规则、<strong>再将本条置禁用</strong>；系统不会自动把老规则截断到某个日期，责任由操作员承担。</span>
+                </div>
+                <div id="wf-edit-tip-active" class="p-3 bg-gray-50 border border-gray-200 rounded text-xs text-gray-700 flex items-start gap-2 hidden">
+                    <i data-lucide="lock" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                    <span><strong>编辑启用中规则：</strong>"需求类型"和"适用财务主体"不可修改（避免历史轨迹漂移）；仅可修改"质保年限、生效开始日、生效结束日"，修改后将参与唯一性校验，冲突即拦截。若修改结束日会造成该需求类型此后无启用中规则，保存前会二次确认。</span>
+                </div>
+                <div id="wf-edit-tip-disabled" class="p-3 bg-gray-50 border border-gray-200 rounded text-xs text-gray-700 flex items-start gap-2 hidden">
+                    <i data-lucide="lock" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                    <span><strong>编辑已禁用规则：</strong>所有字段均可修改，保存<strong>不触发</strong>唯一性校验（禁用规则不参与匹配）。如需重新生效，请保存后在列表点击"启用"，此时才会触发唯一性校验。</span>
+                </div>
             </div>
             <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-2">
                 <button onclick="document.getElementById('add-modal').classList.add('hidden')" class="px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">取消</button>
-                <button class="px-4 py-2 bg-primary text-white rounded-md text-sm hover:bg-blue-700">保存</button>
+                <button class="px-4 py-2 bg-primary text-white rounded-md text-sm hover:bg-blue-700" onclick="saveWarranty()">保存</button>
             </div>
         </div>
     </div>
 
     <script>
-        function openWarrantyModal(mode) {
+        // mode: 'add' | 'edit'；status: 'active' | 'disabled'（仅 edit 时使用）
+        function openWarrantyModal(mode, status) {
             var title = document.getElementById('warranty-modal-title');
-            if (title) title.textContent = (mode === 'edit') ? '编辑质保年限' : '新增质保年限';
+            var demandType = document.getElementById('wf-demand-type');
+            var entityBox = document.getElementById('wf-entity-box');
+            var years = document.getElementById('wf-years');
+            var startDate = document.getElementById('wf-start');
+            var endDate = document.getElementById('wf-end');
+            var tipActive = document.getElementById('wf-edit-tip-active');
+            var tipDisabled = document.getElementById('wf-edit-tip-disabled');
+
+            // 复选框统一处理
+            var entityChecks = entityBox ? entityBox.querySelectorAll('input[type="checkbox"]') : [];
+
+            // 先复位:全部可编辑、隐藏两条编辑提示
+            if (demandType) demandType.disabled = false;
+            entityChecks.forEach(function (c) { c.disabled = false; });
+            if (years) years.disabled = false;
+            if (startDate) startDate.disabled = false;
+            if (endDate) endDate.disabled = false;
+            if (tipActive) tipActive.classList.add('hidden');
+            if (tipDisabled) tipDisabled.classList.add('hidden');
+
+            if (mode === 'edit' && status === 'active') {
+                if (title) title.textContent = '编辑质保年限（启用中）';
+                // 启用中:需求类型 + 财务主体 锁定;其余可改
+                if (demandType) demandType.disabled = true;
+                entityChecks.forEach(function (c) { c.disabled = true; });
+                if (tipActive) tipActive.classList.remove('hidden');
+            } else if (mode === 'edit' && status === 'disabled') {
+                if (title) title.textContent = '编辑质保年限（已禁用）';
+                // 已禁用:所有字段可改,保存不触发唯一性校验
+                if (tipDisabled) tipDisabled.classList.remove('hidden');
+            } else {
+                if (title) title.textContent = '新增质保年限';
+            }
+
+            // 记录当前弹窗模式,保存时读取
+            document.getElementById('add-modal').dataset.mode = mode || 'add';
+            document.getElementById('add-modal').dataset.status = status || '';
             document.getElementById('add-modal').classList.remove('hidden');
         }
-        function disableWarranty(btn) {
-            if (confirm('确认将该条质保年限规则置为失效？失效后不影响已生成的历史转回，仅影响后续签单日落入本区间的合同。')) {
-                var tr = btn.closest('tr');
-                var statusCell = tr.querySelector('td:nth-child(7) span');
-                if (statusCell) {
-                    statusCell.textContent = '已失效';
-                    statusCell.className = 'px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600';
-                }
+        function saveWarranty() {
+            var modal = document.getElementById('add-modal');
+            var mode = modal.dataset.mode;
+            var status = modal.dataset.status;
+            var endDate = document.getElementById('wf-end').value;
+
+            // 编辑启用中规则且填了结束日:提示空档预警(demo 版:统一二次确认)
+            if (mode === 'edit' && status === 'active' && endDate) {
+                if (!confirm('您正在为一条【启用中】规则设置生效结束日 ' + endDate + '。\n\n若该结束日之后没有其他启用中规则覆盖此需求类型,后续新签合同将无法匹配到质保年限。\n\n是否确认保存?若需保留连续覆盖,请先新增替代规则再回来改结束日。')) return;
             }
+            // 已禁用规则编辑保存:提示不触发唯一性校验
+            if (mode === 'edit' && status === 'disabled') {
+                alert('已保存。\n\n本次修改的是【已禁用】规则,未触发唯一性校验;如需重新生效,请在列表点击"启用",届时才会做唯一性校验。');
+            } else {
+                alert('保存成功(demo)。已按需求类型 + 每个财务主体逐一校验唯一性。');
+            }
+            modal.classList.add('hidden');
         }
+        function disableWarranty(btn) {
+            if (!confirm('确认将该条质保年限规则置为禁用？\n\n禁用即刻不参与匹配，已入账凭证不受影响；但【计提中】合同的期满日会按当前启用中规则动态重算（详见规则9：期满日双态语义）。若为规则收口场景，请先新增替代规则，再将本条置禁用。')) return;
+            var tr = btn.closest('tr');
+            var statusCell = tr.querySelector('td:nth-child(7) span');
+            if (statusCell) {
+                statusCell.textContent = '已禁用';
+                statusCell.className = 'px-2 py-0.5 text-xs rounded-full bg-gray-200 text-gray-700';
+            }
+            tr.classList.add('bg-gray-50', 'text-gray-500');
+            btn.closest('td').innerHTML = '<button class="text-primary hover:underline mr-2" onclick="openWarrantyModal(\'edit\',\'disabled\')">编辑</button><button class="text-green-600 hover:underline" onclick="enableWarranty(this)">启用</button>';
+        }
+        function enableWarranty(btn) {
+            if (!confirm('确认启用该条质保年限规则？\n\n启用后即刻参与匹配。请确认同一需求类型 + 财务主体在生效时段内不存在其他启用中规则，避免唯一性冲突。启用后，【计提中】合同的期满日会按当前启用中规则动态重算。')) return;
+            var tr = btn.closest('tr');
+            var statusCell = tr.querySelector('td:nth-child(7) span');
+            if (statusCell) {
+                statusCell.textContent = '启用中';
+                statusCell.className = 'px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800';
+            }
+            tr.classList.remove('bg-gray-50', 'text-gray-500');
+            btn.closest('td').innerHTML = '<button class="text-primary hover:underline mr-2" onclick="openWarrantyModal(\'edit\',\'active\')">编辑</button><button class="text-red-600 hover:underline" onclick="disableWarranty(this)">禁用</button>';
+        }
+        function applyFilter() { /* demo */ }
+        function resetFilter() { var i = document.getElementById('filter-input'); if (i) i.value = ''; }
+        function toggleAdvancedFilter() { var a = document.getElementById('advanced-filter'); if (a) a.classList.toggle('hidden'); }
+        function toggleDisabledRows(cb) {
+            document.querySelectorAll('tbody tr').forEach(function (tr) {
+                if (tr.querySelector('.bg-gray-200')) tr.style.display = cb.checked ? '' : 'none';
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('tbody tr').forEach(function (tr) {
+                if (tr.querySelector('.bg-gray-200')) tr.style.display = 'none';
+            });
+        });
         async function loadSidebar() {
             try {
                 const response = await fetch('common/sidebar.html?t=' + Date.now());
