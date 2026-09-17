@@ -1,0 +1,2693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>业务类型 - 财务中台</title>
+    <link rel="stylesheet" href="../common/tailwind.css">
+    <script src="../common/lucide.min.js"></script>
+    <!-- tailwind.config removed: using precompiled CSS -->
+    <style>
+        /* external font import removed for offline speed */
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sidebar {
+            transition: width 0.3s ease-in-out;
+        }
+
+        .sidebar.collapsed {
+            width: 64px;
+        }
+
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-icon {
+            margin: 0 auto;
+        }
+
+        .sidebar-item {
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 500;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+        }
+
+        .menu-header h2 {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .drawer {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+
+        .drawer.open {
+            transform: translateX(0);
+        }
+
+        .drawer-overlay {
+            display: none;
+        }
+
+        .drawer-overlay.open {
+            display: block;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #003eb3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* 需求标注样式 - 必须严格遵守规范 */
+        .req-badge {
+            display: inline-block;
+            background-color: rgb(250, 173, 20) !important; /* 橙黄色 */
+            color: white;
+            font-size: 11px !important;
+            font-weight: bold;
+            line-height: 16px !important;
+            padding: 0px 5px !important;
+            border-radius: 2px !important;
+            position: absolute;
+            top: -10px;
+            right: -6px;
+            z-index: 9999;
+            opacity: 0; /* 原始badge隐藏 */
+            pointer-events: none;
+        }
+
+        .req-badge-float {
+            position: fixed !important; /* 必须！脱离文档流 */
+            z-index: 9999;
+            background-color: rgb(250, 173, 20) !important; /* 橙黄色 */
+            color: white;
+            font-size: 11px !important;
+            font-weight: bold;
+            line-height: 16px !important;
+            padding: 0px 5px !important;
+            border-radius: 2px !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            pointer-events: auto; /* 必须！允许hover触发 */
+            cursor: pointer;
+        }
+
+        .req-marker {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* 树形结构样式 */
+        .tree-node {
+            padding-left: 16px;
+            border-left: 1px solid #e5e7eb;
+            margin-left: 8px;
+        }
+
+        .tree-node:first-child {
+            margin-top: 4px;
+        }
+
+        .tree-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 2px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tree-item:hover {
+            background-color: #f3f4f6;
+        }
+
+        .tree-item.selected {
+            background-color: #e6f0ff;
+            color: #003eb3;
+            font-weight: 500;
+        }
+
+        .tree-toggle {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* 浮窗样式 */
+        .req-tooltip {
+            position: fixed;
+            max-width: 450px;
+            max-height: 500px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .req-tooltip.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .req-tooltip-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9fafb;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .req-tooltip-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .req-tooltip-close {
+            cursor: pointer;
+            font-size: 20px;
+            color: #6b7280;
+            line-height: 1;
+        }
+
+        .req-tooltip-close:hover {
+            color: #111827;
+        }
+
+        .req-tooltip-content {
+            padding: 16px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        .req-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .status-green { background-color: #10b981; }
+        .status-red { background-color: #ef4444; }
+        .status-gray { background-color: #9ca3af; }
+        .status-blue { background-color: #3b82f6; }
+        .status-orange { background-color: #f97316; }
+
+        code {
+            background-color: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'Monaco', monospace;
+        }
+
+        em {
+            color: #059669;
+            font-style: normal;
+        }
+
+        blockquote {
+            border-left: 3px solid rgb(250, 173, 20);
+            padding-left: 12px;
+            margin: 8px 0;
+            color: #6b7280;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="bg-neutral min-h-screen">
+    <!-- 主容器 -->
+    <div class="flex h-screen">
+        <!-- 侧边栏 -->
+        
+
+        <!-- 主内容区 -->
+        <main class="flex-1  p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <!-- 页面标题 [1] -->
+                <div class="req-marker relative block border-b border-gray-200 pb-4 mb-6" id="req-marker-1" style="display: block;">
+                    <span class="req-badge" data-req="1"
+                          data-title="业务类型"
+                          data-content='<div class="req-section-title">业务类型</div><div><strong>说明：</strong>业务类型管理</div><div><em>包含业务类型分组（左侧）和业务类型列表（右侧），占比1:4</em></div>'>1</span>
+                    <h1 class="text-xl font-semibold text-gray-800">业务类型</h1>
+                </div>
+
+                <!-- 筛选条件 [2] -->
+                <div class="mb-6">
+                    <!-- 基础筛选栏 - req-marker精确包裹此区域 -->
+                    <div class="req-marker inline-block relative" id="req-marker-2" style="display: block; width: 100%;">
+                        <span class="req-badge" data-req="2"
+                              data-title="筛选条件"
+                              data-content='<div class="req-section-title">筛选条件</div><div><strong>基础筛选：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li>字段选择器：可选择搜索字段</li><li>输入框：模糊搜索</li><li>搜索/刷新/高级筛选按钮</li></ul><div style="margin-top: 8px;"><strong>高级筛选：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>业务类型名称</code>：模糊搜索</li><li><code>业务编码</code>：模糊搜索</li><li><code>状态</code>：下拉单选（启用、停用）</li><li><code>上级业务分组</code>：下拉单选（已新增业务类型分组）</li></ul>'>2</span>
+
+                        <!-- 筛选条件和按钮栏 -->
+                        <div class="flex items-center justify-between flex-nowrap">
+                            <!-- 左侧：基础筛选 -->
+                            <div class="flex items-center space-x-2 flex-1">
+                                <!-- 字段选择器 -->
+                                <select id="filter-field" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                    <option value="name">业务类型名称</option>
+                                    <option value="code">业务编码</option>
+                                </select>
+                                <!-- 输入框 -->
+                                <input type="text" id="filter-value" placeholder="按名称搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                <!-- 搜索按钮 -->
+                                <button id="search-btn" class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="搜索">
+                                    <i data-lucide="search" class="w-4 h-4"></i>
+                                </button>
+                                <!-- 刷新按钮 -->
+                                <button id="refresh-btn" class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors" title="刷新">
+                                    <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                </button>
+                                <!-- 高级筛选按钮 -->
+                                <button id="advanced-filter-btn" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center text-sm">
+                                    高级筛选
+                                    <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 高级筛选展开区域（不在req-marker内） -->
+                    <div id="advanced-filter" class="hidden bg-gray-50 p-4 rounded-md border border-gray-200 mt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">业务类型名称</label>
+                                <input type="text" id="adv-filter-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="请输入业务类型名称">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">业务编码</label>
+                                <input type="text" id="adv-filter-code" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="请输入业务编码">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">状态</label>
+                                <select id="adv-filter-status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                    <option value="">全部</option>
+                                    <option value="enabled">启用</option>
+                                    <option value="disabled">停用</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">上级业务分组</label>
+                                <select id="adv-filter-group" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                    <option value="">全部</option>
+                                    <option value="income">收入类</option>
+                                    <option value="expense">支出类</option>
+                                    <option value="cost">费用类</option>
+                                    <option value="asset">资产类</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex justify-end space-x-2">
+                            <button id="reset-filter-btn" class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-sm">
+                                重置
+                            </button>
+                            <button id="query-filter-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors text-sm">
+                                查询
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区域：左右分栏 [3][4] -->
+                <div class="grid grid-cols-5 gap-6">
+                    <!-- 左侧：业务类型分组 [3] -->
+                    <div class="col-span-1" id="req-marker-3">
+                        <div class="req-marker relative block border border-gray-200 rounded-lg p-4" style="display: block;">
+                            <span class="req-badge" data-req="3"
+                                  data-title="业务类型分组"
+                                  data-content='<div class="req-section-title">业务类型分组</div><div><strong>页面位置：</strong>位于右侧主内容区的左侧部分，按照层级树状展示</div><div><strong>布局比例：</strong>分组和业务类型页面占比1:4</div><div><strong>按钮功能：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>新增</code>：打开新增业务类型分组抽屉弹窗</li><li><code>编辑</code>：页面参考新增业务类型分组抽屉弹窗</li><li><code>删除</code>：<em>删除校验（双重条件）</em>：<br/>1. 该分组下<strong>无业务类型数据</strong><br/>2. 且该分组为<strong>末级分组</strong>（无子分组）<br/><blockquote>任一条件不满足则不可删除</blockquote></li></ul>'>3</span>
+
+                            <!-- 分组标题和操作按钮 -->
+                            <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+                                <h3 class="text-sm font-semibold text-gray-700">业务分组</h3>
+                                <div class="flex gap-2">
+                                    <button id="add-group-btn" class="p-1 text-primary hover:bg-secondary rounded" title="新增分组">
+                                        <i data-lucide="plus" class="w-4 h-4"></i>
+                                    </button>
+                                    <button id="edit-group-btn" class="p-1 text-primary hover:bg-secondary rounded" title="编辑分组">
+                                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                    </button>
+                                    <button id="delete-group-btn" class="p-1 text-red-600 hover:bg-red-50 rounded" title="删除分组">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 树形结构 -->
+                            <div class="space-y-1 max-h-[calc(100vh-350px)] overflow-y-auto">
+                                <!-- 整装 -->
+                                <div class="tree-item selected" data-id="group-zz">
+                                    <div class="tree-toggle" onclick="toggleTreeNode(this)">
+                                        <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                                    </div>
+                                    <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                    <span class="text-sm">整装</span>
+                                    <span class="ml-auto text-xs text-gray-400">(7)</span>
+                                </div>
+                                <div class="tree-node" id="children-group-zz">
+                                    <div class="tree-item" data-id="group-zz-1">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">整装收入</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-zz-2">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">材料成本</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-zz-3">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">材料进项税额转出成本</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-zz-4">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">人工成本</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-zz-5">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">劳务分包差额抵税成本</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-zz-6">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">运输成本</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-zz-7">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">其他成本</span>
+                                    </div>
+                                </div>
+
+                                <!-- 软装 -->
+                                <div class="tree-item" data-id="group-rz">
+                                    <div class="tree-toggle" onclick="toggleTreeNode(this)">
+                                        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                                    </div>
+                                    <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                    <span class="text-sm">软装</span>
+                                    <span class="ml-auto text-xs text-gray-400">(1)</span>
+                                </div>
+                                <div class="tree-node hidden" id="children-group-rz">
+                                    <div class="tree-item" data-id="group-rz-1">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">软装收入</span>
+                                    </div>
+                                </div>
+
+                                <!-- 设计费 -->
+                                <div class="tree-item" data-id="group-sjf">
+                                    <div class="tree-toggle" onclick="toggleTreeNode(this)">
+                                        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                                    </div>
+                                    <i data-lucide="folder" class="w-4 h-4 mr-2 text-yellow-500"></i>
+                                    <span class="text-sm">设计费</span>
+                                    <span class="ml-auto text-xs text-gray-400">(2)</span>
+                                </div>
+                                <div class="tree-node hidden" id="children-group-sjf">
+                                    <div class="tree-item" data-id="group-sjf-1">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">设计费收入</span>
+                                    </div>
+                                    <div class="tree-item" data-id="group-sjf-2">
+                                        <i data-lucide="file" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                        <span class="text-sm">设计费成本</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：业务类型列表 [4] -->
+                    <div class="col-span-4" id="req-marker-4">
+                        <div class="req-marker relative block" style="display: block;">
+                            <span class="req-badge" data-req="4"
+                                  data-title="业务类型列表"
+                                  data-content='<div class="req-section-title">业务类型列表</div><div><strong>页面位置：</strong>位于右侧主内容区的右侧部分，展示新增的业务类型列表</div><div><strong>字段清单：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>业务类型编码</code>：唯一标识</li><li><code>业务类型名称</code>：业务类型名称</li><li><code>上级业务分组</code>：所属分组</li><li><code>说明</code>：补充描述</li><li><code>状态</code>：switch按钮（启用/停用）<br/><em>启用、停用无逻辑判断</em></li><li><code>操作</code>：<br/>- <code>编辑</code>：打开编辑业务类型抽屉弹窗<br/>- <code>删除</code>：删除校验该业务类型是否被单据使用</li></ul>'>4</span>
+
+                            <!-- 列表标题和新增按钮 -->
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-semibold text-gray-700">业务类型列表</h3>
+                                <div class="req-marker inline-block" id="req-marker-5">
+                                    <span class="req-badge" data-req="5"
+                                          data-title="操作按钮"
+                                          data-content='<div class="req-section-title">操作按钮</div><div><strong>功能：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>新增</code>：打开新增业务类型抽屉弹窗</li></ul><div><em>位置：在右侧主内容区展示业务类型列表上方</em></div>'>5</span>
+                                    <button id="add-business-type" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center text-sm">
+                                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                                        新增
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 表格列表 -->
+                            <div class="table-wrapper overflow-x-auto border border-gray-200 rounded-lg">
+                                <table class="min-w-full bg-white">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">业务类型编码</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">业务类型名称</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">上级业务分组</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">说明</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">1</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装收入</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">2</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">材料成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">3</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">材料进项税额转出成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">4</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">人工成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">5</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">劳务分包差额抵税成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">6</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">运输成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">7</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">其他成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">8</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">软装收入</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">软装</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">9</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">设计费收入</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">设计费</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm text-gray-700">10</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">设计费成本</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">设计费</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700"></td>
+                                            <td class="px-4 py-3">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-primary hover:text-blue-700 edit-business-type">编辑</button>
+                                                    <button class="text-red-600 hover:text-red-800 delete-business-type">删除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- 分页 -->
+                            <div class="mt-4 flex items-center justify-between">
+                                <div class="text-sm text-gray-500">
+                                    显示 1 至 5 条，共 5 条
+                                </div>
+                                <div class="flex space-x-1">
+                                    <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                                        上一页
+                                    </button>
+                                    <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                                    <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                                        下一页
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 新增/编辑业务类型抽屉 [6] -->
+    <div id="business-type-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-50 overflow-y-auto">
+        <div class="p-6">
+            <div class="req-marker relative block flex justify-between items-center mb-6" id="req-marker-6" style="display: block;">
+                <span class="req-badge" data-req="6"
+                      data-title="新增/编辑业务类型抽屉"
+                      data-content='<div class="req-section-title">新增/编辑业务类型抽屉弹窗</div><div><strong>字段清单：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>业务类型编码</code>：字符串，32位，<span class="status-dot status-red"></span> 必填</li><li><code>业务类型名称</code>：字符串，64位，<span class="status-dot status-red"></span> 必填</li><li><code>上级业务分组</code>：下拉单选（已新增业务类型分组）</li><li><code>说明</code>：字符串，256位</li></ul><div><strong>操作按钮：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>保存</code>：<br/><em>- 校验编码和名称唯一性<br/>- 校验最多支持三级业务类型</em></li><li><code>关闭</code>：关闭抽屉弹窗</li></ul><blockquote>编辑界面同新增界面</blockquote>'>6</span>
+                <h3 id="drawer-title" class="text-lg font-semibold text-gray-900">新增业务类型</h3>
+                <button id="close-drawer" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="business-type-form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">业务类型编码 <span class="text-red-500">*</span></label>
+                        <input type="text" id="business-type-code" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent" placeholder="请输入业务类型编码（32位以内）" required maxlength="32">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">业务类型名称 <span class="text-red-500">*</span></label>
+                        <input type="text" id="business-type-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent" placeholder="请输入业务类型名称（64位以内）" required maxlength="64">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">上级业务分组</label>
+                        <select id="parent-group" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent">
+                            <option value="">请选择上级业务分组</option>
+                            <option value="income">收入类</option>
+                            <option value="income-main">收入类 > 主营业务收入</option>
+                            <option value="income-other">收入类 > 其他收入</option>
+                            <option value="expense">支出类</option>
+                            <option value="cost">费用类</option>
+                            <option value="asset">资产类</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">说明</label>
+                        <textarea id="business-type-desc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent" rows="3" placeholder="请输入说明（256位以内）" maxlength="256"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end space-x-3">
+                    <button type="button" id="cancel-btn" class="btn btn-outline px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50">关闭</button>
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-md bg-primary text-white hover:bg-blue-700">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新增/编辑业务类型分组抽屉 [7] -->
+    <div id="group-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-50 overflow-y-auto">
+        <div class="p-6">
+            <div class="req-marker relative block flex justify-between items-center mb-6" id="req-marker-7" style="display: block;">
+                <span class="req-badge" data-req="7"
+                      data-title="新增/编辑业务类型分组抽屉"
+                      data-content='<div class="req-section-title">新增/编辑业务类型分组抽屉弹窗</div><div><strong>字段清单：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>业务分组编码</code>：字符串，32位，<span class="status-dot status-red"></span> 必填</li><li><code>业务分组名称</code>：字符串，64位，<span class="status-dot status-red"></span> 必填</li><li><code>上级业务分组</code>：下拉单选（已新增业务类型分组）</li><li><code>说明</code>：字符串，256位</li></ul><div><strong>操作按钮：</strong></div><ul style="margin-left: 16px; margin-top: 4px;"><li><code>保存</code>：<br/><em>- 校验编码和名称唯一性<br/>- 校验最多支持三级业务类型分组</em></li><li><code>关闭</code>：关闭抽屉弹窗</li></ul><blockquote>编辑界面同新增界面</blockquote>'>7</span>
+                <h3 id="group-drawer-title" class="text-lg font-semibold text-gray-900">新增业务类型分组</h3>
+                <button id="close-group-drawer" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="group-form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">业务分组编码 <span class="text-red-500">*</span></label>
+                        <input type="text" id="group-code" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent" placeholder="请输入业务分组编码（32位以内）" required maxlength="32">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">业务分组名称 <span class="text-red-500">*</span></label>
+                        <input type="text" id="group-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent" placeholder="请输入业务分组名称（64位以内）" required maxlength="64">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">上级业务分组</label>
+                        <select id="parent-group-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent">
+                            <option value="">请选择上级业务分组</option>
+                            <option value="root">根节点（无上级）</option>
+                            <option value="income">收入类</option>
+                            <option value="expense">支出类</option>
+                            <option value="cost">费用类</option>
+                            <option value="asset">资产类</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">说明</label>
+                        <textarea id="group-desc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003eb3] focus:border-transparent" rows="3" placeholder="请输入说明（256位以内）" maxlength="256"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end space-x-3">
+                    <button type="button" id="cancel-group-btn" class="btn btn-outline px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50">关闭</button>
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-md bg-primary text-white hover:bg-blue-700">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 抽屉遮罩 -->
+    <div id="drawer-overlay" class="drawer-overlay fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+
+    <!-- 需求浮窗容器 -->
+    <div id="req-tooltip-container"></div>
+
+    <script>
+var ReqAnnotation = (function() {
+    var activeTooltips = {};
+    var dragState = null;
+    var floatingBadges = {};
+
+    function runSelfCheck() {
+        var badges = document.querySelectorAll('.req-badge');
+        var warnings = [];
+
+        badges.forEach(function(badge) {
+            var reqNum = badge.getAttribute('data-req');
+            var marker = badge.parentElement;
+            var hasTitle = badge.hasAttribute('data-title');
+            var hasContent = badge.hasAttribute('data-content');
+
+            if (!hasTitle || !hasContent) {
+                warnings.push('[角标' + reqNum + '] 缺少 data-title 或 data-content 属性');
+            }
+            if (marker && !marker.classList.contains('req-marker')) {
+                warnings.push('[角标' + reqNum + '] 父元素缺少 req-marker class');
+            }
+        });
+
+        var container = document.getElementById('req-tooltip-container');
+        if (!container) {
+            warnings.push('[全局] 缺少 #req-tooltip-container 容器元素');
+        }
+
+        var floatStyle = document.querySelector('.req-badge-float');
+        if (!floatStyle) {
+            var styleSheets = document.styleSheets;
+            var hasFloatStyle = false;
+            for (var i = 0; i < styleSheets.length; i++) {
+                try {
+                    var rules = styleSheets[i].cssRules || [];
+                    for (var j = 0; j < rules.length; j++) {
+                        if (rules[j].selectorText && rules[j].selectorText.indexOf('req-badge-float') !== -1) {
+                            hasFloatStyle = true;
+                            if (rules[j].style.position !== 'fixed') {
+                                warnings.push('[CSS] .req-badge-float 缺少 position: fixed');
+                            }
+                            break;
+                        }
+                    }
+                    if (hasFloatStyle) break;
+                } catch(e) {}
+            }
+            if (!hasFloatStyle) {
+                warnings.push('[CSS] 缺少 .req-badge-float 样式定义');
+            }
+        }
+
+        if (warnings.length > 0) {
+            console.warn('[ReqAnnotation] 自检发现 ' + warnings.length + ' 个问题：');
+            warnings.forEach(function(w) { console.warn('  ⚠ ' + w); });
+        } else {
+            console.log('[ReqAnnotation] 自检通过 ✓ 共 ' + badges.length + ' 个角标');
+        }
+
+        return warnings.length === 0;
+    }
+
+    function createFloatingBadge(originalBadge) {
+        var reqNum = originalBadge.getAttribute('data-req');
+        if (floatingBadges[reqNum]) return floatingBadges[reqNum];
+
+        var floatBadge = document.createElement('span');
+        floatBadge.className = 'req-badge-float';
+        floatBadge.setAttribute('data-req', reqNum);
+        floatBadge.textContent = reqNum;
+
+        floatBadge.addEventListener('mouseenter', function() {
+            showTooltip(parseInt(reqNum));
+        });
+
+        document.body.appendChild(floatBadge);
+        floatingBadges[reqNum] = { el: floatBadge, original: originalBadge };
+        return floatingBadges[reqNum];
+    }
+
+    function updateFloatingPositions() {
+        Object.keys(floatingBadges).forEach(function(reqNum) {
+            var item = floatingBadges[reqNum];
+            var marker = item.original.parentElement;
+            if (!marker) return;
+
+            var markerRect = marker.getBoundingClientRect();
+            var badgeWidth = 20;
+            var badgeHeight = 18;
+
+            if (markerRect.width === 0 || markerRect.height === 0) {
+                item.el.style.visibility = 'hidden';
+                return;
+            }
+
+            item.el.style.visibility = 'visible';
+            item.el.style.top = Math.max(0, markerRect.top - 10) + 'px';
+            item.el.style.left = Math.max(0, markerRect.right - badgeWidth - 6) + 'px';
+            item.el.style.width = badgeWidth + 'px';
+            item.el.style.height = badgeHeight + 'px';
+        });
+    }
+
+    function getRequirement(reqNum) {
+        var badge = document.querySelector('.req-badge[data-req="' + reqNum + '"]');
+        if (!badge) return null;
+        return {
+            num: reqNum,
+            title: badge.getAttribute('data-title') || ('需求 ' + reqNum),
+            content: badge.getAttribute('data-content') || ''
+        };
+    }
+
+    function createTooltip(req) {
+        var tooltip = document.createElement('div');
+        tooltip.className = 'req-tooltip';
+        tooltip.id = 'req-tooltip-' + req.num;
+        tooltip.innerHTML = '<div class="req-tooltip-header">' +
+            '<span class="req-tooltip-title"><span style="background:rgb(250,173,20);color:white;font-size:10px;font-weight:bold;padding:1px 4px;border-radius:2px;margin-right:6px;">' + req.num + '</span>' + req.title + '</span>' +
+            '<span class="req-tooltip-close" onclick="ReqAnnotation.closeTooltip(' + req.num + ')">×</span>' +
+            '</div>' +
+            '<div class="req-tooltip-content">' + req.content + '</div>';
+
+        tooltip.addEventListener('mousedown', function(e) {
+            if (e.target.classList.contains('req-tooltip-close')) return;
+            dragState = {
+                tooltip: tooltip,
+                startX: e.clientX,
+                startY: e.clientY,
+                initialLeft: tooltip.offsetLeft,
+                initialTop: tooltip.offsetTop
+            };
+            e.preventDefault();
+        });
+
+        return tooltip;
+    }
+
+    function positionTooltip(tooltip, reqNum) {
+        var floatItem = floatingBadges[reqNum];
+        if (!floatItem || !floatItem.el) return;
+
+        var badgeRect = floatItem.el.getBoundingClientRect();
+        var tooltipWidth = 450;
+        var tooltipMaxHeight = 500;
+        var gap = 8;
+        var safeMargin = 16;
+
+        var left = badgeRect.left;
+        var top = badgeRect.bottom + gap;
+
+        if (left + tooltipWidth > window.innerWidth - safeMargin) {
+            left = window.innerWidth - tooltipWidth - safeMargin;
+        }
+        if (top + tooltipMaxHeight > window.innerHeight - safeMargin) {
+            top = badgeRect.top - gap - Math.min(tooltipMaxHeight, window.innerHeight * 0.7);
+        }
+        if (left < safeMargin) left = safeMargin;
+        if (top < safeMargin) top = badgeRect.bottom + gap;
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+    }
+
+    function showTooltip(reqNum) {
+        if (activeTooltips[reqNum]) {
+            var existing = document.getElementById('req-tooltip-' + reqNum);
+            if (existing) existing.classList.add('show');
+            return;
+        }
+
+        var req = getRequirement(reqNum);
+        if (!req || !req.content) return;
+
+        var tooltip = createTooltip(req);
+        if (!tooltip) return;
+
+        var container = document.getElementById('req-tooltip-container');
+        if (container) {
+            container.appendChild(tooltip);
+            positionTooltip(tooltip, reqNum);
+            tooltip.classList.add('show');
+            activeTooltips[reqNum] = true;
+        } else {
+            console.error('[ReqAnnotation] 缺少 #req-tooltip-container，无法显示浮窗');
+        }
+    }
+
+    function closeTooltip(reqNum) {
+        var tooltip = document.getElementById('req-tooltip-' + reqNum);
+        if (tooltip) {
+            tooltip.classList.remove('show');
+            setTimeout(function() { tooltip.remove(); }, 200);
+        }
+        delete activeTooltips[reqNum];
+    }
+
+    function init() {
+        var badges = document.querySelectorAll('.req-badge');
+        if (badges.length === 0) {
+            console.log('[ReqAnnotation] 未找到任何 .req-badge 角标，跳过初始化');
+            return;
+        }
+
+        runSelfCheck();
+
+        badges.forEach(function(badge) {
+            createFloatingBadge(badge);
+        });
+
+        function doPosition() {
+            updateFloatingPositions();
+        }
+
+        doPosition();
+        setTimeout(doPosition, 100);
+        setTimeout(doPosition, 500);
+
+        document.addEventListener('mousemove', function(e) {
+            if (!dragState) return;
+            var dx = e.clientX - dragState.startX;
+            var dy = e.clientY - dragState.startY;
+            dragState.tooltip.style.left = (dragState.initialLeft + dx) + 'px';
+            dragState.tooltip.style.top = (dragState.initialTop + dy) + 'px';
+        });
+
+        document.addEventListener('mouseup', function() {
+            dragState = null;
+        });
+
+        var ticking = false;
+        function onScrollOrResize() {
+            if (!ticking) {
+                requestAnimationFrame(function() {
+                    updateFloatingPositions();
+                    Object.keys(activeTooltips).forEach(function(num) {
+                        var tt = document.getElementById('req-tooltip-' + num);
+                        if (tt) positionTooltip(tt, parseInt(num));
+                    });
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }
+
+        window.addEventListener('scroll', onScrollOrResize, true);
+        window.addEventListener('resize', onScrollOrResize);
+    }
+
+    return {
+        init: init,
+        closeTooltip: closeTooltip,
+        showTooltip: showTooltip
+    };
+})();
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ReqAnnotation.init);
+} else {
+    ReqAnnotation.init();
+}
+
+</script>
+    <script>
+        // 加载侧边栏
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html?t=' + Date.now());
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+
+                setTimeout(function() {
+                    var script = document.createElement('script');
+                    script.src = 'common/scripts.js';
+                    script.onload = function() {
+                        if (typeof initCommonFunctions === 'function') {
+                            initCommonFunctions();
+                        }
+                    };
+                    document.body.appendChild(script);
+                }, 100);
+            } catch (error) {
+                console.error('加载侧边栏失败:', error);
+            }
+        }
+
+        // 初始化Lucide图标
+        lucide.createIcons();
+
+        // 加载侧边栏
+        loadSidebar();
+
+        // ========== 筛选条件功能（参考单据类型） ==========
+        var filterField = document.getElementById('filter-field');
+        var filterValue = document.getElementById('filter-value');
+        var advancedFilterBtn = document.getElementById('advanced-filter-btn');
+        var advancedFilter = document.getElementById('advanced-filter');
+
+        // 字段选择器切换时更新占位符
+        filterField.addEventListener('change', function() {
+            var selectedValue = this.value;
+            if (selectedValue === 'name') {
+                filterValue.placeholder = '按名称搜索';
+            } else if (selectedValue === 'code') {
+                filterValue.placeholder = '按编码搜索';
+            }
+            filterValue.value = '';
+        });
+
+        // 高级筛选展开/收起
+        advancedFilterBtn.addEventListener('click', function() {
+            advancedFilter.classList.toggle('hidden');
+
+            // 切换按钮文本和图标
+            if (!advancedFilter.classList.contains('hidden')) {
+                this.innerHTML = '收起筛选 <i data-lucide="chevron-up" class="w-4 h-4 ml-1"></i>';
+            } else {
+                this.innerHTML = '高级筛选 <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>';
+            }
+
+            // 重新初始化图标
+            lucide.createIcons();
+        });
+
+        // 搜索按钮点击事件
+        document.getElementById('search-btn').addEventListener('click', function() {
+            var field = filterField.value;
+            var value = filterValue.value.trim();
+            alert('基础筛选：' + (field === 'name' ? '业务类型名称' : '业务编码') + ' = "' + value + '"');
+        });
+
+        // 刷新按钮点击事件
+        document.getElementById('refresh-btn').addEventListener('click', function() {
+            filterValue.value = '';
+            if (!advancedFilter.classList.contains('hidden')) {
+                document.getElementById('adv-filter-name').value = '';
+                document.getElementById('adv-filter-code').value = '';
+                document.getElementById('adv-filter-status').value = '';
+                document.getElementById('adv-filter-group').value = '';
+            }
+            alert('已刷新！');
+        });
+
+        // 高级筛选-重置按钮
+        document.getElementById('reset-filter-btn').addEventListener('click', function() {
+            document.getElementById('adv-filter-name').value = '';
+            document.getElementById('adv-filter-code').value = '';
+            document.getElementById('adv-filter-status').value = '';
+            document.getElementById('adv-filter-group').value = '';
+        });
+
+        // 高级筛选-查询按钮
+        document.getElementById('query-filter-btn').addEventListener('click', function() {
+            var name = document.getElementById('adv-filter-name').value.trim();
+            var code = document.getElementById('adv-filter-code').value.trim();
+            var status = document.getElementById('adv-filter-status').value;
+            var group = document.getElementById('adv-filter-group').value;
+
+            var conditions = [];
+            if (name) conditions.push('名称: ' + name);
+            if (code) conditions.push('编码: ' + code);
+            if (status) conditions.push('状态: ' + (status === 'enabled' ? '启用' : '停用'));
+            if (group) conditions.push('分组: ' + group);
+
+            if (conditions.length === 0) {
+                alert('请至少输入一个筛选条件');
+                return;
+            }
+
+            alert('高级筛选条件：\n' + conditions.join('\n'));
+        });
+
+        // 树节点展开/收起
+        window.toggleTreeNode = function(element) {
+            var icon = element.querySelector('i');
+            var treeItem = element.closest('.tree-item');
+            var nodeId = treeItem.getAttribute('data-id');
+            var childrenNode = document.getElementById('children-' + nodeId);
+
+            if (childrenNode) {
+                if (childrenNode.classList.contains('hidden')) {
+                    childrenNode.classList.remove('hidden');
+                    icon.setAttribute('data-lucide', 'chevron-down');
+                } else {
+                    childrenNode.classList.add('hidden');
+                    icon.setAttribute('data-lucide', 'chevron-right');
+                }
+                lucide.createIcons();
+            }
+        };
+
+        // 业务类型抽屉功能
+        var drawer = document.getElementById('business-type-drawer');
+        var addBtn = document.getElementById('add-business-type');
+        var closeBtn = document.getElementById('close-drawer');
+        var cancelBtn = document.getElementById('cancel-btn');
+
+        addBtn.addEventListener('click', function() {
+            document.getElementById('drawer-title').textContent = '新增业务类型';
+            document.getElementById('business-type-form').reset();
+            openDrawer(drawer);
+        });
+
+        document.querySelectorAll('.edit-business-type').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.getElementById('drawer-title').textContent = '编辑业务类型';
+                document.getElementById('business-type-code').value = 'BT001';
+                document.getElementById('business-type-name').value = '销售收入';
+                document.getElementById('parent-group').value = 'income-main';
+                document.getElementById('business-type-desc').value = '主营业务收入';
+                openDrawer(drawer);
+            });
+        });
+
+        document.querySelectorAll('.delete-business-type').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                if (confirm('确定要删除该业务类型吗？\n\n注意：如果该业务类型已被单据使用，则无法删除。')) {
+                    alert('删除成功！');
+                }
+            });
+        });
+
+        closeBtn.addEventListener('click', function() {
+            closeDrawer(drawer);
+        });
+
+        cancelBtn.addEventListener('click', function() {
+            closeDrawer(drawer);
+        });
+
+        document.getElementById('drawer-overlay').addEventListener('click', function() {
+            closeDrawer(drawer);
+            closeGroupDrawer();
+        });
+
+        document.getElementById('business-type-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var code = document.getElementById('business-type-code').value.trim();
+            var name = document.getElementById('business-type-name').value.trim();
+
+            if (!code || !name) {
+                alert('请填写必填项！');
+                return;
+            }
+
+            if (code === 'BT001' || code === 'BT002') {
+                alert('业务类型编码已存在，请重新输入！');
+                return;
+            }
+
+            if (name === '销售收入' || name === '采购支出') {
+                alert('业务类型名称已存在，请重新输入！');
+                return;
+            }
+
+            var parentGroup = document.getElementById('parent-group').value;
+            if (parentGroup && parentGroup.split('-').length > 3) {
+                alert('最多支持三级业务类型！');
+                return;
+            }
+
+            alert('保存成功！');
+            closeDrawer(drawer);
+        });
+
+        // 业务类型分组抽屉功能
+        var groupDrawer = document.getElementById('group-drawer');
+        var addGroupBtn = document.getElementById('add-group-btn');
+        var editGroupBtn = document.getElementById('edit-group-btn');
+        var deleteGroupBtn = document.getElementById('delete-group-btn');
+        var closeGroupBtn = document.getElementById('close-group-drawer');
+        var cancelGroupBtn = document.getElementById('cancel-group-btn');
+
+        addGroupBtn.addEventListener('click', function() {
+            document.getElementById('group-drawer-title').textContent = '新增业务类型分组';
+            document.getElementById('group-form').reset();
+            openGroupDrawer();
+        });
+
+        editGroupBtn.addEventListener('click', function() {
+            document.getElementById('group-drawer-title').textContent = '编辑业务类型分组';
+            document.getElementById('group-code').value = 'GROUP001';
+            document.getElementById('group-name').value = '收入类';
+            document.getElementById('parent-group-select').value = 'root';
+            document.getElementById('group-desc').value = '收入类业务分组';
+            openGroupDrawer();
+        });
+
+        deleteGroupBtn.addEventListener('click', function() {
+            if (confirm('确定要删除该业务类型分组吗？\n\n注意：如果该分组下有业务类型数据，则无法删除。')) {
+                alert('删除成功！');
+            }
+        });
+
+        closeGroupBtn.addEventListener('click', function() {
+            closeGroupDrawer();
+        });
+
+        cancelGroupBtn.addEventListener('click', function() {
+            closeGroupDrawer();
+        });
+
+        document.getElementById('group-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var code = document.getElementById('group-code').value.trim();
+            var name = document.getElementById('group-name').value.trim();
+
+            if (!code || !name) {
+                alert('请填写必填项！');
+                return;
+            }
+
+            if (code === 'GROUP001') {
+                alert('业务分组编码已存在，请重新输入！');
+                return;
+            }
+
+            if (name === '收入类') {
+                alert('业务分组名称已存在，请重新输入！');
+                return;
+            }
+
+            var parentGroup = document.getElementById('parent-group-select').value;
+            if (parentGroup && parentGroup !== 'root') {
+                var level = parentGroup.split('-').length + 1;
+                if (level > 3) {
+                    alert('最多支持三级业务类型分组！');
+                    return;
+                }
+            }
+
+            alert('保存成功！');
+            closeGroupDrawer();
+        });
+
+        // 打开/关闭抽屉函数
+        function openDrawer(drawerEl) {
+            drawerEl.classList.add('open');
+            var overlay = document.getElementById('drawer-overlay');
+            if (overlay) {
+                overlay.classList.add('open');
+            }
+        }
+
+        function closeDrawer(drawerEl) {
+            drawerEl.classList.remove('open');
+            var overlay = document.getElementById('drawer-overlay');
+            if (overlay) {
+                overlay.classList.remove('open');
+            }
+        }
+
+        function openGroupDrawer() {
+            groupDrawer.classList.add('open');
+            var overlay = document.getElementById('drawer-overlay');
+            if (overlay) {
+                overlay.classList.add('open');
+            }
+        }
+
+        function closeGroupDrawer() {
+            groupDrawer.classList.remove('open');
+            var overlay = document.getElementById('drawer-overlay');
+            if (overlay) {
+                overlay.classList.remove('open');
+            }
+        }
+    </script>
+
+    <!-- PRD Viewer -->
+    <style>
+/* ================= PRD Viewer =================
+ * 原型页面右下角浮动按钮 + 右侧抽屉
+ * 展示本页对应的 PRD 章节 + 变更记录（双 Tab）
+ * =============================================== */
+
+/* 浮动按钮 */
+.prd-viewer-fab {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #003eb3;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 62, 179, 0.35);
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+ transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prd-viewer-fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 62, 179, 0.45);
+}
+
+.prd-viewer-fab::after {
+    content: attr(data-tip);
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.78);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
+
+.prd-viewer-fab:hover::after {
+    opacity: 1;
+}
+
+.prd-viewer-fab svg {
+    width: 22px;
+    height: 22px;
+    pointer-events: none;
+}
+
+/* 遮罩层 */
+.prd-viewer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.prd-viewer-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 抽屉 */
+.prd-viewer-drawer {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 640px;
+    max-width: 100vw;
+    min-width: 420px;
+    background: #fff;
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+    z-index: 10000;
+    transform: translateX(100%);
+    transition: transform 0.28s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 左侧拖拽手柄 */
+.prd-viewer-resizer {
+    position: absolute;
+    left: -3px;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    cursor: ew-resize;
+    z-index: 2;
+    background: transparent;
+    transition: background 0.15s;
+}
+
+.prd-viewer-resizer:hover,
+.prd-viewer-resizer.dragging {
+    background: rgba(0, 62, 179, 0.25);
+}
+
+.prd-viewer-drawer.resizing {
+    transition: none;
+    user-select: none;
+}
+
+.prd-viewer-drawer.open {
+    transform: translateX(0);
+}
+
+/* 头部 */
+.prd-viewer-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.prd-viewer-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.prd-viewer-subtitle {
+font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.prd-viewer-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.prd-viewer-close:hover {
+    color: #1f2937;
+    background: #f3f4f6;
+}
+
+/* Tab 切换 */
+.prd-viewer-tabs {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
+    background: #fafafa;
+}
+
+.prd-viewer-tab {
+    flex: 1;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #6b7280;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.prd-viewer-tab.active {
+    color: #003eb3;
+    border-bottom-color: #003eb3;
+    background: #fff;
+    font-weight: 500;
+}
+
+.prd-viewer-tab .count {
+    display: inline-block;
+    margin-left: 4px;
+    background: #e6f0ff;
+    color: #003eb3;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 10px;
+}
+
+.prd-viewer-tab.active .count {
+    background: #003eb3;
+    color: #fff;
+}
+
+/* 内容区 */
+.prd-viewer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.prd-viewer-pane {
+    display: none;
+}
+
+.prd-viewer-pane.active {
+    display: block;
+}
+
+/* Markdown 渲染 */
+.prd-md {
+    color: #374151;
+    font-size: 13.5px;
+    line-height: 1.7;
+}
+
+.prd-md h1,
+.prd-md h2,
+.prd-md h3,
+.prd-md h4 {
+    color: #111827;
+    margin: 18px 0 8px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.prd-md h1 { font-size: 18px; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+.prd-md h2 { font-size: 16px; }
+.prd-md h3 { font-size: 15px; color: #003eb3; }
+.prd-md h4 { font-size: 14px; color: #4b5563; }
+
+.prd-md h3:first-child,
+.prd-md h2:first-child,
+.prd-md h1:first-child { margin-top: 0; }
+
+.prd-md p { margin: 6px 0; }
+
+.prd-md ul {
+    margin: 4px 0 8px;
+    padding-left: 18px;
+}
+
+.prd-md li {
+    margin: 2px 0;
+}
+
+.prd-md li > ul {
+    margin-top: 2px;
+}
+
+.prd-md code {
+    background: #f3f4f6;
+    color: #003eb3;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.prd-md hr {
+    margin: 16px 0;
+    border: 0;
+    border-top: 1px dashed #d1d5db;
+}
+
+/* 变更时间轴 */
+.prd-changelog-empty {
+    color: #9ca3af;
+    font-size: 13px;
+    text-align: center;
+    padding: 24px 0;
+}
+
+.prd-changelog-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+
+.prd-changelog-list::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: #e5e7eb;
+}
+
+.prd-changelog-item {
+    position: relative;
+    padding: 4px 0 14px 22px;
+}
+
+.prd-changelog-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #003eb3;
+}
+
+.prd-changelog-item:not(:first-child)::before {
+    border-color: #d1d5db;
+}
+
+.prd-changelog-date {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.prd-changelog-scope {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 11px;
+    padding: 1px 6px;
+    background: #e6f0ff;
+    color: #003eb3;
+    border-radius: 10px;
+}
+
+.prd-changelog-summary {
+    color: #374151;
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin-top: 3px;
+}
+
+.prd-changelog-summary code {
+    background: #f3f4f6;
+    color: #003eb3;
+    padding: 0 5px;
+    border-radius: 3px;
+    font-size: 12.5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* 底部操作 */
+.prd-viewer-footer {
+    flex-shrink: 0;
+    padding: 12px 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafafa;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.prd-viewer-footer button {
+    padding: 6px 12px;
+    background: #003eb3;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.prd-viewer-footer button:hover { background: #002b82; }
+
+/* 缺失态 */
+.prd-viewer-missing {
+    text-align: center;
+    color: #9ca3af;
+    padding: 40px 20px;
+}
+
+.prd-viewer-missing code {
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #003eb3;
+}
+
+/* Toast */
+.prd-viewer-toast {
+    position: fixed;
+    left: 50%;
+    top: 20px;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.78);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    z-index: 10001;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.prd-viewer-toast.show { opacity: 1; }
+
+/* 小屏适配 */
+@media (max-width: 640px) {
+    .prd-viewer-drawer { width: 100vw; min-width: 0; }
+    .prd-viewer-fab { right: 16px; bottom: 16px; }
+    .prd-viewer-resizer { display: none; }
+    .prd-viewer-layout { flex-direction: column; }
+    .prd-viewer-toc { width: 100% !important; max-height: 140px; border-right: 0; border-bottom: 1px solid #e5e7eb; }
+}
+
+/* ========== 搜索栏（A） ========== */
+.prd-viewer-searchbar {
+    flex-shrink: 0;
+    padding: 8px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fff;
+    display: none;
+    align-items: center;
+    gap: 8px;
+}
+
+.prd-viewer-searchbar.open {
+    display: flex;
+}
+
+.prd-viewer-searchbar input {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.prd-viewer-searchbar input:focus {
+    border-color: #003eb3;
+    box-shadow: 0 0 0 2px rgba(0, 62, 179, 0.12);
+}
+
+.prd-viewer-search-count {
+    font-size: 12px;
+    color: #6b7280;
+    min-width: 48px;
+    text-align: center;
+}
+
+.prd-viewer-search-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background: #fff;
+    color: #4b5563;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.prd-viewer-search-btn:hover:not(:disabled) {
+    border-color: #003eb3;
+    color: #003eb3;
+}
+
+.prd-viewer-search-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* 搜索高亮 */
+.prd-md mark.prd-hit,
+.prd-changelog-summary mark.prd-hit {
+    background: #fff2b3;
+    color: #1f2937;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.prd-md mark.prd-hit.current,
+.prd-changelog-summary mark.prd-hit.current {
+    background: #ffcf33;
+    box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.35);
+}
+
+/* ========== 目录 + 内容两栏布局（B） ========== */
+.prd-viewer-layout {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.prd-viewer-toc {
+    width: 180px;
+    flex-shrink: 0;
+    border-right: 1px solid #e5e7eb;
+    background: #fafafa;
+    overflow-y: auto;
+    padding: 12px 0;
+}
+
+.prd-viewer-toc-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0 14px 6px;
+}
+
+.prd-viewer-toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.prd-viewer-toc-item {
+    padding: 5px 14px 5px 14px;
+    font-size: 12.5px;
+    color: #4b5563;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    line-height: 1.4;
+    word-break: break-all;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.prd-viewer-toc-item:hover {
+    background: #eef2ff;
+    color: #1f2937;
+}
+
+.prd-viewer-toc-item.active {
+    background: #e6f0ff;
+    color: #003eb3;
+    border-left-color: #003eb3;
+    font-weight: 500;
+}
+
+.prd-viewer-toc-item.level-2 { padding-left: 14px; }
+.prd-viewer-toc-item.level-3 { padding-left: 26px; font-size: 12px; color: #6b7280; }
+.prd-viewer-toc-item.level-4 { padding-left: 38px; font-size: 11.5px; color: #9ca3af; }
+
+.prd-viewer-toc-empty {
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+/* 内容区调整：现在 pane 本身要滚动 */
+.prd-viewer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    min-width: 0;
+    scroll-behavior: smooth;
+}
+
+/* 变更记录 Tab 激活时隐藏左侧目录（目录仅服务于需求描述 Tab） */
+.prd-viewer-layout.tab-changelog .prd-viewer-toc {
+    display: none;
+}
+
+/* 锚点滚动偏移（避免被顶部遮挡） */
+.prd-md [data-anchor] {
+    scroll-margin-top: 12px;
+}
+
+/* ========== 快捷键帮助浮层（C） ========== */
+.prd-viewer-help {
+    position: fixed;
+    right: 24px;
+    bottom: 90px;
+    width: 280px;
+    background: #1f2937;
+    color: #f3f4f6;
+    padding: 12px 14px;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    font-size: 12.5px;
+    line-height: 1.6;
+    z-index: 10002;
+    display: none;
+}
+
+.prd-viewer-help.open {
+    display: block;
+}
+
+.prd-viewer-help-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.prd-viewer-help-close {
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.prd-viewer-help kbd {
+    display: inline-block;
+    min-width: 18px;
+    padding: 1px 6px;
+    background: #374151;
+    border: 1px solid #4b5563;
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: #e5e7eb;
+    text-align: center;
+    margin-right: 2px;
+}
+
+.prd-viewer-help-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 2px 0;
+}
+
+.prd-viewer-help-row span:last-child {
+    color: #9ca3af;
+}
+
+</style>
+    <script>
+/**
+ * PRD Viewer（增强版）
+ * 右下浮动按钮 + 右侧抽屉，展示本页对应的 PRD 章节 + 变更记录。
+ *
+ * 功能：
+ *   A. 抽屉内搜索（高亮 + 上一条/下一条 + 计数）
+ *   B. 锚点目录（h2/h3/h4 自动生成，滚动联动高亮，点击跳转）
+ *   C. 快捷键（? 或 Ctrl/Cmd+K 打开；Esc 关闭；/ 聚焦搜索；↑↓ 导航结果）
+ *   D. 抽屉宽度（默认 640px，左边缘拖拽，localStorage 记忆）
+ *
+ * 数据源：common/prd-sections.json（由 tools/build-prd.py 构建）
+ */
+(function () {
+    'use strict';
+
+    if (window.__prdViewerInjected__) return;
+    window.__prdViewerInjected__ = true;
+
+    // ---------- 常量 ----------
+    var ASSET_PREFIX = '';
+    var DATA_URL = ASSET_PREFIX + 'common/prd-sections.json';
+    var SOURCE_URL = ASSET_PREFIX + 'PRD/prd.md';
+    var FULL_URL = ASSET_PREFIX + 'common/prd-full.html';
+
+    var STORAGE_KEY_WIDTH = 'prd-viewer.width';
+    var DEFAULT_WIDTH = 640;
+    var MIN_WIDTH = 420;
+    // 最大宽度在运行期按视口宽度计算
+
+    // ---------- 工具 ----------
+    function getPageKey() {
+        var name = (window.location.pathname || '').split('/').pop() || '';
+        return name || 'index.html';
+    }
+
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, '\u0026amp;')
+            .replace(/</g, '\u0026lt;')
+            .replace(/>/g, '\u0026gt;')
+            .replace(/"/g, '\u0026quot;')
+            .replace(/'/g, '\u0026#39;');
+    }
+
+    function renderInline(text) {
+        var safe = escapeHtml(text);
+        return safe.replace(/`([^`]+)`/g, function (_m, code) {
+            return '<code>' + code + '</code>';
+        });
+    }
+
+    function slugify(text, seen) {
+        var base = String(text).trim().replace(/\s+/g, '-').replace(/[^\w\-\u4e00-\u9fa5]+/g, '');
+        if (!base) base = 'section';
+        var slug = base;
+        var i = 2;
+        while (seen[slug]) {
+            slug = base + '-' + i++;
+        }
+        seen[slug] = true;
+        return slug;
+    }
+
+    // ---------- Markdown 渲染（带 anchor） ----------
+    /**
+     * @returns {{ html: string, headings: Array<{level:number, text:string, id:string}> }}
+     */
+    function renderMarkdown(md) {
+        if (!md) return { html: '', headings: [] };
+        var lines = md.split(/\r?\n/);
+        var out = [];
+        var headings = [];
+        var seen = {};
+        var listStack = [];
+
+        function closeListsUntil(indent) {
+            while (listStack.length && listStack[listStack.length - 1] > indent) {
+                out.push('</ul>');
+                listStack.pop();
+            }
+        }
+        function closeAllLists() {
+            while (listStack.length) { out.push('</ul>'); listStack.pop(); }
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].replace(/\s+$/, '');
+            if (!line.trim()) { closeAllLists(); continue; }
+
+            var h = /^(#{1,4})\s+(.*)$/.exec(line);
+            if (h) {
+                closeAllLists();
+                var level = h[1].length;
+                var text = h[2];
+                var id = slugify(text, seen);
+                if (level >= 2 && level <= 4) {
+                    headings.push({ level: level, text: text, id: id });
+                }
+                out.push('<h' + level + ' id="' + id + '" data-anchor="' + id + '">' + renderInline(text) + '</h' + level + '>');
+                continue;
+            }
+            if (/^---+\s*$/.test(line)) {
+                closeAllLists();
+                out.push('<hr>');
+                continue;
+            }
+            var li = /^(\s*)-\s+(.*)$/.exec(line);
+            if (li) {
+                var indent = li[1].length;
+                if (!listStack.length || listStack[listStack.length - 1] < indent) {
+                    out.push('<ul>'); listStack.push(indent);
+                } else {
+                    closeListsUntil(indent);
+                    if (!listStack.length || listStack[listStack.length - 1] < indent) {
+                        out.push('<ul>'); listStack.push(indent);
+                    }
+                }
+                out.push('<li>' + renderInline(li[2]) + '</li>');
+                continue;
+            }
+            closeAllLists();
+            out.push('<p>' + renderInline(line) + '</p>');
+        }
+        closeAllLists();
+        return { html: out.join('\n'), headings: headings };
+    }
+
+    function renderChangelog(list) {
+        if (!list || !list.length) {
+            return '<div class="prd-changelog-empty">该页面暂无变更记录</div>';
+        }
+        var html = '<ul class="prd-changelog-list">';
+        list.forEach(function (item) {
+            html += '<li class="prd-changelog-item">' +
+                '<div>' +
+                    '<span class="prd-changelog-date">' + escapeHtml(item.date) + '</span>' +
+                    (item.scope ? '<span class="prd-changelog-scope">' + escapeHtml(item.scope) + '</span>' : '') +
+                '</div>' +
+                '<div class="prd-changelog-summary">' + renderInline(item.summary) + '</div>' +
+            '</li>';
+        });
+        return html + '</ul>';
+    }
+
+    function renderTOC(headings) {
+        if (!headings || !headings.length) {
+            return '<div class="prd-viewer-toc-empty">（无章节标题）</div>';
+        }
+        var html = '<ul class="prd-viewer-toc-list">';
+        headings.forEach(function (h) {
+            html += '<li class="prd-viewer-toc-item level-' + h.level + '" data-target="' + h.id + '">' +
+                    escapeHtml(h.text) + '</li>';
+        });
+        return html + '</ul>';
+    }
+
+    // ---------- 图标 ----------
+    var FAB_ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
+    var CLOSE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>';
+
+    // ---------- DOM 构建 ----------
+    function buildDOM(data, rendered) {
+        var fab = document.createElement('button');
+        fab.className = 'prd-viewer-fab';
+        fab.setAttribute('data-tip', '查看本页 PRD（? 键打开）');
+        fab.setAttribute('aria-label', '查看本页 PRD');
+        fab.innerHTML = FAB_ICON;
+
+        var backdrop = document.createElement('div');
+        backdrop.className = 'prd-viewer-backdrop';
+
+        var drawer = document.createElement('aside');
+        drawer.className = 'prd-viewer-drawer';
+        drawer.setAttribute('role', 'dialog');
+        drawer.setAttribute('aria-label', 'PRD 查看');
+
+        var moduleLabel = data.section
+            ? data.module + ' / ' + data.section
+            : data.module || '未关联模块';
+        var changelogCount = (data.changelog && data.changelog.length) || 0;
+
+        drawer.innerHTML =
+            '<div class="prd-viewer-resizer" title="拖拽调整宽度"></div>' +
+            '<div class="prd-viewer-header">' +
+                '<div>' +
+                    '<div class="prd-viewer-title">' + escapeHtml(data.title || '产品需求') + '</div>' +
+                    '<div class="prd-viewer-subtitle">' + escapeHtml(moduleLabel) + '</div>' +
+                '</div>' +
+                '<div style="display:flex;gap:4px;align-items:center">' +
+                    '<button class="prd-viewer-search-btn" data-act="toggle-search" title="搜索 (/)">🔍</button>' +
+                    '<button class="prd-viewer-search-btn" data-act="toggle-help" title="快捷键 (?)">?</button>' +
+                    '<button class="prd-viewer-close" aria-label="关闭">' + CLOSE_ICON + '</button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="prd-viewer-searchbar">' +
+                '<input type="text" placeholder="在本页 PRD 内搜索..." />' +
+                '<span class="prd-viewer-search-count">0 / 0</span>' +
+                '<button class="prd-viewer-search-btn" data-act="prev" title="上一条 (↑)">▲</button>' +
+                '<button class="prd-viewer-search-btn" data-act="next" title="下一条 (↓)">▼</button>' +
+            '</div>' +
+            '<div class="prd-viewer-tabs">' +
+                '<button class="prd-viewer-tab active" data-tab="prd">需求描述</button>' +
+                '<button class="prd-viewer-tab" data-tab="changelog">变更记录' +
+                    (changelogCount ? '<span class="count">' + changelogCount + '</span>' : '') +
+                '</button>' +
+            '</div>' +
+            '<div class="prd-viewer-layout">' +
+                '<nav class="prd-viewer-toc" aria-label="本页目录">' +
+                    '<div class="prd-viewer-toc-title">目录</div>' +
+                    renderTOC(rendered.headings) +
+                '</nav>' +
+                '<div class="prd-viewer-body">' +
+                    '<div class="prd-viewer-pane active" data-pane="prd">' +
+                        (data.missing
+                            ? '<div class="prd-viewer-missing">该页面暂无 PRD 描述。<br>请在 <code>PRD/prd.md</code> 中补充对应章节。</div>'
+                            : '<div class="prd-md">' + rendered.html + '</div>') +
+                    '</div>' +
+                    '<div class="prd-viewer-pane" data-pane="changelog">' +
+                        renderChangelog(data.changelog) +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="prd-viewer-footer">' +
+                '<a href="' + FULL_URL + '?page=' + encodeURIComponent(getPageKey()) + '" target="_blank" rel="noopener" title="在新标签页打开 PRD 全文并高亮本章节">在 prd.md 中查看完整文档 ↗</a>' +
+                '<button class="prd-copy-btn">复制本页内容</button>' +
+            '</div>';
+
+        var help = document.createElement('div');
+        help.className = 'prd-viewer-help';
+        help.innerHTML =
+            '<div class="prd-viewer-help-title">快捷键 ' +
+                '<button class="prd-viewer-help-close" aria-label="关闭">×</button>' +
+            '</div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>?</kbd> <kbd>Ctrl/⌘</kbd>+<kbd>K</kbd></span><span>打开/关闭抽屉</span></div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>Esc</kbd></span><span>关闭抽屉 / 清除搜索</span></div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>/</kbd></span><span>聚焦搜索框</span></div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>↑</kbd> <kbd>↓</kbd> / <kbd>Enter</kbd></span><span>搜索结果上/下一条</span></div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>1</kbd> <kbd>2</kbd></span><span>切换 Tab（抽屉打开时）</span></div>';
+
+        var toast = document.createElement('div');
+        toast.className = 'prd-viewer-toast';
+
+        document.body.appendChild(fab);
+        document.body.appendChild(backdrop);
+        document.body.appendChild(drawer);
+        document.body.appendChild(help);
+        document.body.appendChild(toast);
+
+        return { fab: fab, backdrop: backdrop, drawer: drawer, help: help, toast: toast };
+    }
+
+    // ---------- 搜索（A） ----------
+    function createSearcher(drawer) {
+        var bar = drawer.querySelector('.prd-viewer-searchbar');
+        var input = bar.querySelector('input');
+        var countEl = bar.querySelector('.prd-viewer-search-count');
+        var btnPrev = bar.querySelector('[data-act="prev"]');
+        var btnNext = bar.querySelector('[data-act="next"]');
+        var hits = [];
+        var current = -1;
+
+        function activePane() {
+            return drawer.querySelector('.prd-viewer-pane.active');
+        }
+
+        function clear() {
+            var pane = activePane();
+            if (!pane) return;
+            pane.querySelectorAll('mark.prd-hit').forEach(function (m) {
+                var parent = m.parentNode;
+                parent.replaceChild(document.createTextNode(m.textContent), m);
+                parent.normalize();
+            });
+            hits = [];
+            current = -1;
+            updateCount();
+        }
+
+        function updateCount() {
+            countEl.textContent = hits.length ? (current + 1) + ' / ' + hits.length : '0 / 0';
+            btnPrev.disabled = btnNext.disabled = hits.length === 0;
+        }
+
+        function highlight(term) {
+            clear();
+            if (!term) return;
+            var pane = activePane();
+            if (!pane) return;
+            var rx = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$\u0026'), 'gi');
+
+            function walk(node) {
+                if (!node) return;
+                if (node.nodeType === Node.TEXT_NODE) {
+                    var text = node.nodeValue;
+                    if (!text || !rx.test(text)) return;
+                    rx.lastIndex = 0;
+                    var frag = document.createDocumentFragment();
+                    var last = 0, m;
+                    while ((m = rx.exec(text)) !== null) {
+                        if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+                        var mk = document.createElement('mark');
+                        mk.className = 'prd-hit';
+                        mk.textContent = m[0];
+                        frag.appendChild(mk);
+                        hits.push(mk);
+                        last = m.index + m[0].length;
+                        if (m[0].length === 0) rx.lastIndex++;
+                    }
+                    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+                    node.parentNode.replaceChild(frag, node);
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    var tag = node.tagName;
+                    if (tag === 'MARK' || tag === 'SCRIPT' || tag === 'STYLE') return;
+                    var children = Array.prototype.slice.call(node.childNodes);
+                    children.forEach(walk);
+                }
+            }
+            walk(pane);
+            if (hits.length) focusHit(0);
+            updateCount();
+        }
+
+        function focusHit(idx) {
+            if (!hits.length) return;
+            if (idx < 0) idx = hits.length - 1;
+            if (idx >= hits.length) idx = 0;
+            hits.forEach(function (m) { m.classList.remove('current'); });
+            hits[idx].classList.add('current');
+            hits[idx].scrollIntoView({ block: 'center', behavior: 'smooth' });
+            current = idx;
+            updateCount();
+        }
+
+        function openBar() {
+            bar.classList.add('open');
+            setTimeout(function () { input.focus(); input.select(); }, 0);
+        }
+        function closeBar() {
+            bar.classList.remove('open');
+            input.value = '';
+            clear();
+        }
+        function isOpen() { return bar.classList.contains('open'); }
+
+        input.addEventListener('input', function () { highlight(input.value.trim()); });
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                focusHit(e.shiftKey ? current - 1 : current + 1);
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                if (input.value) { input.value = ''; clear(); }
+                else closeBar();
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault(); focusHit(current + 1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault(); focusHit(current - 1);
+            }
+        });
+        btnPrev.addEventListener('click', function () { focusHit(current - 1); });
+        btnNext.addEventListener('click', function () { focusHit(current + 1); });
+
+        return {
+            open: openBar,
+            close: closeBar,
+            isOpen: isOpen,
+            clear: clear,
+            rerun: function () { if (input.value.trim()) highlight(input.value.trim()); },
+            next: function () { focusHit(current + 1); },
+            prev: function () { focusHit(current - 1); },
+            focusInput: function () { openBar(); }
+        };
+    }
+
+    // ---------- 目录联动（B） ----------
+    function setupTOC(drawer) {
+        var toc = drawer.querySelector('.prd-viewer-toc');
+        var body = drawer.querySelector('.prd-viewer-body');
+        var items = toc.querySelectorAll('.prd-viewer-toc-item');
+
+        items.forEach(function (it) {
+            it.addEventListener('click', function () {
+                var target = it.getAttribute('data-target');
+                var el = body.querySelector('[data-anchor="' + target + '"]');
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setActive(it);
+                }
+            });
+        });
+
+        function setActive(item) {
+            items.forEach(function (x) { x.classList.toggle('active', x === item); });
+        }
+
+        // 滚动联动：当前可见区域最靠上的标题高亮
+        body.addEventListener('scroll', function () {
+            if (drawer.__tocSyncTimer) cancelAnimationFrame(drawer.__tocSyncTimer);
+            drawer.__tocSyncTimer = requestAnimationFrame(function () {
+                var anchors = body.querySelectorAll('[data-anchor]');
+                if (!anchors.length) return;
+                var top = body.getBoundingClientRect().top;
+                var best = null;
+                for (var i = 0; i < anchors.length; i++) {
+                    var r = anchors[i].getBoundingClientRect();
+                    if (r.top - top <= 24) best = anchors[i]; else break;
+                }
+                if (!best) best = anchors[0];
+                var id = best.getAttribute('data-anchor');
+                var item = toc.querySelector('[data-target="' + id + '"]');
+                if (item) setActive(item);
+            });
+        });
+    }
+
+    // ---------- 宽度拖拽（D） ----------
+    function setupResizer(drawer) {
+        var handle = drawer.querySelector('.prd-viewer-resizer');
+        var stored = parseInt(localStorage.getItem(STORAGE_KEY_WIDTH), 10);
+        if (stored && stored >= MIN_WIDTH) applyWidth(stored);
+
+        function applyWidth(w) {
+            var max = Math.max(MIN_WIDTH, window.innerWidth - 40);
+            w = Math.max(MIN_WIDTH, Math.min(max, w));
+            drawer.style.width = w + 'px';
+        }
+
+        var dragging = false;
+        handle.addEventListener('mousedown', function (e) {
+            dragging = true;
+            drawer.classList.add('resizing');
+            handle.classList.add('dragging');
+            document.body.style.cursor = 'ew-resize';
+            e.preventDefault();
+        });
+        window.addEventListener('mousemove', function (e) {
+            if (!dragging) return;
+            // 宽度 = 视口右缘 - 鼠标 X
+            applyWidth(window.innerWidth - e.clientX);
+        });
+        window.addEventListener('mouseup', function () {
+            if (!dragging) return;
+            dragging = false;
+            drawer.classList.remove('resizing');
+            handle.classList.remove('dragging');
+            document.body.style.cursor = '';
+            try {
+                localStorage.setItem(STORAGE_KEY_WIDTH, parseInt(drawer.style.width, 10));
+            } catch (_) {}
+        });
+
+        // 视口变化时约束宽度不超过视口
+        window.addEventListener('resize', function () {
+            var cur = parseInt(drawer.style.width, 10) || DEFAULT_WIDTH;
+            applyWidth(cur);
+        });
+    }
+
+    // ---------- 交互绑定 ----------
+    function bindEvents(els, data) {
+        var fab = els.fab, backdrop = els.backdrop, drawer = els.drawer, help = els.help, toast = els.toast;
+        var searcher = createSearcher(drawer);
+        setupTOC(drawer);
+        setupResizer(drawer);
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toast.__t);
+            toast.__t = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+        }
+
+        function open() {
+            backdrop.classList.add('open');
+            drawer.classList.add('open');
+        }
+        function close() {
+            backdrop.classList.remove('open');
+            drawer.classList.remove('open');
+            searcher.close();
+            help.classList.remove('open');
+        }
+        function isOpen() { return drawer.classList.contains('open'); }
+        function toggle() { isOpen() ? close() : open(); }
+
+        fab.addEventListener('click', open);
+        backdrop.addEventListener('click', close);
+        drawer.querySelector('.prd-viewer-close').addEventListener('click', close);
+
+        // 头部工具栏按钮
+        drawer.querySelectorAll('[data-act]').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                var act = btn.getAttribute('data-act');
+                if (act === 'toggle-search') searcher.isOpen() ? searcher.close() : searcher.open();
+                else if (act === 'toggle-help') help.classList.toggle('open');
+            });
+        });
+        help.querySelector('.prd-viewer-help-close').addEventListener('click', function () {
+            help.classList.remove('open');
+        });
+
+        // Tab 切换
+        var tabs = drawer.querySelectorAll('.prd-viewer-tab');
+        var panes = drawer.querySelectorAll('.prd-viewer-pane');
+        var layout = drawer.querySelector('.prd-viewer-layout');
+        function switchTab(name) {
+            tabs.forEach(function (t) { t.classList.toggle('active', t.getAttribute('data-tab') === name); });
+            panes.forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-pane') === name); });
+            // 标记当前 Tab，供 CSS 控制目录显示（变更记录 Tab 隐藏目录）
+            if (layout) {
+                layout.classList.toggle('tab-prd', name === 'prd');
+                layout.classList.toggle('tab-changelog', name === 'changelog');
+            }
+            // 切换后重跑搜索（搜索作用于当前 pane）
+            searcher.rerun();
+        }
+        // 初始化标记为需求描述 Tab
+        if (layout) layout.classList.add('tab-prd');
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () { switchTab(tab.getAttribute('data-tab')); });
+        });
+
+        // 复制
+        drawer.querySelector('.prd-copy-btn').addEventListener('click', function () {
+            var text = data.markdown || '';
+            if (data.changelog && data.changelog.length) {
+                text += '\n\n## 变更记录\n';
+                data.changelog.forEach(function (c) {
+                    text += '- ' + c.date + ' [' + (c.scope || '') + '] ' + c.summary + '\n';
+                });
+            }
+            copyText(text, showToast);
+        });
+
+        // 全局快捷键（C）
+        document.addEventListener('keydown', function (e) {
+            var tag = (e.target && e.target.tagName) || '';
+            var typing = tag === 'INPUT' || tag === 'TEXTAREA' || (e.target && e.target.isContentEditable);
+
+            // 打开：? 或 Ctrl/Cmd+K
+            if (!typing && (e.key === '?' || ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')))) {
+                e.preventDefault();
+                toggle();
+                return;
+            }
+            if (!isOpen()) return;
+
+            if (e.key === 'Escape') {
+                // 若搜索栏开着则优先关闭搜索栏
+                if (searcher.isOpen()) { searcher.close(); return; }
+                if (help.classList.contains('open')) { help.classList.remove('open'); return; }
+                close();
+                return;
+            }
+
+            // 抽屉已打开，以下交互不应在编辑框中误触发
+            if (typing) return;
+
+            if (e.key === '/') {
+                e.preventDefault();
+                searcher.focusInput();
+            } else if (e.key === 'ArrowDown') {
+                if (searcher.isOpen()) { e.preventDefault(); searcher.next(); }
+            } else if (e.key === 'ArrowUp') {
+                if (searcher.isOpen()) { e.preventDefault(); searcher.prev(); }
+            } else if (e.key === '1') {
+                switchTab('prd');
+            } else if (e.key === '2') {
+                switchTab('changelog');
+            }
+        });
+    }
+
+    function copyText(text, showToast) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(
+                function () { showToast('已复制到剪贴板'); },
+                function () { fallbackCopy(text, showToast); }
+            );
+        } else {
+            fallbackCopy(text, showToast);
+        }
+    }
+
+    function fallbackCopy(text, showToast) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('已复制到剪贴板'); }
+        catch (_) { showToast('复制失败'); }
+        document.body.removeChild(ta);
+    }
+
+    // ---------- 启动 ----------
+    function init() {
+        var pageKey = getPageKey();
+        fetch(DATA_URL, { cache: 'no-cache' })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (json) {
+                var sections = (json && json.sections) || {};
+                var data = sections[pageKey];
+                if (!data) {
+                    data = { title: '产品需求', module: null, section: null, markdown: '', changelog: [], missing: true };
+                }
+                var rendered = data.missing
+                    ? { html: '', headings: [] }
+                    : renderMarkdown(data.markdown || '');
+                var els = buildDOM(data, rendered);
+                bindEvents(els, data);
+                // 暴露调试接口
+                window.PRDViewer = {
+                    data: data,
+                    open: function () { els.drawer.classList.add('open'); els.backdrop.classList.add('open'); },
+                    close: function () { els.drawer.classList.remove('open'); els.backdrop.classList.remove('open'); }
+                };
+            })
+            .catch(function (err) {
+                console.warn('[prd-viewer] 加载 prd-sections.json 失败：', err);
+                var data = { title: '产品需求', module: null, section: null, markdown: '', changelog: [], missing: true, _loadError: String(err && err.message || err) };
+                var els = buildDOM(data, { html: '', headings: [] });
+                bindEvents(els, data);
+            });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
+</body>
+</html>

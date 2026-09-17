@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计提比例配置 - 财务中台</title>
+    <link rel="stylesheet" href="../common/tailwind.css">
+    <script src="../common/lucide.min.js"></script>
+    <!-- tailwind.config removed: using precompiled CSS -->
+    <style>
+/* external font import removed for offline speed */
+
+body {
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    transition: width 0.3s ease-in-out;
+    overflow-y: auto;
+    height: 100vh;
+    position: relative;
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.sidebar > div, .sidebar nav {
+    position: relative;
+    z-index: 2;
+}
+
+.sidebar.collapsed {
+    width: 64px;
+}
+
+.sidebar.collapsed .sidebar-text {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-icon {
+    margin: 0 auto;
+}
+
+.sidebar-item {
+    transition: all 0.2s ease-in-out;
+    font-size: 0.875rem;
+}
+
+.sidebar-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 500;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+}
+
+.menu-header h2 {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 二级子菜单样式 */
+.submenu-content {
+    border-left: 1px solid rgba(255,255,255,0.15);
+    margin-left: 12px;
+    margin-top: 2px;
+}
+.submenu-header {
+    user-select: none;
+}
+.submenu-content .sidebar-item.active {
+    background: rgba(255,255,255,0.15);
+}
+
+.drawer {
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(100%);
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 15;
+    display: none;
+}
+
+.drawer-overlay.open {
+    display: block;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #003eb3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* 表格样式 */
+.table-container {
+    overflow-x: auto;
+}
+
+.table-container table {
+    min-width: 100%;
+    border-collapse: collapse;
+}
+
+.table-container th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.table-container td, .table-container th {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table-container tr:hover {
+    background-color: #f9fafb;
+}
+
+/* 按钮样式 */
+.btn {
+    transition: all 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+}
+
+.btn-primary {
+    background-color: #003eb3;
+    color: white;
+    border: 1px solid #003eb3;
+}
+
+.btn-primary:hover {
+    background-color: #0056c7;
+}
+
+.btn-secondary {
+    background-color: white;
+    color: #003eb3;
+    border: 1px solid #003eb3;
+}
+
+.btn-secondary:hover {
+    background-color: #e6f0ff;
+}
+
+.btn-outline {
+    background-color: white;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+}
+
+.btn-outline:hover {
+    background-color: #f3f4f6;
+}
+
+/* 输入框样式 */
+.input-field {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.input-field:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #003eb3;
+    border-color: transparent;
+}
+
+/* 卡片样式 */
+.card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    padding: 1.5rem;
+}
+
+/* 筛选栏样式 */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+/* 分页样式 */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    margin-top: 1.5rem;
+}
+
+.pagination button {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background-color: white;
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #f3f4f6;
+}
+
+.pagination button.active {
+    background-color: #003eb3;
+    color: white;
+    border-color: #003eb3;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 64px;
+    }
+    
+    .sidebar .sidebar-text {
+        display: none;
+    }
+    
+    .sidebar .sidebar-icon {
+        margin: 0 auto;
+    }
+    
+    .main-content {
+        margin-left: 64px;
+    }
+    
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-bar > div {
+        width: 100%;
+    }
+}
+</style>
+</head>
+<body class="bg-neutral">
+    <div class="flex h-screen">
+        
+        <main class="flex-1  p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="space-y-6">
+                <!-- 标题 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="text-xs text-gray-500 mb-2">项目核算 / 售后维修计提 / 计提比例配置</div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-xl font-semibold text-gray-800">计提比例配置</h1>
+                            <p class="text-sm text-gray-500 mt-1">以<strong>项目类型</strong>为主配置售后维修计提比例，一条比例勾选其<strong>适用的一批财务主体</strong>。同一项目类型 + 同一财务主体在任一时点只能命中一条<strong>启用中</strong>比例；未被任何启用中比例覆盖的财务主体，其合同走缺配挂账进入【异常单据处理】。</p>
+                        </div>
+                        <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 flex items-center gap-1 text-sm" onclick="openAccrualModal('add')">
+                            <i data-lucide="plus" class="w-4 h-4"></i> 新增比例
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 规则提示 -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+                    <i data-lucide="lightbulb" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+                    <div class="text-sm text-blue-800 space-y-1">
+                        <p><strong>业务规则：</strong></p>
+                        <ul class="list-disc pl-5 space-y-0.5">
+                            <li>以<strong>项目类型</strong>为主：一条比例配一个比例值，勾选它适用的一批财务主体；同一项目类型 + 同一财务主体在任一时点只能命中一条<strong>启用中</strong>比例，保存新比例/启用已禁用比例时系统按"项目类型 + 每个被勾选的财务主体"逐一校验时间段不重叠；<strong>已禁用行不占唯一性名额</strong>。</li>
+                            <li>计提比例按<strong>项目签单日</strong>匹配：签单日落在哪条<strong>启用中</strong>比例的生效开始日~结束日区间内、且合同所属财务主体在该比例适用范围内，就用哪条比例；否则走缺配挂账进入【异常单据处理】。历史比例（含已禁用或已收口）不影响已生成的计提单，因为计提单已固化比例快照。</li>
+                            <li>比例调整采用<strong>"手工收口旧比例 + 新增一条新比例"两步流程</strong>（不做系统自动截断，让停用动作显式可见、可复核）：先编辑旧行把生效结束日填为最后生效日，再新增新行、生效开始日 = 旧结束日次日；旧比例数值不允许直接改。</li>
+                            <li><strong>禁用 vs 收口</strong>：日常"到期换比例 / 计划性下线"用<strong>编辑收口结束日</strong>（有明确停用日、时间轴干净）；"这条建错了 / 立即整条作废"用<strong>禁用</strong>（不留生效痕迹、可再启用）。禁用即刻不参与匹配，允许后续再启用。</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 搜索条件和按钮（对齐 financial-entity 标准筛选组件） -->
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex-1 flex items-center flex-wrap gap-2">
+                            <!-- 筛选条件选择器 -->
+                            <select id="filter-select" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                                <option value="projectType">项目类型</option>
+                                <option value="entity">财务主体</option>
+                                <option value="operator">操作员</option>
+                            </select>
+                            <!-- 输入框 -->
+                            <input type="text" id="filter-input" placeholder="按项目类型搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                            <!-- 搜索按钮 -->
+                            <button onclick="applyFilter()" class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                <i data-lucide="search" class="w-4 h-4"></i>
+                            </button>
+                            <!-- 刷新按钮 -->
+                            <button onclick="resetFilter()" class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                                <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                            </button>
+                            <!-- 高级筛选按钮 -->
+                            <button id="advanced-filter-btn" onclick="toggleAdvancedFilter()" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center text-sm">
+                                高级筛选
+                                <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                            </button>
+                            <!-- 含已禁用开关 -->
+                            <label class="flex items-center gap-1 text-sm text-gray-600 ml-2"><input type="checkbox" id="show-disabled" onchange="toggleDisabledRows(this)" class="rounded border-gray-300"> 含已禁用</label>
+                        </div>
+                        <!-- 右侧按钮组 -->
+                        <div class="flex space-x-3">
+                            <button onclick="openAccrualModal('add')" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center text-sm">
+                                <i data-lucide="plus" class="w-4 h-4 mr-2"></i>新增
+                            </button>
+                            <button class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm flex items-center gap-1"><i data-lucide="download" class="w-4 h-4"></i>导出</button>
+                        </div>
+                    </div>
+
+                    <!-- 高级筛选条件 -->
+                    <div id="advanced-filter" class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 hidden">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">项目类型</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                <option value="">全部</option><option>整装</option><option>软装</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                <option value="">全部</option><option>北京家装</option><option>上海家装</option><option>广州家装</option><option>成都家装</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">生效开始日（起）</label>
+                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">生效开始日（止）</label>
+                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 表格 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border border-gray-200 rounded-lg text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">序号</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">项目类型</th>
+                                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">计提比例</th>
+                                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">适用财务主体</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">生效开始日</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">生效结束日</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">启用状态</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">最近操作</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-3 py-2">1</td>
+                                    <td class="px-3 py-2 font-medium">整装</td>
+                                    <td class="px-3 py-2 text-right font-medium text-primary">2.00%</td>
+                                    <td class="px-3 py-2"><span class="text-gray-700">北京家装、上海家装、成都家装</span> <span class="text-xs text-gray-400">（3个主体）</span></td>
+                                    <td class="px-3 py-2">2026-01-01</td>
+                                    <td class="px-3 py-2 text-gray-400">-</td>
+                                    <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">启用中</span></td>
+                                    <td class="px-3 py-2 text-gray-500" title="李丽 · 2025-12-28 新增&#10;王强 · 2026-07-15 编辑（补充成都家装）">李丽 · 2025-12-28 新增</td>
+                                    <td class="px-3 py-2 whitespace-nowrap"><button class="text-primary hover:underline mr-2" onclick="openAccrualModal('edit')">编辑</button><button class="text-red-600 hover:underline" onclick="disableAccrual(this)">禁用</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-3 py-2">2</td>
+                                    <td class="px-3 py-2 font-medium">软装</td>
+                                    <td class="px-3 py-2 text-right font-medium text-primary">1.50%</td>
+                                    <td class="px-3 py-2"><span class="text-gray-700">北京家装、上海家装</span> <span class="text-xs text-gray-400">（2个主体）</span></td>
+                                    <td class="px-3 py-2">2026-01-01</td>
+                                    <td class="px-3 py-2 text-gray-400">-</td>
+                                    <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">启用中</span></td>
+                                    <td class="px-3 py-2 text-gray-500">李丽 · 2025-12-28 新增</td>
+                                    <td class="px-3 py-2 whitespace-nowrap"><button class="text-primary hover:underline mr-2" onclick="openAccrualModal('edit')">编辑</button><button class="text-red-600 hover:underline" onclick="disableAccrual(this)">禁用</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-3 py-2">3</td>
+                                    <td class="px-3 py-2 font-medium">整装</td>
+                                    <td class="px-3 py-2 text-right font-medium text-primary">2.00%</td>
+                                    <td class="px-3 py-2"><span class="text-gray-700">广州家装</span> <span class="text-xs text-gray-400">（1个主体）</span></td>
+                                    <td class="px-3 py-2">2025-01-01</td>
+                                    <td class="px-3 py-2">2026-08-31</td>
+                                    <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">启用中</span> <span class="text-xs text-gray-400 ml-1">（已收口）</span></td>
+                                    <td class="px-3 py-2 text-gray-500" title="王强 · 2025-01-01 新增&#10;王强 · 2026-07-15 编辑（收口结束日 2026-08-31）">王强 · 2026-07-15 编辑收口</td>
+                                    <td class="px-3 py-2 whitespace-nowrap"><button class="text-primary hover:underline mr-2" onclick="openAccrualModal('edit')">编辑</button><button class="text-red-600 hover:underline" onclick="disableAccrual(this)">禁用</button></td>
+                                </tr>
+                                <tr class="bg-gray-50 text-gray-500">
+                                    <td class="px-3 py-2">4</td>
+                                    <td class="px-3 py-2">整装</td>
+                                    <td class="px-3 py-2 text-right">2.50%</td>
+                                    <td class="px-3 py-2">广州家装 <span class="text-xs text-gray-400">（1个主体）</span></td>
+                                    <td class="px-3 py-2">2026-09-01</td>
+                                    <td class="px-3 py-2">-</td>
+                                    <td class="px-3 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-gray-200 text-gray-700">已禁用</span></td>
+                                    <td class="px-3 py-2" title="王强 · 2026-07-15 新增&#10;王强 · 2026-07-20 禁用（比例值填错）">王强 · 2026-07-20 禁用</td>
+                                    <td class="px-3 py-2 whitespace-nowrap"><button class="text-primary hover:underline mr-2" onclick="openAccrualModal('edit')">编辑</button><button class="text-green-600 hover:underline" onclick="enableAccrual(this)">启用</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 新增弹窗 -->
+    <div id="add-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-[520px] max-w-[92vw]">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 id="accrual-modal-title" class="text-base font-semibold text-gray-800">新增计提比例</h3>
+                <button onclick="document.getElementById('add-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-sm">
+                <div>
+                    <label class="block text-gray-700 mb-1">项目类型 <span class="text-red-500">*</span></label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option>请选择</option><option>整装</option><option>软装</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-1">计提比例 (%) <span class="text-red-500">*</span></label>
+                    <input type="number" step="0.01" min="0" max="100" placeholder="例：2.00" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <p class="text-xs text-gray-500 mt-1">保留 2 位小数，范围 0-100；该比例对所选全部财务主体统一生效</p>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-gray-700">适用财务主体 <span class="text-red-500">*</span></label>
+                        <label class="text-xs text-primary cursor-pointer flex items-center gap-1"><input type="checkbox" class="align-middle"> 全选</label>
+                    </div>
+                    <div class="border border-gray-300 rounded-md p-3 grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+                        <label class="flex items-center gap-2"><input type="checkbox" checked> 北京家装</label>
+                        <label class="flex items-center gap-2"><input type="checkbox" checked> 上海家装</label>
+                        <label class="flex items-center gap-2"><input type="checkbox"> 广州家装</label>
+                        <label class="flex items-center gap-2"><input type="checkbox" checked> 成都家装</label>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">勾选该比例适用的财务主体，可多选；未勾选的主体在计提时走缺配挂账</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-gray-700 mb-1">生效开始日 <span class="text-red-500">*</span></label>
+                        <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-1">生效结束日</label>
+                        <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <p class="text-xs text-gray-500 mt-1">留空表示无限期</p>
+                    </div>
+                </div>
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800 flex items-start gap-2">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                    <span>比例调整采用<strong>"手工收口旧比例 + 新增新比例"两步流程</strong>：先在旧行点"编辑"，把生效结束日填为旧比例的最后生效日；再点"新增"新增本条，生效开始日填为旧结束日的次日。保存时按"项目类型 + 每个被勾选的财务主体"逐一校验时间段不重叠，冲突则拦截并提示具体冲突行。<br>编辑态下，<strong>启用中</strong>的行仅"生效结束日"可改（用于收口）；<strong>已禁用</strong>的行所有字段可改，改完保存不校验唯一性，唯一性校验只在"新增保存 / 启用"两个动作触发。</span>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-2">
+                <button onclick="document.getElementById('add-modal').classList.add('hidden')" class="px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">取消</button>
+                <button class="px-4 py-2 bg-primary text-white rounded-md text-sm hover:bg-blue-700">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openAccrualModal(mode) {
+            var t = document.getElementById('accrual-modal-title');
+            if (t) t.textContent = (mode === 'edit') ? '编辑计提比例' : '新增计提比例';
+            document.getElementById('add-modal').classList.remove('hidden');
+        }
+        function disableAccrual(btn) {
+            if (!confirm('确认将该条计提比例规则置为禁用？\n\n禁用即刻不参与匹配，已生成的计提单不受影响（比例已固化为快照）；后续新签合同若匹配不到启用中规则将走【异常单据处理】。\n\n若为规则收口场景，请先新增替代规则，再置本条为禁用。')) return;
+            var tr = btn.closest('tr');
+            var s = tr.querySelector('td:nth-child(7) span');
+            if (s) { s.textContent = '已禁用'; s.className = 'px-2 py-0.5 text-xs rounded-full bg-gray-200 text-gray-700'; }
+            tr.classList.add('bg-gray-50', 'text-gray-500');
+            btn.closest('td').innerHTML = '<button class="text-primary hover:underline mr-2" onclick="openAccrualModal(\'edit\')">编辑</button><button class="text-green-600 hover:underline" onclick="enableAccrual(this)">启用</button>';
+        }
+        function enableAccrual(btn) {
+            if (!confirm('确认启用该条计提比例规则？\n\n启用后即刻参与匹配。请确认同一项目类型 + 财务主体在生效时段内不存在其他启用中比例，避免唯一性冲突。')) return;
+            var tr = btn.closest('tr');
+            var s = tr.querySelector('td:nth-child(7) span');
+            if (s) { s.textContent = '启用中'; s.className = 'px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800'; }
+            tr.classList.remove('bg-gray-50', 'text-gray-500');
+            btn.closest('td').innerHTML = '<button class="text-primary hover:underline mr-2" onclick="openAccrualModal(\'edit\')">编辑</button><button class="text-red-600 hover:underline" onclick="disableAccrual(this)">禁用</button>';
+        }
+        function applyFilter() { /* demo: 原型演示 */ }
+        function resetFilter() { var i = document.getElementById('filter-input'); if (i) i.value = ''; }
+        function toggleAdvancedFilter() { var a = document.getElementById('advanced-filter'); if (a) a.classList.toggle('hidden'); }
+        function toggleDisabledRows(cb) {
+            document.querySelectorAll('tbody tr').forEach(function (tr) {
+                if (tr.querySelector('.bg-gray-200')) tr.style.display = cb.checked ? '' : 'none';
+            });
+        }
+        // 默认隐藏已禁用行
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('tbody tr').forEach(function (tr) {
+                if (tr.querySelector('.bg-gray-200')) tr.style.display = 'none';
+            });
+        });
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html?t=' + Date.now());
+                document.getElementById('sidebar-container').innerHTML = await response.text();
+                const script = document.createElement('script');
+                script.src = 'common/scripts.js';
+                script.onload = () => { if (typeof initCommonFunctions === 'function') initCommonFunctions(); };
+                document.body.appendChild(script);
+            } catch (e) { console.error(e); }
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadSidebar);
+        else loadSidebar();
+    </script>
+</body>
+</html>

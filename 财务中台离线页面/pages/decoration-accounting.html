@@ -1,0 +1,3380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>整装核算 - 财务中台</title>
+    <link rel="stylesheet" href="../common/tailwind.css">
+    <script src="../common/lucide.min.js"></script>
+    <!-- tailwind.config removed: using precompiled CSS -->
+    <style>
+/* external font import removed for offline speed */
+
+body {
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    transition: width 0.3s ease-in-out;
+    overflow-y: auto;
+    height: 100vh;
+    position: relative;
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.sidebar > div, .sidebar nav {
+    position: relative;
+    z-index: 2;
+}
+
+.sidebar.collapsed {
+    width: 64px;
+}
+
+.sidebar.collapsed .sidebar-text {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-icon {
+    margin: 0 auto;
+}
+
+.sidebar-item {
+    transition: all 0.2s ease-in-out;
+    font-size: 0.875rem;
+}
+
+.sidebar-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 500;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+}
+
+.menu-header h2 {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 二级子菜单样式 */
+.submenu-content {
+    border-left: 1px solid rgba(255,255,255,0.15);
+    margin-left: 12px;
+    margin-top: 2px;
+}
+.submenu-header {
+    user-select: none;
+}
+.submenu-content .sidebar-item.active {
+    background: rgba(255,255,255,0.15);
+}
+
+.drawer {
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(100%);
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 15;
+    display: none;
+}
+
+.drawer-overlay.open {
+    display: block;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #003eb3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* 表格样式 */
+.table-container {
+    overflow-x: auto;
+}
+
+.table-container table {
+    min-width: 100%;
+    border-collapse: collapse;
+}
+
+.table-container th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.table-container td, .table-container th {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table-container tr:hover {
+    background-color: #f9fafb;
+}
+
+/* 按钮样式 */
+.btn {
+    transition: all 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+}
+
+.btn-primary {
+    background-color: #003eb3;
+    color: white;
+    border: 1px solid #003eb3;
+}
+
+.btn-primary:hover {
+    background-color: #0056c7;
+}
+
+.btn-secondary {
+    background-color: white;
+    color: #003eb3;
+    border: 1px solid #003eb3;
+}
+
+.btn-secondary:hover {
+    background-color: #e6f0ff;
+}
+
+.btn-outline {
+    background-color: white;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+}
+
+.btn-outline:hover {
+    background-color: #f3f4f6;
+}
+
+/* 输入框样式 */
+.input-field {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.input-field:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #003eb3;
+    border-color: transparent;
+}
+
+/* 卡片样式 */
+.card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    padding: 1.5rem;
+}
+
+/* 筛选栏样式 */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+/* 分页样式 */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    margin-top: 1.5rem;
+}
+
+.pagination button {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background-color: white;
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #f3f4f6;
+}
+
+.pagination button.active {
+    background-color: #003eb3;
+    color: white;
+    border-color: #003eb3;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 64px;
+    }
+    
+    .sidebar .sidebar-text {
+        display: none;
+    }
+    
+    .sidebar .sidebar-icon {
+        margin: 0 auto;
+    }
+    
+    .main-content {
+        margin-left: 64px;
+    }
+    
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-bar > div {
+        width: 100%;
+    }
+}
+</style>
+    <style>
+        .req-badge {
+            display: inline-block;
+            vertical-align: top;
+            background-color: rgb(250, 173, 20);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 16px;
+            padding: 0px 5px;
+            border-radius: 2px;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            top: -10px;
+            right: -6px;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .req-badge-float {
+            display: inline-block;
+            vertical-align: top;
+            background-color: rgb(250, 173, 20);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 16px;
+            padding: 0px 5px;
+            border-radius: 2px;
+            border: none;
+            cursor: pointer;
+            position: fixed !important;
+            z-index: 9999;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            pointer-events: auto;
+            white-space: nowrap;
+        }
+        .req-badge-float:hover {
+            transform: scale(1.15);
+            box-shadow: 0 3px 12px rgba(250,173,20,0.6);
+            z-index: 10000;
+        }
+        .req-marker {
+            position: relative;
+            display: inline-block;
+            padding-top: 12px;
+        }
+        .req-marker > *:first-child {
+            margin-top: -12px;
+        }
+        .req-tooltip {
+            position: fixed;
+            background-color: #f0efef;
+            border-radius: 4px;
+            width: 450px;
+            max-height: 500px;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 9999;
+            display: none;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .req-tooltip.show { display: block; }
+        .req-tooltip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .req-tooltip-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+        .req-tooltip-close {
+            cursor: pointer;
+            color: #999;
+            font-size: 18px;
+            line-height: 1;
+            padding: 2px 6px;
+        }
+        .req-tooltip-close:hover { color: #333; }
+        .req-tooltip-content {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #444;
+        }
+        .req-tooltip-content p { margin-bottom: 12px; }
+        .req-tooltip-content ul { padding-left: 20px; margin-bottom: 12px; }
+        .req-tooltip-content li { margin-bottom: 6px; }
+        .req-tooltip-content strong { color: #222; }
+        .req-tooltip-content em { color: #666; font-style: italic; }
+        .req-tooltip-content blockquote {
+            border-left: 3px solid #ccc;
+            padding-left: 12px;
+            margin: 8px 0;
+            color: #666;
+            background: #fafafa;
+            padding: 8px 12px;
+        }
+        .req-section-title {
+            font-weight: bold;
+            color: #333;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        .status-green { background-color: #52c41a; }
+        .status-red { background-color: #ff4d4f; }
+        .status-gray { background-color: #999; }
+        .status-blue { background-color: #1890ff; }
+        .status-orange { background-color: #faad14; }
+        .table-wrapper {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="bg-neutral">
+    <div class="flex h-screen">
+        
+        <main class="flex-1  p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="space-y-6">
+
+                <!-- 页面标题 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h1 class="text-xl font-semibold text-gray-800">整装核算</h1>
+                </div>
+
+                <!-- Tab导航 [5] -->
+                <div class="bg-white rounded-lg shadow-sm p-6 req-marker relative block" id="req-marker-5">
+                    <span class="req-badge" data-req="5"
+                          data-title="需求描述：Tab导航"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[5] 需求描述：Tab导航</h3><div class="req-section-title">Tab列表</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>整装项目收入核算任务tab</strong>：用于创建和管理整装项目的收入核算任务</li><li><strong>整装项目核算单tab</strong>：用于查看和管理整装项目核算单据</li></ol><div class="req-section-title">交互逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li>默认显示第一个Tab内容</li><li>点击Tab切换对应的内容区域</li></ul></div>'>5</span>
+
+                    <div class="border-b border-gray-200">
+                        <nav class="-mb-px flex space-x-8">
+                            <button class="tab-btn active border-b-2 border-primary text-primary py-3 px-1 text-sm font-medium" data-tab="task-tab">
+                                整装项目收入核算任务
+                            </button>
+                            <button class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 py-3 px-1 text-sm font-medium" data-tab="accounting-tab">
+                                整装项目核算单
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- Tab1: 整装项目收入核算任务 -->
+                    <div id="task-tab" class="tab-content mt-6">
+                        <!-- 筛选条件和按钮栏 [7] -->
+                        <div class="mb-4">
+                            <!-- 基础筛选栏 -->
+                            <div class="flex items-center justify-between mb-4 flex-nowrap req-marker relative inline-block" id="req-marker-7">
+                                <span class="req-badge" data-req="7"
+                                      data-title="需求描述：筛选条件"
+                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[7] 需求描述：筛选条件</h3><div class="req-section-title">字段清单（4个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>合同号</strong>：精准匹配</li><li><strong>核算期间</strong>：默认当前会计期间</li><li><strong>计算批次号</strong>：精准匹配</li><li><strong>计算状态</strong>：枚举值：未计算、计算中、已计算、计算失败</li></ol><div class="req-section-title">注意</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">项目类型和核算方法不是筛选条件，在新增任务弹窗中分别为锁定默认值（整装、完工百分比）</blockquote></div>'>7</span>
+                                <div class="flex items-center space-x-2 flex-1">
+                                    <select id="filter-field-task" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="contractNo">合同号</option>
+                                        <option value="projectType">项目类型</option>
+                                        <option value="period">核算期间</option>
+                                        <option value="method">核算方法</option>
+                                        <option value="batchNo">计算批次号</option>
+                                        <option value="status">计算状态</option>
+                                    </select>
+                                    <input type="text" id="filter-value-task" placeholder="按合同号搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors search-btn">
+                                        <i data-lucide="search" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors refresh-btn">
+                                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                    </button>
+                                    <button id="advanced-filter-btn-task" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center advanced-filter-btn" data-filter="advanced-filter-task">
+                                        高级筛选
+                                        <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                    </button>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <div class="req-marker inline-block" id="req-marker-6">
+                                        <span class="req-badge" data-req="6"
+                                              data-title="需求描述：新增按钮"
+                                              data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[6] 需求描述：新增按钮</h3><div class="req-section-title">交互逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击"新增"按钮打开<strong>新增整装项目收入核算任务（弹窗）</strong></li></ul></div>'>6</span>
+                                        <button id="add-task-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center whitespace-nowrap">
+                                            <i data-lucide="plus" class="w-4 h-4 mr-1"></i>
+                                            新增
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 高级筛选展开区域 -->
+                            <div id="advanced-filter-task" class="hidden bg-gray-50 p-4 rounded-md border border-gray-200 mb-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
+                                        <input type="text" placeholder="合同号" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">项目类型</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <option value="">项目类型</option>
+                                            <option value="整装">整装</option>
+                                            <option value="软装">软装</option>
+                                            <option value="设计费">设计费</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">核算期间</label>
+                                        <input type="text" placeholder="核算期间" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">核算方法</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <option value="">核算方法</option>
+                                            <option value="完工百分比">完工百分比</option>
+                                            <option value="完成合同法">完成合同法</option>
+                                            <option value="开工确收">开工确收</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">计算批次号</label>
+                                        <input type="text" placeholder="计算批次号" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">计算状态</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <option value="">计算状态</option>
+                                            <option value="未计算">未计算</option>
+                                            <option value="计算中">计算中</option>
+                                            <option value="计算完成">计算完成</option>
+                                            <option value="计算失败">计算失败</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 列表 [8] -->
+                        <div class="overflow-x-auto req-marker relative inline-block" id="req-marker-8">
+                            <span class="req-badge" data-req="8"
+                                  data-title="需求描述：任务列表"
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[8] 需求描述：任务列表</h3><div class="req-section-title">字段清单（12个字段+操作）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>计算批次号</strong>：自动生成</li><li><strong>项目类型</strong>：取项目基础资料</li><li><strong>核算期间</strong>：取当前会计期间</li><li><strong>核算方法</strong>：默认完工百分比</li><li><strong>计算状态</strong>：枚举：未计算/计算中/已计算/计算失败</li><li><strong>本次核算合同数量</strong>：参与计算的合同总数</li><li><strong>本次核算成功数量</strong>：成功完成计算的合同数</li><li><strong>本次核算失败数量</strong>：计算失败的合同数</li><li><strong>是否重算已计算未确认的合同</strong>：布尔值</li><li><strong>是否重算已确认的合同</strong>：布尔值</li><li><strong>创建人</strong>：当前登录用户</li><li><strong>创建时间</strong>：自动生成</li></ol><div class="req-section-title">操作</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>报告查询</strong>：<em>计算状态=已计算时该按钮才可见</em>，点击后弹窗展示报告详情</li></ul></div>'>8</span>
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">计算批次号</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">项目类型</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">核算期间</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">核算方法</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">计算状态</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">重算已计算未确认</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">重算已确认</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建人</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm text-gray-900 font-medium">ZZPC202604150001</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">2026-04</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">完工百分比</td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已计算</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">否</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">否</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">张三</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">2026-04-15 10:30:00</td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <button class="text-primary hover:text-blue-700 view-report-btn">报告查询</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm text-gray-900 font-medium">ZZPC202604140001</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">2026-04</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">完工百分比</td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">计算中</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">是</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">否</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">李四</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">2026-04-14 15:45:00</td>
+                                        <td class="px-4 py-3 text-sm">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm text-gray-900 font-medium">ZZPC202604130001</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">整装</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">2026-04</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">完工百分比</td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">计算失败</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">否</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">否</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">王五</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">2026-04-13 09:20:00</td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <button class="text-primary hover:text-blue-700 view-report-btn">报告查询</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab2: 整装项目核算单 -->
+                    <div id="accounting-tab" class="tab-content mt-6 hidden">
+                        <!-- 筛选条件和按钮栏 [10] -->
+                        <div class="mb-4">
+                            <!-- 基础筛选栏 -->
+                            <div class="flex items-center justify-between mb-4 flex-nowrap req-marker relative inline-block" id="req-marker-10">
+                                <span class="req-badge" data-req="10"
+                                      data-title="需求描述：核算单筛选条件"
+                                      data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[10] 需求描述：核算单筛选条件</h3><div class="req-section-title">字段清单（13个）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>单据编号</strong>：精准搜索</li><li><strong>单据类型</strong>：枚举：项目核算调整单、标准项目核算单</li><li><strong>会计期间</strong>：选择期间</li><li><strong>财务主体</strong>：支持多选</li><li><strong>计算状态</strong>：枚举：未计算、已计算、计算失败、计算中</li><li><strong>核算确认状态</strong>：枚举：未确认、审批中、已确认</li><li><strong>合同号</strong>：取项目基础资料</li><li><strong>签单日期</strong>：取项目基础资料</li><li><strong>需求类型</strong>：取项目基础资料</li><li><strong>产品分类</strong>：取项目基础资料</li><li><strong>实际开工日期</strong>：取项目基础资料</li><li><strong>财务确认竣工日期</strong>：取项目基础资料</li><li><strong>计算批次</strong>：精准搜索</li></ol></div>'>10</span>
+                                <div class="flex items-center space-x-2 flex-1">
+                                    <select id="filter-field-accounting" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="docNo">单据编号</option>
+                                        <option value="docType">单据类型</option>
+                                        <option value="period">会计期间</option>
+                                        <option value="entity">财务主体</option>
+                                        <option value="contractNo">合同号</option>
+                                    </select>
+                                    <input type="text" id="filter-value-accounting" placeholder="按单据编号搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors search-btn">
+                                        <i data-lucide="search" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors refresh-btn">
+                                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                    </button>
+                                    <button id="advanced-filter-btn-accounting" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center advanced-filter-btn" data-filter="advanced-filter-accounting">
+                                        高级筛选
+                                        <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                    </button>
+                                </div>
+                                <div class="flex flex-row space-x-2">
+                                    <div class="req-marker inline-block" id="req-marker-9">
+                                        <span class="req-badge" data-req="9"
+                                              data-title="需求描述：操作按钮"
+                                              data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[9] 需求描述：操作按钮</h3><div class="req-section-title">按钮清单</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>导出</strong>：根据筛选条件导出数据</li><li><strong>确认本期收入</strong>：勾选合同后，点击按钮，支持单选/多选<br/><em>校验条件：</em>勾选单据需满足<strong>计算状态=已计算</strong>且<strong>确认状态=未确认</strong>，不满足则报错提示<br/>如果项目类型=整装，则需要发起审批，审批通过后，确认状态反写为已确认</li></ol><div class="req-section-title">业务规则</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">确认本期收入会触发审批流程，审批通过后才能更新核算确认状态</blockquote></div>'>9</span>
+                                        <div class="flex flex-row space-x-2">
+                                            <button id="export-accounting-btn" class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center whitespace-nowrap">
+                                                <i data-lucide="download" class="w-4 h-4 mr-1"></i>
+                                                导出
+                                            </button>
+                                            <button id="confirm-revenue-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center whitespace-nowrap">
+                                                <i data-lucide="check-circle" class="w-4 h-4 mr-1"></i>
+                                                确认本期收入
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 高级筛选展开区域 -->
+                            <div id="advanced-filter-accounting" class="hidden bg-gray-50 p-4 rounded-md border border-gray-200 mb-4">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">单据编号</label>
+                                        <input type="text" placeholder="单据编号" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">单据类型</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                            <option value="">单据类型</option>
+                                            <option value="项目核算调整单">项目核算调整单</option>
+                                            <option value="标准项目核算单">标准项目核算单</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">会计期间</label>
+                                        <input type="text" placeholder="会计期间" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">财务主体</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                            <option value="">财务主体</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">计算状态</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                            <option value="">计算状态</option>
+                                            <option value="未计算">未计算</option>
+                                            <option value="已计算">已计算</option>
+                                            <option value="计算失败">计算失败</option>
+                                            <option value="计算中">计算中</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">核算确认状态</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                            <option value="">核算确认状态</option>
+                                            <option value="未确认">未确认</option>
+                                            <option value="审批中">审批中</option>
+                                            <option value="已确认">已确认</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
+                                        <input type="text" placeholder="合同号" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">签单日期</label>
+                                        <input type="date" placeholder="签单日期" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">需求类型</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                            <option value="">需求类型</option>
+                                            <option value="新房装修">新房装修</option>
+                                            <option value="老房翻新">老房翻新</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">产品分类</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                            <option value="">产品分类</option>
+                                            <option value="标准整装">标准整装</option>
+                                            <option value="豪华整装">豪华整装</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">实际开工日期</label>
+                                        <input type="date" placeholder="实际开工日期" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">财务确认竣工日期</label>
+                                        <input type="date" placeholder="财务确认竣工日期" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">计算批次</label>
+                                        <input type="text" placeholder="计算批次" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 核算单列表 [11] -->
+                        <div class="table-wrapper req-marker relative inline-block" id="req-marker-11">
+                            <span class="req-badge" data-req="11"
+                                  data-title="需求描述：核算单列表"
+                                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[11] 需求描述：核算单列表</h3><div class="req-section-title">字段清单（29个字段+操作）</div><p style="line-height: 1.8; margin-bottom: 8px;"><em>列表展示核心字段（18个），完整字段请查看详情</em></p><div class="req-section-title">列表展示字段</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>单据编号</strong>：自动生成，编码规则WG+yymm+8位流水号</li><li><strong>单据类型</strong>：枚举：项目核算调整单、标准项目核算单</li><li><strong>会计期间</strong></li><li><strong>财务主体</strong></li><li><strong>计算状态</strong>：枚举：未计算/已计算/计算失败/计算中</li><li><strong>核算确认状态</strong>：枚举：未确认/审批中/已确认<br/><em>状态机：[新增]→未确认→[确认收入]→已确认</em></li><li><strong>项目类型</strong></li><li><strong>合同号</strong></li><li><strong>合同名称</strong></li><li><strong>计税方式</strong></li><li><strong>客户名称</strong></li><li><strong>客户编号</strong></li><li><strong>需求类型</strong></li><li><strong>产品分类</strong></li><li><strong>签单日期</strong></li><li><strong>实际开工日期</strong></li><li><strong>财务确认竣工日期</strong></li><li><strong>应收总额</strong></li><li><strong>本次毛利率</strong>=（本次确认收入-本次确认成本）/本次确认收入，「本次核算」口径，反映本张核算单的毛利率</li><li><strong>本次确认收入</strong></li><li><strong>本次确认成本</strong></li><li><strong>计算批次</strong></li><li><strong>是否重算</strong></li><li><strong>本月计算次数</strong></li><li><strong>核算确认时间</strong></li><li><strong>计算完成时间</strong></li><li><strong>错误信息</strong></li><li><strong>创建时间</strong></li><li><strong>创建人</strong></li></ol><div class="req-section-title">操作</div><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>详情</strong> [12]：点击后弹窗展示完整字段信息</li><li><strong>流程查看</strong> [26]：弹框查看审批流程详情，仅当单据存在审批流时才显示</li></ul></div>'>11</span>
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap"><input type="checkbox" id="checkAll"></th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">单据编号</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">单据类型</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">会计期间</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">财务主体</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">计算状态</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">确认状态</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">项目类型</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">合同号</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">合同名称</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">客户名称</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">签单日期</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">应收总额</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">本次毛利率</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">本次确认收入</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">本次确认成本</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">计算批次</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">是否重算</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">本月次数</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm whitespace-nowrap"><input type="checkbox" class="row-check" data-calc-status="已计算" data-confirm-status="已确认"></td>
+                                        <td class="px-3 py-2 text-sm text-gray-900 font-medium whitespace-nowrap">WG26041500000001</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">标准项目核算单</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">2026-04</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">成都分公司</td>
+                                        <td class="px-3 py-2 text-sm whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已计算</span>
+                                        </td>
+                                        <td class="px-3 py-2 text-sm whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已确认</span>
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">整装</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">RZ901000001</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">测试项目A</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">测试客户A</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">2026-01-15</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">500,000.00</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">25.50%</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">120,000.00</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">89,400.00</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">ZZPC202604150001</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">否</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">1</td>
+                                        <td class="px-3 py-2 text-sm whitespace-nowrap">
+                                            <div class="flex items-center space-x-2">
+                                                <button class="text-primary hover:text-blue-700 view-detail-btn">详情</button>
+                                                <div class="req-marker inline-flex items-center" id="req-marker-26">
+                                                    <span class="req-badge" data-req="26"
+                                                          data-title="流程查看按钮"
+                                                          data-content='<div class="req-section-title">流程查看按钮</div><div><strong>显示样式：</strong>文字链接按钮，与"详情"按钮并列</div><div><strong>功能说明：</strong>点击后弹框展示审批流程详情</div><div><strong>弹框内容：</strong></div><div>&nbsp;&nbsp;• 流程状态（进行中/已完成/已驳回等）</div><div>&nbsp;&nbsp;• 流程节点列表（当前节点、历史节点）</div><div>&nbsp;&nbsp;• 各节点操作人信息</div><div>&nbsp;&nbsp;• 各节点操作时间</div><div><em>业务规则：仅当单据存在审批流时才显示此按钮，无审批流时隐藏</em></div><div><strong>交互逻辑：</strong></div><div>&nbsp;&nbsp;1. 点击按钮打开弹框</div><div>&nbsp;&nbsp;2. 弹框以模态方式展示，支持关闭</div><div>&nbsp;&nbsp;3. 数据从工作流引擎实时获取</div><blockquote>注意事项：需对接工作流API获取流程实例数据</blockquote>'>26</span>
+                                                    <button class="text-primary hover:text-blue-700">流程查看</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm whitespace-nowrap"><input type="checkbox" class="row-check" data-calc-status="计算中" data-confirm-status="未确认"></td>
+                                        <td class="px-3 py-2 text-sm text-gray-900 font-medium whitespace-nowrap">WG26041400000001</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">标准项目核算单</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">2026-04</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">成都分公司</td>
+                                        <td class="px-3 py-2 text-sm whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">计算中</span>
+                                        </td>
+                                        <td class="px-3 py-2 text-sm whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">未确认</span>
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">整装</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">RZ901000002</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">测试项目B</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">测试客户B</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">2026-02-20</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">450,000.00</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">-</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">-</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">-</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">ZZPC202604140001</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">是</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">2</td>
+                                        <td class="px-3 py-2 text-sm whitespace-nowrap">
+                                            <div class="flex items-center space-x-2">
+                                                <button class="text-primary hover:text-blue-700 view-detail-btn">详情</button>
+                                                <div class="req-marker inline-flex items-center" id="req-marker-26-copy">
+                                                    <span class="req-badge" data-req="26"
+                                                          data-title="流程查看按钮"
+                                                          data-content='<div class="req-section-title">流程查看按钮</div><div><strong>显示样式：</strong>文字链接按钮，与"详情"按钮并列</div><div><strong>功能说明：</strong>点击后弹框展示审批流程详情</div><div><strong>弹框内容：</strong></div><div>&nbsp;&nbsp;• 流程状态（进行中/已完成/已驳回等）</div><div>&nbsp;&nbsp;• 流程节点列表（当前节点、历史节点）</div><div>&nbsp;&nbsp;• 各节点操作人信息</div><div>&nbsp;&nbsp;• 各节点操作时间</div><div><em>业务规则：仅当单据存在审批流时才显示此按钮，无审批流时隐藏</em></div><div><strong>交互逻辑：</strong></div><div>&nbsp;&nbsp;1. 点击按钮打开弹框</div><div>&nbsp;&nbsp;2. 弹框以模态方式展示，支持关闭</div><div>&nbsp;&nbsp;3. 数据从工作流引擎实时获取</div><blockquote>注意事项：需对接工作流API获取流程实例数据</blockquote>'>26</span>
+                                                    <button class="text-primary hover:text-blue-700">流程查看</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- 新增整装项目收入核算任务抽屉 [6] -->
+    <div id="add-task-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto req-marker relative inline-block" id="req-marker-6-drawer">
+            <span class="req-badge" data-req="6"
+                  data-title="新增整装项目收入核算任务（抽屉）"
+                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[6] 新增整装项目收入核算任务（抽屉）</h3><div class="req-section-title">打开方式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击<strong>"新增计算任务"</strong>按钮打开此抽屉</li></ul><div class="req-section-title">字段清单（共7个字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>项目类型</strong>：<br/>• 锁定，默认<em>整装</em><br/>• 枚举值：整装、软装、设计费<br/>• 必填项</li><li><strong>核算方法</strong>：<br/>• 锁定，默认<em>完工百分比</em><br/>• 枚举值：完成合同法、完工百分比、开工确收<br/>• 必填项</li><li><strong>财务组织</strong>：<br/>• 下拉多选，支持全选功能<br/>• 必填项</li><li><strong>核算期间</strong>：<br/>• 锁定，自动带出当前会计期间<br/>• 必填项</li><li><strong>合同号</strong>：<br/>• 输入后下拉多选<br/>• 不填则默认没有合同过滤条件<br/>• 非必填项</li></ol><div class="req-section-title">重算选项（2个布尔选项）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>是否重算项目收入已计算且未确认的合同</strong><br/>• 布尔值，默认<strong>不勾选</strong><br/><em>勾选后的条件扩展：</em><br/>   - 计算状态 = 未计算 or 计算失败 or <strong>已计算</strong><br/>   - 确认状态 = 未确认 且 没有审批中的项目收入确认审批流程</li><li><strong>是否重算项目收入已计算且已确认的合同</strong><br/>• 布尔值，默认<strong>不勾选</strong><br/><em>勾选后的条件扩展：</em><br/>   - 计算状态 = 未计算 or 计算失败 or <strong>已计算</strong><br/>   - 确认状态 = <strong>已确认</strong></li></ol><div class="req-section-title">项目筛选条件逻辑（默认条件）</div><blockquote style="margin-left: 20px; padding: 8px 12px; background: #e8f4fd; border-left: 4px solid #2196F3; font-style: italic;">当以上两个重算选项<strong>均未勾选</strong>时，项目需同时满足以下三个条件：<br/><br/>① 计算状态 = <strong>未计算</strong> 或 <strong>计算失败</strong><br/>② 确认状态 = <strong>未确认</strong> 且 <strong>没有审批中</strong>的项目收入确认审批流程<br/>③ <strong>未创建当期核算单据</strong><br/><br/><em style="color: #d32f2f;">若不满足任一条件，系统提示错误信息："未满足条件xxx"</em></blockquote><div style="margin: 10px 0; padding: 8px; background: #fff3cd; border-left: 4px solid #ffc107;"><strong>重要说明：</strong>若勾选了上述布尔选项，则在以上三个默认条件基础上取对应勾选条件的<strong>并集</strong>。</div><div class="req-section-title">确认按钮 - 完整交互逻辑</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>二次确认机制</strong>：点击确认后，若勾选了<strong>"重算已确认的合同"</strong>选项，需要进行<strong>二次确认</strong>弹窗；否则直接创建整装项目核算任务</li><li><strong>确认计算范围</strong>：<br/>• 在本期应核算项目条件基础上 + 合同号筛选 + 是否重算（计算状态、确认状态）<br/><em style="color: #d32f2f;">排除规则：</em>需排除"合同有计算批次且对应批次计算任务正在计算中"的情况</li><li><strong>创建项目核算单据</strong>：<br/><strong>增量单据处理：</strong><br/>• 未创建核算单据的合同 → 创建单据（<em>是否重算=否</em>）+ 更新当前计算批次号<br/>• 重算本期核算状态=已确认的合同 → 创建单据（<em>是否重算=是</em>）+ 更新当前计算批次号<br/><strong>存量单据处理：</strong><br/>• 已有单据 → 直接更新计算批次号</li><li><strong>后台计算执行</strong>：根据最终计算范围执行整装项目核算收入计算逻辑</li><li><strong>退出界面触发</strong>：退出界面后自动启动后台计算</li><li><strong>完成提示</strong>：计算完成后弹框提示"<strong style="color: #1976D2;">你有整装项目收入核算任务已经计算完成，请查看详情！</strong>" → 点击后跳转查询核算报告页面</li></ol><div class="req-section-title">取消按钮</div><ul style="margin-left: 20px; line-height:1.8;"><li>点击取消按钮 → 关闭抽屉/弹窗</li></ul><div class="req-section-title">注意事项</div><ul style="margin-left: 20px; line-height: 1.8;"><li>所有锁定字段的默认值由系统根据当前登录用户和当前时间自动带出</li><li>财务组织必须至少选择一个才能提交</li><li>重算选项会影响计算范围和单据创建策略（增量 vs 存量）</li><li>正在计算中的批次不会被重复计算</li></ul></div>'>6</span>
+
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-900">新增整装项目收入核算任务</h3>
+                <button id="close-task-modal" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">项目类型 <span class="text-red-500">*</span></label>
+                            <input type="text" value="整装" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">核算方法 <span class="text-red-500">*</span></label>
+                            <input type="text" value="完工百分比" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">财务组织 <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <div id="entity-tags" class="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md min-h-[40px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div id="entity-dropdown" class="hidden absolute z-10 top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                <div class="p-2">
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="all">
+                                        <input type="checkbox" class="mr-2" id="entity-all">
+                                        <label for="entity-all">全选</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="org1">
+                                        <input type="checkbox" class="mr-2" id="entity-org1">
+                                        <label for="entity-org1">成都分公司</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="org2">
+                                        <input type="checkbox" class="mr-2" id="entity-org2">
+                                        <label for="entity-org2">北京分公司</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="org3">
+                                        <input type="checkbox" class="mr-2" id="entity-org3">
+                                        <label for="entity-org3">上海分公司</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selected-entities" name="selected-entities">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">核算期间 <span class="text-red-500">*</span></label>
+                            <input type="text" value="2026-04" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">合同号</label>
+                            <input type="text" placeholder="请输入或选择合同号" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="w-4 h-4 text-primary focus:ring-primary">
+                            <span class="ml-2 text-sm text-gray-700">是否重算已计算未确认的合同</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="w-4 h-4 text-primary focus:ring-primary">
+                            <span class="ml-2 text-sm text-gray-700">是否重算已确认的合同</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
+                <button id="cancel-task-btn" class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">取消</button>
+                <button id="confirm-task-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情弹窗 [12] -->
+    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-7xl mx-4 max-h-[90vh] overflow-y-auto req-marker relative inline-block" id="req-marker-12">
+            <span class="req-badge" data-req="12"
+                  data-title="需求描述：整装项目核算单详情"
+                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[12] 需求描述：整装项目核算单详情</h3><div class="req-section-title">打开方式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击列表中的<strong>"详情"</strong>按钮打开此弹窗</li></ul><div class="req-section-title">字段清单（按模块分组）</div><p style="line-height: 1.8; margin-bottom: 8px;"><em>分为以下模块：</em></p><div class="req-section-title">一、基本信息（29个字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>单据编号</strong>：自动生成，编码规则WG+yymm+8位流水号</li><li><strong>单据类型</strong>：枚举：项目核算调整单、标准项目核算单</li><li><strong>会计期间</strong></li><li><strong>财务主体</strong></li><li><strong>计算状态</strong>：枚举：未计算/已计算/计算失败</li><li><strong>核算确认状态</strong>：枚举：未确认/审批中/已确认<br/><em>状态机：[新增]→未确认→[确认收入]→已确认</em></li><li><strong>合同号</strong>、<strong>合同名称</strong>、<strong>计税方式</strong>、<strong>税率</strong></li><li><strong>客户名称</strong>、<strong>客户编号</strong></li><li><strong>楼盘名称</strong>、<strong>楼盘地址</strong></li><li><strong>需求类型</strong>、<strong>产品名称</strong>、<strong>产品分类</strong></li><li><strong>业务线</strong>、<strong>到店门店</strong></li><li><strong>签单设计师</strong>、<strong>签单设计部</strong>、<strong>签单日期</strong></li><li><strong>实际开工日期</strong>、<strong>实际竣工日期</strong>、<strong>财务确认竣工日期</strong></li><li><strong>应收总额</strong>、<strong>预计总成本</strong>、<strong>预计总收入</strong>、<strong>预计毛利率</strong></li></ol><div class="req-section-title">二、本次核算信息（15个字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本次毛利率</strong>=（本次确认收入-本次确认成本）/本次确认收入，「本次核算」口径，反映本张核算单的毛利率</li><li><strong>当月确认总收入</strong>=当月累计已确认收入+本次确认收入</li><li><strong>当月确认总成本</strong>=当月累计已确认成本+本次确认成本</li><li><strong>本次毛利率</strong>=（本次确认收入-本次确认成本）/本次确认收入，「本次核算」口径，反映本张核算单的毛利率</li><li><strong>本次确认收入</strong>：<br/>- 完工月：=应收总额/(1+税率)-截止上次累计确认收入+收入调整金额（不含税）<br/>- 非完工月：=截止本月累计合同履约成本/预计总成本*预计总收入-截止上次累计确认收入+收入调整金额（不含税）<br/><em>精度要求：非完工月中间计算过程不得对"累计合同履约成本/预计总成本"做round，必须用原始值直接乘预计总收入，仅最终结果保留2位小数</em><br/><em>口径说明：收入调整金额为不含税口径，须与公式其他项保持一致；若调整单录入含税金额则需先除以(1+税率)再参与计算</em></li><li><strong>本次确认成本</strong>=当月合同履约总成本余额+成本调整金额-本月已确认成本</li><li><strong>本月已确认成本</strong>：取该合同本期所有已确认核算单【本次确认成本】合计（核算确认状态=已确认、计算状态=已计算），<em>不包含当前正在计算的单据本身</em></li><li><strong>累计当月毛利率</strong>=（截止本月累计确认收入-截止本月累计确认成本）/截止本月累计确认收入，「截止本月累计」口径</li><li><strong>截止当月累计完工百分比</strong>：<br/>- 完工月合同：默认为1<br/>- 非完工月：=截止本月累计合同履约成本/预计总成本，精度2</li><li><strong>本次完工百分比</strong>=截止当月累计完工百分比-截止上次累计完工百分比，精度2</li><li><strong>收入调整金额</strong>（不含税口径）：取调整单（状态=生效 and 是否参与核算=否）</li><li><strong>成本调整金额</strong>：取调整单（状态=生效 and 是否参与核算=否）</li><li><strong>调整单号</strong>：取该合同的调整单（调整单状态=生效 and 是否参与核算=否），若存在多个用逗号分隔</li><li><strong>已竣工未交款计税</strong>（仅完工月计算）：=（应收总额-截至本月计税收款金额+截至本月计税退款金额）/（1+税率）*税率-截止上次累计已竣工未交款计税</li><li><strong>截至竣工计税收款金额</strong>、<strong>截至竣工计税退款金额</strong></li></ol><div class="req-section-title">三、累计确认信息（7个字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>截止上次累计已竣工未交款计税</strong>：取该合同所有历史已确认的项目核算表的【已竣工未交款计税】合计</li><li><strong>当月累计已确认成本</strong>：取该合同本期已确认项目核算单【本次确认成本】合计</li><li><strong>当月累计已确认收入</strong>：取该合同本期已确认项目核算单【本次确认收入】合计</li><li><strong>截止本月累计确认收入</strong>=本次确认收入+截止上次累计确认收入</li><li><strong>截止本月累计确认成本</strong>=本次确认成本+截止上次累计确认成本</li><li><strong>截止上次累计确认收入</strong>：取该合同核算确认时间最近一次项目核算表的【截止本月累计确认收入】</li><li><strong>截止上次累计确认成本</strong>：取该合同核算确认时间最近一次项目核算表的【截止本月累计确认成本】</li></ol><div class="req-section-title">四、本次成本调整明细（6个字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>本次成本调整材料成本-其中材料</strong></li><li><strong>本次成本调整材料成本-其中：材料进项税额转出</strong></li><li><strong>本次成本调整人工成本（工人及员工）</strong></li><li><strong>本次成本调整劳务分包差额抵税</strong></li><li><strong>本次成本调整运输成本</strong></li><li><strong>本次成本调整其他成本</strong></li></ol><div class="req-section-title">五、合同履约成本明细（24个字段）</div><p style="line-height: 1.8; margin-bottom: 8px; margin-left: 20px;"><em>分为4组，每组6个明细科目：</em></p><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>截止本月累计合同履约成本</strong>（6个）：取EBS科目截止该会计期间的借方合计减去贷方合计（排除掉日记账来源结转主营成本的凭证，来源待定）+该合同期初202609期的截止本月累计值<br/>- 材料成本-其中：材料（科目148102050101）<br/>- 材料进项税额转出（科目148102050102）<br/>- 人工成本-工人及员工（科目148102030102）<br/>- 劳务分包差额抵税（科目148102030106）<br/>- 运输成本（科目148102060101）<br/>- 其他成本（科目148102030101）</li><li><strong>当月合同履约总成本余额</strong>（6个）：取EBS科目截止该会计期间的借方合计减去贷方合计（排除掉日记账来源结转主营成本的凭证），同上6个科目</li><li><strong>本次确认合同履约总成本余额</strong>（6个）：=当月对应科目+本次成本调整对应科目-本月已确认的对应科目合计，同上6个科目</li><li><strong>截止上次累计合同履约成本</strong>（6个）：取该合同核算确认时间最近一次项目核算表的【截止本次累计xxx】，计算状态=已计算，核算确认状态=已确认</li></ol><div class="req-section-title">六、系统信息（12个字段）</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>整装收入应收单号</strong></li><li><strong>尾款未计税应收单号</strong></li><li><strong>计算批次</strong></li><li><strong>是否重算</strong></li><li><strong>本月计算次数</strong></li><li><strong>核算确认时间</strong></li><li><strong>计算完成时间</strong></li><li><strong>错误信息</strong></li><li><strong>创建时间</strong></li><li><strong>创建人</strong></li><li><strong>修改时间</strong></li><li><strong>修改人</strong></li></ol><div class="req-section-title">业务规则</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">所有金额字段保留2位小数；百分比值精度为2；完工百分比区分完工月/非完工月的不同计算逻辑；收入调整金额为不含税口径</blockquote></div>'>12</span>
+
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-lg font-semibold text-gray-900">整装项目核算单详情</h3>
+                <button id="close-detail-modal" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <!-- 基本信息 [12] -->
+                <div class="mb-6 req-marker relative block" id="req-marker-12-basic">
+                    <span class="req-badge" data-req="12"
+                          data-title="需求描述：基本信息（29个字段）"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[12] 需求描述：基本信息</h3><div class="req-section-title">字段清单（29个字段）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>单据编号</strong>：自动生成，编码规则WG+yymm+8位流水号</li><li><strong>单据类型</strong>：枚举（项目核算调整单/标准项目核算单）</li><li><strong>会计期间</strong></li><li><strong>财务主体</strong></li><li><strong>计算状态</strong>：枚举（未计算/已计算/计算失败）</li><li><strong>核算确认状态</strong>：枚举（未确认/审批中/已确认）<br/><em>状态机：[新增]→未确认→[确认收入]→已确认</em></li><li><strong>合同号/合同名称</strong>：取项目基础资料</li><li><strong>计税方式/税率</strong>：取项目基础资料</li><li><strong>客户名称/客户编号</strong>：取项目基础资料</li><li><strong>楼盘名称/楼盘地址</strong>：取项目基础资料</li><li><strong>需求类型/产品名称/产品分类</strong>：取项目基础资料</li><li><strong>业务线</strong>：取项目基础资料</li><li><strong>到店门店</strong>：取项目基础资料</li><li><strong>签单设计师/签单设计部/签单日期</strong>：取项目基础资料</li><li><strong>实际开工日期/实际竣工日期/财务确认竣工日期</strong>：取项目基础资料</li><li><strong>应收总额/预计总成本/预计总收入/预计毛利率</strong>：取项目基础资料<br/><em>预计毛利率=(预计总收入-预计总成本)/预计总收入</em></li></ol></div>'>12</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">基本信息</h4>
+                    <div class="grid grid-cols-4 gap-x-6 gap-y-3">
+                        <div><label class="text-xs text-gray-500">单据编号</label><p class="text-sm font-medium mt-1">WG26041500000001</p></div>
+                        <div><label class="text-xs text-gray-500">单据类型</label><p class="text-sm font-medium mt-1"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">标准项目核算单</span></p></div>
+                        <div><label class="text-xs text-gray-500">会计期间</label><p class="text-sm font-medium mt-1">2026-04</p></div>
+                        <div><label class="text-xs text-gray-500">财务主体</label><p class="text-sm font-medium mt-1">成都分公司</p></div>
+                        <div><label class="text-xs text-gray-500">计算状态</label><p class="text-sm font-medium mt-1"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><span class="status-dot status-green"></span>已计算</span></p></div>
+                        <div><label class="text-xs text-gray-500">核算确认状态</label><p class="text-sm font-medium mt-1"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><span class="status-dot status-green"></span>已确认</span></p></div>
+                        <div><label class="text-xs text-gray-500">合同号</label><p class="text-sm font-medium mt-1">RZ901000001</p></div>
+                        <div><label class="text-xs text-gray-500">合同名称</label><p class="text-sm font-medium mt-1">测试项目A</p></div>
+                        <div><label class="text-xs text-gray-500">计税方式</label><p class="text-sm font-medium mt-1">一般计税</p></div>
+                        <div><label class="text-xs text-gray-500">税率</label><p class="text-sm font-medium mt-1">13%</p></div>
+                        <div><label class="text-xs text-gray-500">客户名称</label><p class="text-sm font-medium mt-1">测试客户A</p></div>
+                        <div><label class="text-xs text-gray-500">客户编号</label><p class="text-sm font-medium mt-1">KH001</p></div>
+                        <div><label class="text-xs text-gray-500">楼盘名称</label><p class="text-sm font-medium mt-1">测试楼盘A</p></div>
+                        <div><label class="text-xs text-gray-500">楼盘地址</label><p class="text-sm font-medium mt-1">成都市高新区XX路XX号</p></div>
+                        <div><label class="text-xs text-gray-500">需求类型</label><p class="text-sm font-medium mt-1">新房装修</p></div>
+                        <div><label class="text-xs text-gray-500">产品名称</label><p class="text-sm font-medium mt-1">整装A套餐</p></div>
+                        <div><label class="text-xs text-gray-500">产品分类</label><p class="text-sm font-medium mt-1">标准整装</p></div>
+                        <div><label class="text-xs text-gray-500">业务线</label><p class="text-sm font-medium mt-1">整装业务线</p></div>
+                        <div><label class="text-xs text-gray-500">到店门店</label><p class="text-sm font-medium mt-1">成都旗舰店</p></div>
+                        <div><label class="text-xs text-gray-500">签单设计师</label><p class="text-sm font-medium mt-1">张三</p></div>
+                        <div><label class="text-xs text-gray-500">签单设计部</label><p class="text-sm font-medium mt-1">设计一部</p></div>
+                        <div><label class="text-xs text-gray-500">签单日期</label><p class="text-sm font-medium mt-1">2026-01-15</p></div>
+                        <div><label class="text-xs text-gray-500">实际开工日期</label><p class="text-sm font-medium mt-1">2026-02-01</p></div>
+                        <div><label class="text-xs text-gray-500">实际竣工日期</label><p class="text-sm font-medium mt-1">2026-03-30</p></div>
+                        <div><label class="text-xs text-gray-500">财务确认竣工日期</label><p class="text-sm font-medium mt-1">2026-04-05</p></div>
+                        <div><label class="text-xs text-gray-500">应收总额</label><p class="text-sm font-semibold mt-1 text-blue-600">500,000.00</p></div>
+                        <div><label class="text-xs text-gray-500">预计总成本</label><p class="text-sm font-medium mt-1">380,000.00</p></div>
+                        <div><label class="text-xs text-gray-500">预计总收入</label><p class="text-sm font-medium mt-1">520,000.00</p></div>
+                        <div><label class="text-xs text-gray-500">预计毛利率</label><p class="text-sm font-medium mt-1 text-green-600">26.92%</p></div>
+                    </div>
+                </div>
+
+                <!-- 核算信息 [12] -->
+                <div class="mb-6 req-marker relative block" id="req-marker-12-calc">
+                    <span class="req-badge" data-req="12"
+                          data-title="需求描述：本次核算信息（12个字段）"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[12] 需求描述：核算信息</h3><div class="req-section-title">字段清单（12个字段）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>累计当月毛利率</strong>= (截止本月累计确认收入-截止本月累计确认成本)/截止本月累计确认收入</li><li><strong>截止当月累计完工百分比</strong>：<br/>• 完工月合同：默认为1<br/>• 非完工月：=截止本月累计合同履约成本/预计总成本</li><li><strong>本次完工百分比</strong>= 截止当月累计完工百分比 - 截止上次累计完工百分比</li><li><strong>本次毛利率</strong>= (本次确认收入-本次确认成本)/本次确认收入，「本次核算」口径，反映本张核算单的毛利率</li><li><strong>本次确认收入</strong>：<br/>• 完工月：=应收总额/(1+税率)-截止上次累计确认收入+收入调整金额（不含税）<br/>• 非完工月：=截止当月累计完工百分比*预计总收入-截止上次累计确认收入+收入调整金额（不含税）<br/><em>精度要求：`截止当月累计完工百分比`精度2，与计算顺序3保持一致</em><br/><em>口径说明：收入调整金额为不含税口径，须与公式其他项保持一致；若调整单录入含税金额则需先除以(1+税率)再参与计算</em></li><li><strong>本次确认成本</strong>= 当月合同履约总成本余额+成本调整金额-本月已确认成本</li><li><strong>本月已确认成本</strong>：取该合同本期所有已确认核算单【本次确认成本】合计（核算确认状态=已确认、计算状态=已计算），<em>不包含当前正在计算的单据本身</em></li><li><strong>收入调整金额</strong>（不含税口径）：取调整单（状态=生效 and 是否参与核算=否）</li><li><strong>成本调整金额</strong>：取调整单（状态=生效 and 是否参与核算=否）</li><li><strong>调整单号</strong>：取调整单（状态=生效 and 是否参与核算=否）</li><li><strong>已竣工未交款计税</strong>（仅完工月计算）</li><li><strong>截至竣工计税收款金额</strong></li><li><strong>截至竣工计税退款金额</strong></li></ol><div class="req-section-title">业务规则</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">完工百分比区分完工月/非完工月的不同计算逻辑；所有金额保留2位小数</blockquote></div>'>12</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">本次核算信息</h4>
+                    <div class="grid grid-cols-4 gap-x-6 gap-y-3">
+                        <div><label class="text-xs text-gray-500">当月确认总收入</label><p class="text-sm font-medium mt-1 text-blue-600">120,000.00</p></div>
+                        <div><label class="text-xs text-gray-500">当月确认总成本</label><p class="text-sm font-medium mt-1">89,400.00</p></div>
+                        <div><label class="text-xs text-gray-500">本次毛利率</label><p class="text-sm font-medium mt-1 text-blue-600">25.50%</p></div>
+                        <div><label class="text-xs text-gray-500">本次确认收入</label><p class="text-sm font-semibold mt-1 text-green-600">120,000.00</p></div>
+                        <div><label class="text-xs text-gray-500">本次确认成本</label><p class="text-sm font-semibold mt-1 text-red-600">89,400.00</p></div>
+                        <div><label class="text-xs text-gray-500">累计当月毛利率</label><p class="text-sm font-medium mt-1 text-blue-600">26.80%</p></div>
+                        <div><label class="text-xs text-gray-500">截止当月累计完工百分比</label><p class="text-sm font-medium mt-1">75.00%</p></div>
+                        <div><label class="text-xs text-gray-500">本次完工百分比</label><p class="text-sm font-medium mt-1">8.33%</p></div>
+                        <div><label class="text-xs text-gray-500">收入调整金额</label><p class="text-sm font-medium mt-1">0.00</p></div>
+                        <div><label class="text-xs text-gray-500">成本调整金额</label><p class="text-sm font-medium mt-1">0.00</p></div>
+                        <div><label class="text-xs text-gray-500">调整单号</label><p class="text-sm font-medium mt-1">-</p></div>
+                        <div><label class="text-xs text-gray-500">已竣工未交款计税</label><p class="text-sm font-medium mt-1">15,200.00</p></div>
+                        <div><label class="text-xs text-gray-500">截至竣工计税收款金额</label><p class="text-sm font-medium mt-1">450,000.00</p></div>
+                        <div><label class="text-xs text-gray-500">截至竣工计税退款金额</label><p class="text-sm font-medium mt-1">0.00</p></div>
+                    </div>
+                </div>
+
+                <!-- 累计确认信息 [12] -->
+                <div class="mb-6 req-marker relative block" id="req-marker-12-cumulative">
+                    <span class="req-badge" data-req="12"
+                          data-title="需求描述：累计确认信息（7个字段）"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[12] 需求描述：累计确认信息</h3><div class="req-section-title">字段清单（7个字段）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>截止上次累计已竣工未交款计税</strong>：取该合同所有历史已确认的项目核算表的【已竣工未交款计税】合计</li><li><strong>当月累计已确认成本</strong>：取该合同本期已确认项目核算单【本次确认成本】合计，单据条件：合同号相同，会计期间相同，核算确认状态=已确认，计算状态=已计算</li><li><strong>当月累计已确认收入</strong>：取该合同本期已确认项目核算单【本次确认收入】合计，单据条件：合同号相同，会计期间相同，核算确认状态=已确认，计算状态=已计算</li><li><strong>截止本月累计确认收入</strong>= 本次确认收入 + 截止上次累计确认收入</li><li><strong>截止本月累计确认成本</strong>= 本次确认成本 + 截止上次累计确认成本</li><li><strong>截止上次累计确认收入</strong>：取该合同核算确认时间最近一次项目核算表的【截止本月累计确认收入】，计算状态=已计算，核算确认状态=已确认</li><li><strong>截止上次累计确认成本</strong>：取该合同核算确认时间最近一次项目核算表的【截止本月累计确认成本】，计算状态=已计算，核算确认状态=已确认</li></ol></div>'>12</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">累计确认信息</h4>
+                    <div class="grid grid-cols-4 gap-x-6 gap-y-3">
+                        <div><label class="text-xs text-gray-500">截止上次累计已竣工未交款计税</label><p class="text-sm font-medium mt-1">10,300.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止本月累计确认收入</label><p class="text-sm font-semibold mt-1 text-blue-600">380,000.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止本月累计确认成本</label><p class="text-sm font-semibold mt-1 text-orange-600">278,600.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止上次累计确认收入</label><p class="text-sm font-medium mt-1">260,000.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止上次累计确认成本</label><p class="text-sm font-medium mt-1">189,200.00</p></div>
+                    </div>
+                </div>
+
+                <!-- 本次成本调整明细 [12] -->
+                <div class="mb-6 req-marker relative block" id="req-marker-12-cost-adjust">
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">本次成本调整明细</h4>
+                    <div class="grid grid-cols-3 gap-x-6 gap-y-3 bg-orange-50 p-4 rounded-lg">
+                        <div><label class="text-xs text-gray-500">本次成本调整材料成本-其中材料</label><p class="text-sm font-medium mt-1">0.00</p></div>
+                        <div><label class="text-xs text-gray-500">本次成本调整材料成本-其中：材料进项税额转出</label><p class="text-sm font-medium mt-1">0.00</p></div>
+                        <div><label class="text-xs text-gray-500">本次成本调整人工成本（工人及员工）</label><p class="text-sm font-medium mt-1">0.00</p></div>
+                        <div><label class="text-xs text-gray-500">本次成本调整劳务分包差额抵税</label><p class="text-sm font-medium mt-1">0.00</p></div>
+                        <div><label class="text-xs text-gray-500">本次成本调整运输成本</label><p class="text-sm font-medium mt-1">0.00</p></div>
+                        <div><label class="text-xs text-gray-500">本次成本调整其他成本</label><p class="text-sm font-medium mt-1">0.00</p></div>
+                    </div>
+                </div>
+
+                <!-- 截止本月累计合同履约成本 [12] -->
+                <div class="mb-6 req-marker relative block" id="req-marker-12-month-cost">
+                    <span class="req-badge" data-req="12"
+                          data-title="需求描述：截止本月累计合同履约成本（6个子项）"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[12] 需求描述：截止本月累计合同履约成本</h3><div class="req-section-title">字段清单（6个子项+合计）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>截止本月累计材料成本-其中：材料</strong>（科目148102050101）：取EBS科目截止该会计期间的借方合计减去贷方合计（排除掉日记账来源结转主营成本的凭证，来源待定）+该合同期初202609期的截止本月累计材料成本-其中：材料</li><li><strong>截止本月累计材料成本-其中：材料进项税额转出</strong>（科目148102050102）：取EBS科目截止该会计期间的借方合计减去贷方合计（排除掉日记账来源结转主营成本的凭证）+该合同期初202609期的截止本月累计材料成本-其中：材料进项税额转出</li><li><strong>截止本月累计人工成本（工人及员工）</strong>（科目148102030102）：同上取值逻辑</li><li><strong>截止本月累计劳务分包差额抵税</strong>（科目148102030106）：同上取值逻辑</li><li><strong>截止本月累计运输成本</strong>（科目148102060101）：同上取值逻辑</li><li><strong>截止本月累计其他成本</strong>（科目148102030101）：同上取值逻辑</li></ol></div>'>12</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">截止本月累计合同履约成本</h4>
+                    <div class="grid grid-cols-3 gap-x-6 gap-y-3 bg-blue-50 p-4 rounded-lg">
+                        <div><label class="text-xs text-gray-500">截止本月累计材料成本-其中：材料</label><p class="text-sm font-medium mt-1">156,000.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止本月累计材料成本-其中：材料进项税额转出</label><p class="text-sm font-medium mt-1">2,340.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止本月累计人工成本（工人及员工）</label><p class="text-sm font-medium mt-1">68,500.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止本月累计劳务分包差额抵税</label><p class="text-sm font-medium mt-1">1,200.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止本月累计运输成本</label><p class="text-sm font-medium mt-1">8,900.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止本月累计其他成本</label><p class="text-sm font-medium mt-1">21,660.00</p></div>
+                        <div class="col-span-3"><label class="text-xs text-gray-500"><strong>合计</strong></label><p class="text-sm font-semibold mt-1 text-blue-600">258,600.00</p></div>
+                    </div>
+                </div>
+
+                <!-- 当月合同履约总成本余额 [12] -->
+                <div class="mb-6 req-marker relative block" id="req-marker-12-current-cost">
+                    <span class="req-badge" data-req="12"
+                          data-title="需求描述：当月合同履约总成本余额（6个子项）"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[12] 需求描述：当月合同履约总成本余额</h3><div class="req-section-title">字段清单（6个子项+合计）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>当月材料成本-其中材料</strong>（科目148102050101）：取EBS科目截止该会计期间的借方合计减去贷方合计（排除掉日记账来源结转主营成本的凭证）</li><li><strong>当月材料成本-其中：材料进项税额转出</strong>（科目148102050102）：取EBS科目截止该会计期间的借方合计减去贷方合计（排除掉日记账来源结转主营成本的凭证）</li><li><strong>当月人工成本（工人及员工）</strong>（科目148102030102）：同上取值逻辑</li><li><strong>当月劳务分包差额抵税</strong>（科目148102030106）：同上取值逻辑</li><li><strong>当月运输成本</strong>（科目148102060101）：同上取值逻辑</li><li><strong>当月其他成本</strong>（科目148102030101）：同上取值逻辑</li></ol></div>'>12</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">当月合同履约总成本余额</h4>
+                    <div class="grid grid-cols-3 gap-x-6 gap-y-3 bg-gray-50 p-4 rounded-lg">
+                        <div><label class="text-xs text-gray-500">当月材料成本-其中材料</label><p class="text-sm font-medium mt-1">23,400.00</p></div>
+                        <div><label class="text-xs text-gray-500">当月材料成本-其中：材料进项税额转出</label><p class="text-sm font-medium mt-1">351.00</p></div>
+                        <div><label class="text-xs text-gray-500">当月人工成本（工人及员工）</label><p class="text-sm font-medium mt-1">10,275.00</p></div>
+                        <div><label class="text-xs text-gray-500">当月劳务分包差额抵税</label><p class="text-sm font-medium mt-1">180.00</p></div>
+                        <div><label class="text-xs text-gray-500">当月运输成本</label><p class="text-sm font-medium mt-1">1,335.00</p></div>
+                        <div><label class="text-xs text-gray-500">当月其他成本</label><p class="text-sm font-medium mt-1">3,249.00</p></div>
+                        <div class="col-span-3"><label class="text-xs text-gray-500"><strong>合计</strong></label><p class="text-sm font-semibold mt-1 text-green-600">38,790.00</p></div>
+                    </div>
+                </div>
+
+                <!-- 本次确认合同履约总成本余额 [12] -->
+                <div class="mb-6 req-marker relative block" id="req-marker-12-confirm-cost">
+                    <span class="req-badge" data-req="12"
+                          data-title="需求描述：本次确认合同履约总成本余额（6个子项）"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[12] 需求描述：本次确认合同履约总成本余额</h3><div class="req-section-title">字段清单（6个子项+合计）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>本次确认材料成本-其中材料</strong>= 当月材料成本-其中材料 + 本次成本调整材料成本-其中材料 - 本月已确认的本次确认材料成本-其中材料的合计</li><li><strong>本次确认材料成本-其中：材料进项税额转出</strong>= 同上逻辑</li><li><strong>本次确认人工成本（工人及员工）</strong>= 同上逻辑</li><li><strong>本次确认劳务分包差额抵税</strong>= 同上逻辑</li><li><strong>本次确认运输成本</strong>= 同上逻辑</li><li><strong>本次确认其他成本</strong>= 同上逻辑</li></ol><div class="req-section-title">计算逻辑</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">本次确认合同履约总成本余额的各明细科目=当月对应科目+本次成本调整对应科目-本月已确认的对应科目合计，与本次确认成本公式口径一致</blockquote></div>'>12</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">本次确认合同履约总成本余额</h4>
+                    <div class="grid grid-cols-3 gap-x-6 gap-y-3 bg-indigo-50 p-4 rounded-lg">
+                        <div><label class="text-xs text-gray-500">本次确认材料成本-其中材料</label><p class="text-sm font-medium mt-1">23,400.00</p></div>
+                        <div><label class="text-xs text-gray-500">本次确认材料成本-其中：材料进项税额转出</label><p class="text-sm font-medium mt-1">351.00</p></div>
+                        <div><label class="text-xs text-gray-500">本次确认人工成本（工人及员工）</label><p class="text-sm font-medium mt-1">10,275.00</p></div>
+                        <div><label class="text-xs text-gray-500">本次确认劳务分包差额抵税</label><p class="text-sm font-medium mt-1">180.00</p></div>
+                        <div><label class="text-xs text-gray-500">本次确认运输成本</label><p class="text-sm font-medium mt-1">1,335.00</p></div>
+                        <div><label class="text-xs text-gray-500">本次确认其他成本</label><p class="text-sm font-medium mt-1">3,249.00</p></div>
+                        <div class="col-span-3"><label class="text-xs text-gray-500"><strong>合计</strong></label><p class="text-sm font-semibold mt-1 text-indigo-600">38,790.00</p></div>
+                    </div>
+                </div>
+
+                <!-- 截止上次累计合同履约成本 [12] -->
+                <div class="mb-6 req-marker relative block" id="req-marker-12-last-cost">
+                    <span class="req-badge" data-req="12"
+                          data-title="需求描述：截止上次累计合同履约成本（6个子项）"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[12] 需求描述：截止上次累计合同履约成本</h3><div class="req-section-title">字段清单（6个子项+合计）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>截止上次累计材料成本-其中：材料</strong>：取该合同核算确认时间最近一次项目核算表的【截止本次累计材料成本-其中：材料】，计算状态=已计算，核算确认状态=已确认</li><li><strong>截止上次累计材料成本-其中：材料进项税额转出</strong>：取该合同核算确认时间最近一次项目核算表的【截止本次累计材料成本-其中：材料进项税额转出】，计算状态=已计算，核算确认状态=已确认</li><li><strong>截止上次累计人工成本（工人及员工）</strong>：取该合同核算确认时间最近一次项目核算表的【截止本次累计人工成本（工人及员工）】，计算状态=已计算，核算确认状态=已确认</li><li><strong>截止上次累计劳务分包成本差额抵税</strong>：取该合同核算确认时间最近一次项目核算表的【截止本次累计劳务分包成本差额抵税】，计算状态=已计算，核算确认状态=已确认</li><li><strong>截止上次累计运输成本</strong>：取该合同核算确认时间最近一次项目核算表的【截止本次累计运输成本】，计算状态=已计算，核算确认状态=已确认</li><li><strong>截止上次累计其他成本</strong>：取该合同核算确认时间最近一次项目核算表的【截止本次累计其他成本】，计算状态=已计算，核算确认状态=已确认</li></ol></div>'>12</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">截止上次累计合同履约成本</h4>
+                    <div class="grid grid-cols-3 gap-x-6 gap-y-3 bg-yellow-50 p-4 rounded-lg">
+                        <div><label class="text-xs text-gray-500">截止上次累计材料成本-其中：材料</label><p class="text-sm font-medium mt-1">132,600.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止上次累计材料成本-其中：材料进项税额转出</label><p class="text-sm font-medium mt-1">1,989.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止上次累计人工成本（工人及员工）</label><p class="text-sm font-medium mt-1">58,225.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止上次累计劳务分包成本差额抵税</label><p class="text-sm font-medium mt-1">1,020.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止上次累计运输成本</label><p class="text-sm font-medium mt-1">7,565.00</p></div>
+                        <div><label class="text-xs text-gray-500">截止上次累计其他成本</label><p class="text-sm font-medium mt-1">18,411.00</p></div>
+                        <div class="col-span-3"><label class="text-xs text-gray-500"><strong>合计</strong></label><p class="text-sm font-semibold mt-1 text-orange-600">219,810.00</p></div>
+                    </div>
+                </div>
+
+                <!-- 系统信息 [12] -->
+                <div class="mb-6 req-marker relative block" id="req-marker-12-system">
+                    <span class="req-badge" data-req="12"
+                          data-title="需求描述：系统信息（12个字段）"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[12] 需求描述：系统信息</h3><div class="req-section-title">字段清单（12个字段）</div><ol style="margin-left: 20px; line-height: 1.6;"><li><strong>整装收入应收单号</strong>：确认收入后生成的应收单号</li><li><strong>尾款未计税应收单号</strong>：已竣工未交款计税生成的应收单号</li><li><strong>计算批次</strong>：自动生成，格式ZZPC+yymm+8位流水号</li><li><strong>是否重算</strong>：布尔值</li><li><strong>本月计算次数</strong>：统计值</li><li><strong>核算确认时间</strong>：确认收入时的时间戳</li><li><strong>计算完成时间</strong>：任务完成时的时间戳</li><li><strong>错误信息</strong>：计算失败时的异常详情</li><li><strong>创建时间</strong>：单据创建时间</li><li><strong>创建人</strong>：创建操作人</li><li><strong>修改时间</strong>：最后修改时间</li><li><strong>修改人</strong>：最后修改操作人</li></ol></div>'>12</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">系统信息</h4>
+                    <div class="grid grid-cols-4 gap-x-6 gap-y-3">
+                        <div><label class="text-xs text-gray-500">整装收入应收单号</label><p class="text-sm font-medium mt-1">AR20260416001</p></div>
+                        <div><label class="text-xs text-gray-500">尾款未计税应收单号</label><p class="text-sm font-medium mt-1">AR20260416002</p></div>
+                        <div><label class="text-xs text-gray-500">计算批次</label><p class="text-sm font-medium mt-1">ZZPC202604150001</p></div>
+                        <div><label class="text-xs text-gray-500">是否重算</label><p class="text-sm font-medium mt-1"><span class="text-gray-600">否</span></p></div>
+                        <div><label class="text-xs text-gray-500">本月计算次数</label><p class="text-sm font-medium mt-1">1</p></div>
+                        <div><label class="text-xs text-gray-500">核算确认时间</label><p class="text-sm font-medium mt-1">2026-04-16 14:30:00</p></div>
+                        <div><label class="text-xs text-gray-500">计算完成时间</label><p class="text-sm font-medium mt-1">2026-04-16 14:25:00</p></div>
+                        <div><label class="text-xs text-gray-500">错误信息</label><p class="text-sm font-medium mt-1">-</p></div>
+                        <div><label class="text-xs text-gray-500">创建时间</label><p class="text-sm font-medium mt-1">2026-04-15 10:30:00</p></div>
+                        <div><label class="text-xs text-gray-500">创建人</label><p class="text-sm font-medium mt-1">张三</p></div>
+                        <div><label class="text-xs text-gray-500">修改时间</label><p class="text-sm font-medium mt-1">2026-04-16 14:35:00</p></div>
+                        <div><label class="text-xs text-gray-500">修改人</label><p class="text-sm font-medium mt-1">财务审核员</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 报告查询弹框 -->
+    <div id="report-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto req-marker relative inline-block" id="req-marker-report">
+            <span class="req-badge" data-req="report"
+                  data-title="整装项目收入核算任务报告查询（弹框）"
+                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[report] 整装项目收入核算任务报告查询（弹框）</h3><div class="req-section-title">打开方式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击任务列表中的<strong>"报告查询"</strong>按钮打开此弹框</li></ul><div class="req-section-title">模块清单</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>[report-1] 核算结果区域</strong>：显示本次计算任务的汇总统计信息<ul style="margin-left: 20px; margin-top: 4px;"><li>计算批次号：系统自动生成的唯一标识</li><li>本次核算项目总数量：参与计算的合同总数</li><li>核算成功数量：成功完成计算的合同数</li><li>核算失败数量：计算失败的合同数</li></ul></li><li><strong>[21] 失败详情列表</strong>：表格展示所有计算失败的合同明细<ul style="margin-left: 20px; margin-top: 4px;"><li>财务主体：失败的合同所属财务主体</li><li>合同号：具体失败的合同编号</li><li>失败原因：<em>具体的业务校验失败原因说明</em><br/>示例：预计总收入为&gt;0、预计总成本&gt;0；应收总额≦0</li></ul></li></ol><div class="req-section-title">交互逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击遮罩层或关闭按钮可关闭弹框</li><li>失败详情支持滚动查看（如有大量失败记录）</li></ul><div class="req-section-title">注意事项</div><blockquote style="margin-left: 20px; padding: 8px 12px; background: #fff3cd; border-left: 4px solid #ffc107; font-style: italic;">此报告仅展示当前选中任务的核算结果，不同任务的报告内容独立。</blockquote></div>'>report</span>
+
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-lg font-semibold text-gray-900">整装项目收入核算任务报告</h3>
+                <button id="close-report-modal" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <!-- 核算结果 [report-1] -->
+                <div class="req-marker relative block" id="req-marker-report-1">
+                    <span class="req-badge" data-req="report-1"
+                          data-title="核算结果"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[report-1] 核算结果</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>采用卡片式布局，4个指标并排显示</li><li>每个指标包含标签名和数值</li><li>数值使用较大字号突出显示</li></ul><div class="req-section-title">字段清单</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>计算批次号</strong>：系统生成的唯一标识符，格式如 ZZPC202604150001</li><li><strong>本次核算项目总数量</strong>：参与本次计算的所有合同总数</li><li><strong>核算成功数量</strong>：成功完成收入核算的合同数量</li><li><strong>核算失败数量</strong>：因各种原因导致计算失败的合同数量</li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>总数量 = 成功数量 + 失败数量</em></li><li><em>批次号在创建任务时自动生成，全局唯一</em></li></ul></div>'>report-1</span>
+
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="text-sm font-medium text-gray-700 mb-4">核算结果</h4>
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="bg-white rounded-md p-4 text-center shadow-sm">
+                                <p class="text-xs text-gray-500 mb-2">计算批次号</p>
+                                <p class="text-sm font-semibold text-gray-900">ZZPC202604150001</p>
+                            </div>
+                            <div class="bg-white rounded-md p-4 text-center shadow-sm">
+                                <p class="text-xs text-gray-500 mb-2">本次核算项目总数量</p>
+                                <p class="text-lg font-bold text-blue-600">15</p>
+                            </div>
+                            <div class="bg-white rounded-md p-4 text-center shadow-sm">
+                                <p class="text-xs text-gray-500 mb-2">核算成功数量</p>
+                                <p class="text-lg font-bold text-green-600">13</p>
+                            </div>
+                            <div class="bg-white rounded-md p-4 text-center shadow-sm">
+                                <p class="text-xs text-gray-500 mb-2">核算失败数量</p>
+                                <p class="text-lg font-bold text-red-600">2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 失败详情列表 [21] -->
+                <div class="req-marker relative block" id="req-marker-21">
+                    <span class="req-badge" data-req="21"
+                          data-title="失败详情列表"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[21] 失败详情列表</h3><div class="req-section-title">显示样式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>采用标准表格形式展示</li><li>支持横向滚动（如列宽超出容器）</li><li>无数据时显示空状态提示</li></ul><div class="req-section-title">字段清单</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>财务主体</strong>：失败合同所属的财务组织/公司主体</li><li><strong>合同号</strong>：具体计算失败的合同编号，可点击跳转查看详情</li><li><strong>失败原因</strong>：<em>详细的业务校验错误描述</em><br/><br/><strong>常见失败场景示例：</strong><table style="width:100%;border-collapse:collapse;margin-top:8px;"><thead><tr style="background:#f5f5f5;"><th style="border:1px solid #ddd;padding:8px;text-align:left;">财务主体</th><th style="border:1px solid #ddd;padding:8px;text-align:left;">合同号</th><th style="border:1px solid #ddd;padding:8px;text-align:left;">失败原因</th></tr></thead><tbody><tr><td style="border:1px solid #ddd;padding:8px;">财务主体1</td><td style="border:1px solid #ddd;padding:8px;">HT202603001</td><td style="border:1px solid #ddd;padding:8px;">预计总收入为&gt;0、预计总成本&gt;0</td></tr><tr><td style="border:1px solid #ddd;padding:8px;">财务主体2</td><td style="border:1px solid #ddd;padding:8px;">HT202603005</td><td style="border:1px solid #ddd;padding:8px;">应收总额≦0</td></tr></tbody></table></li></ol><div class="req-section-title">业务规则</div><ul style="margin-left: 20px; line-height: 1.8;"><li><em>仅当核算失败数量 &gt; 0 时显示此列表</em></li><li><em>失败原因由后端计算引擎返回，前端原样展示</em></li><li><em>合同号可配置为可点击链接，跳转至对应详情页</em></li></ul><div class="req-section-title">注意事项</div><blockquote style="margin-left: 20px; padding: 8px 12px; background: #fff3cd; border-left: 4px solid #ffc107; font-style: italic;">失败原因文本可能较长，建议单元格设置合理的最大宽度或启用文字省略+tooltip提示。</blockquote></div>'>21</span>
+
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="text-sm font-medium text-gray-700 mb-4">失败详情列表</h4>
+                        <div class="table-wrapper overflow-x-auto" style="max-height:240px;overflow-y:auto;">
+                            <table class="w-full bg-white rounded-lg overflow-hidden">
+                                <thead class="bg-gray-100 sticky top-0">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">财务主体</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">合同号</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">失败原因</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3 text-sm text-gray-900">财务主体1</td>
+                                        <td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">HT202603001</td>
+                                        <td class="px-4 py-3 text-sm text-red-600">预计总收入为>0、预计总成本>0</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3 text-sm text-gray-900">财务主体2</td>
+                                        <td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">HT202603005</td>
+                                        <td class="px-4 py-3 text-sm text-red-600">应收总额≦0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 成功详情列表 -->
+                <div class="req-marker relative block" id="req-marker-success-list">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleReportSuccessList()">
+                            <div class="flex items-center space-x-2">
+                                <h4 class="text-sm font-medium text-gray-700">成功详情列表</h4>
+                                <span class="text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded">13个合同</span>
+                            </div>
+                            <div class="flex items-center space-x-1 text-gray-400">
+                                <span class="text-xs" id="success-list-toggle-text">展开</span>
+                                <svg id="success-list-arrow" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+                        <div id="report-success-list-body" class="hidden mt-3">
+                            <div class="table-wrapper overflow-x-auto" style="max-height:300px;overflow-y:auto;">
+                                <table class="w-full bg-white rounded-lg overflow-hidden">
+                                    <thead class="bg-gray-100 sticky top-0">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">序号</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">财务主体</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">合同号</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">合同名称</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">核算状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">1</td><td class="px-4 py-3 text-sm text-gray-900">成都分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000001</td><td class="px-4 py-3 text-sm text-gray-700">万科公园5号A栋302</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">2</td><td class="px-4 py-3 text-sm text-gray-900">成都分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000002</td><td class="px-4 py-3 text-sm text-gray-700">保利国际广场B座1501</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">3</td><td class="px-4 py-3 text-sm text-gray-900">成都分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000003</td><td class="px-4 py-3 text-sm text-gray-700">中海锦城3期6栋802</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">4</td><td class="px-4 py-3 text-sm text-gray-900">北京分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000004</td><td class="px-4 py-3 text-sm text-gray-700">融创壹号院C栋2201</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">5</td><td class="px-4 py-3 text-sm text-gray-900">北京分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000006</td><td class="px-4 py-3 text-sm text-gray-700">远洋天著春秋D栋903</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">6</td><td class="px-4 py-3 text-sm text-gray-900">北京分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000007</td><td class="px-4 py-3 text-sm text-gray-700">金茂府E栋1801</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">7</td><td class="px-4 py-3 text-sm text-gray-900">北京分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000008</td><td class="px-4 py-3 text-sm text-gray-700">首开琅樾F栋502</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">8</td><td class="px-4 py-3 text-sm text-gray-900">上海分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000009</td><td class="px-4 py-3 text-sm text-gray-700">翠湖天地御苑G栋3301</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">9</td><td class="px-4 py-3 text-sm text-gray-900">上海分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000010</td><td class="px-4 py-3 text-sm text-gray-700">汤臣一品H栋1201</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">10</td><td class="px-4 py-3 text-sm text-gray-900">成都分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000011</td><td class="px-4 py-3 text-sm text-gray-700">龙湖天璞I栋603</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">11</td><td class="px-4 py-3 text-sm text-gray-900">成都分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000012</td><td class="px-4 py-3 text-sm text-gray-700">华润悦府J栋2103</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">12</td><td class="px-4 py-3 text-sm text-gray-900">北京分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000013</td><td class="px-4 py-3 text-sm text-gray-700">中国玺K栋1502</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                        <tr class="hover:bg-gray-50"><td class="px-4 py-3 text-sm text-gray-500">13</td><td class="px-4 py-3 text-sm text-gray-900">上海分公司</td><td class="px-4 py-3 text-sm text-blue-600 hover:text-blue-800 cursor-pointer">ZZ901000014</td><td class="px-4 py-3 text-sm text-gray-700">苏河湾L栋801</td><td class="px-4 py-3 text-sm text-green-600">已计算</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="req-tooltip-container"></div>
+    <script>
+var ReqAnnotation = (function() {
+    var activeTooltips = {};
+    var dragState = null;
+    var floatingBadges = {};
+
+    function runSelfCheck() {
+        var badges = document.querySelectorAll('.req-badge');
+        var warnings = [];
+
+        badges.forEach(function(badge) {
+            var reqNum = badge.getAttribute('data-req');
+            var marker = badge.parentElement;
+            var hasTitle = badge.hasAttribute('data-title');
+            var hasContent = badge.hasAttribute('data-content');
+
+            if (!hasTitle || !hasContent) {
+                warnings.push('[角标' + reqNum + '] 缺少 data-title 或 data-content 属性');
+            }
+            if (marker && !marker.classList.contains('req-marker')) {
+                warnings.push('[角标' + reqNum + '] 父元素缺少 req-marker class');
+            }
+        });
+
+        var container = document.getElementById('req-tooltip-container');
+        if (!container) {
+            warnings.push('[全局] 缺少 #req-tooltip-container 容器元素');
+        }
+
+        var floatStyle = document.querySelector('.req-badge-float');
+        if (!floatStyle) {
+            var styleSheets = document.styleSheets;
+            var hasFloatStyle = false;
+            for (var i = 0; i < styleSheets.length; i++) {
+                try {
+                    var rules = styleSheets[i].cssRules || [];
+                    for (var j = 0; j < rules.length; j++) {
+                        if (rules[j].selectorText && rules[j].selectorText.indexOf('req-badge-float') !== -1) {
+                            hasFloatStyle = true;
+                            if (rules[j].style.position !== 'fixed') {
+                                warnings.push('[CSS] .req-badge-float 缺少 position: fixed');
+                            }
+                            break;
+                        }
+                    }
+                    if (hasFloatStyle) break;
+                } catch(e) {}
+            }
+            if (!hasFloatStyle) {
+                warnings.push('[CSS] 缺少 .req-badge-float 样式定义');
+            }
+        }
+
+        if (warnings.length > 0) {
+            console.warn('[ReqAnnotation] 自检发现 ' + warnings.length + ' 个问题：');
+            warnings.forEach(function(w) { console.warn('  ⚠ ' + w); });
+        } else {
+            console.log('[ReqAnnotation] 自检通过 ✓ 共 ' + badges.length + ' 个角标');
+        }
+
+        return warnings.length === 0;
+    }
+
+    function createFloatingBadge(originalBadge) {
+        var reqNum = originalBadge.getAttribute('data-req');
+        if (floatingBadges[reqNum]) return floatingBadges[reqNum];
+
+        var floatBadge = document.createElement('span');
+        floatBadge.className = 'req-badge-float';
+        floatBadge.setAttribute('data-req', reqNum);
+        floatBadge.textContent = reqNum;
+
+        floatBadge.addEventListener('mouseenter', function() {
+            showTooltip(parseInt(reqNum));
+        });
+
+        document.body.appendChild(floatBadge);
+        floatingBadges[reqNum] = { el: floatBadge, original: originalBadge };
+        return floatingBadges[reqNum];
+    }
+
+    function updateFloatingPositions() {
+        Object.keys(floatingBadges).forEach(function(reqNum) {
+            var item = floatingBadges[reqNum];
+            var marker = item.original.parentElement;
+            if (!marker) return;
+
+            var markerRect = marker.getBoundingClientRect();
+            var badgeWidth = 20;
+            var badgeHeight = 18;
+
+            if (markerRect.width === 0 || markerRect.height === 0) {
+                item.el.style.visibility = 'hidden';
+                return;
+            }
+
+            item.el.style.visibility = 'visible';
+            item.el.style.top = Math.max(0, markerRect.top - 10) + 'px';
+            item.el.style.left = Math.max(0, markerRect.right - badgeWidth - 6) + 'px';
+            item.el.style.width = badgeWidth + 'px';
+            item.el.style.height = badgeHeight + 'px';
+        });
+    }
+
+    function getRequirement(reqNum) {
+        var badge = document.querySelector('.req-badge[data-req="' + reqNum + '"]');
+        if (!badge) return null;
+        return {
+            num: reqNum,
+            title: badge.getAttribute('data-title') || ('需求 ' + reqNum),
+            content: badge.getAttribute('data-content') || ''
+        };
+    }
+
+    function createTooltip(req) {
+        var tooltip = document.createElement('div');
+        tooltip.className = 'req-tooltip';
+        tooltip.id = 'req-tooltip-' + req.num;
+        tooltip.innerHTML = '<div class="req-tooltip-header">' +
+            '<span class="req-tooltip-title"><span style="background:rgb(250,173,20);color:white;font-size:10px;font-weight:bold;padding:1px 4px;border-radius:2px;margin-right:6px;">' + req.num + '</span>' + req.title + '</span>' +
+            '<span class="req-tooltip-close" onclick="ReqAnnotation.closeTooltip(' + req.num + ')">×</span>' +
+            '</div>' +
+            '<div class="req-tooltip-content">' + req.content + '</div>';
+
+        tooltip.addEventListener('mousedown', function(e) {
+            if (e.target.classList.contains('req-tooltip-close')) return;
+            dragState = {
+                tooltip: tooltip,
+                startX: e.clientX,
+                startY: e.clientY,
+                initialLeft: tooltip.offsetLeft,
+                initialTop: tooltip.offsetTop
+            };
+            e.preventDefault();
+        });
+
+        return tooltip;
+    }
+
+    function positionTooltip(tooltip, reqNum) {
+        var floatItem = floatingBadges[reqNum];
+        if (!floatItem || !floatItem.el) return;
+
+        var badgeRect = floatItem.el.getBoundingClientRect();
+        var tooltipWidth = 450;
+        var tooltipMaxHeight = 500;
+        var gap = 8;
+        var safeMargin = 16;
+
+        var left = badgeRect.left;
+        var top = badgeRect.bottom + gap;
+
+        if (left + tooltipWidth > window.innerWidth - safeMargin) {
+            left = window.innerWidth - tooltipWidth - safeMargin;
+        }
+        if (top + tooltipMaxHeight > window.innerHeight - safeMargin) {
+            top = badgeRect.top - gap - Math.min(tooltipMaxHeight, window.innerHeight * 0.7);
+        }
+        if (left < safeMargin) left = safeMargin;
+        if (top < safeMargin) top = badgeRect.bottom + gap;
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+    }
+
+    function showTooltip(reqNum) {
+        if (activeTooltips[reqNum]) {
+            var existing = document.getElementById('req-tooltip-' + reqNum);
+            if (existing) existing.classList.add('show');
+            return;
+        }
+
+        var req = getRequirement(reqNum);
+        if (!req || !req.content) return;
+
+        var tooltip = createTooltip(req);
+        if (!tooltip) return;
+
+        var container = document.getElementById('req-tooltip-container');
+        if (container) {
+            container.appendChild(tooltip);
+            positionTooltip(tooltip, reqNum);
+            tooltip.classList.add('show');
+            activeTooltips[reqNum] = true;
+        } else {
+            console.error('[ReqAnnotation] 缺少 #req-tooltip-container，无法显示浮窗');
+        }
+    }
+
+    function closeTooltip(reqNum) {
+        var tooltip = document.getElementById('req-tooltip-' + reqNum);
+        if (tooltip) {
+            tooltip.classList.remove('show');
+            setTimeout(function() { tooltip.remove(); }, 200);
+        }
+        delete activeTooltips[reqNum];
+    }
+
+    function init() {
+        var badges = document.querySelectorAll('.req-badge');
+        if (badges.length === 0) {
+            console.log('[ReqAnnotation] 未找到任何 .req-badge 角标，跳过初始化');
+            return;
+        }
+
+        runSelfCheck();
+
+        badges.forEach(function(badge) {
+            createFloatingBadge(badge);
+        });
+
+        function doPosition() {
+            updateFloatingPositions();
+        }
+
+        doPosition();
+        setTimeout(doPosition, 100);
+        setTimeout(doPosition, 500);
+
+        document.addEventListener('mousemove', function(e) {
+            if (!dragState) return;
+            var dx = e.clientX - dragState.startX;
+            var dy = e.clientY - dragState.startY;
+            dragState.tooltip.style.left = (dragState.initialLeft + dx) + 'px';
+            dragState.tooltip.style.top = (dragState.initialTop + dy) + 'px';
+        });
+
+        document.addEventListener('mouseup', function() {
+            dragState = null;
+        });
+
+        var ticking = false;
+        function onScrollOrResize() {
+            if (!ticking) {
+                requestAnimationFrame(function() {
+                    updateFloatingPositions();
+                    Object.keys(activeTooltips).forEach(function(num) {
+                        var tt = document.getElementById('req-tooltip-' + num);
+                        if (tt) positionTooltip(tt, parseInt(num));
+                    });
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }
+
+        window.addEventListener('scroll', onScrollOrResize, true);
+        window.addEventListener('resize', onScrollOrResize);
+    }
+
+    return {
+        init: init,
+        closeTooltip: closeTooltip,
+        showTooltip: showTooltip
+    };
+})();
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ReqAnnotation.init);
+} else {
+    ReqAnnotation.init();
+}
+
+</script>
+    <script>
+        // 全局函数：成功详情列表折叠/展开
+        function toggleReportSuccessList() {
+            var body = document.getElementById('report-success-list-body');
+            var arrow = document.getElementById('success-list-arrow');
+            var toggleText = document.getElementById('success-list-toggle-text');
+            if (body) {
+                if (body.classList.contains('hidden')) {
+                    body.classList.remove('hidden');
+                    if (arrow) arrow.style.transform = 'rotate(180deg)';
+                    if (toggleText) toggleText.textContent = '收起';
+                } else {
+                    body.classList.add('hidden');
+                    if (arrow) arrow.style.transform = 'rotate(0deg)';
+                    if (toggleText) toggleText.textContent = '展开';
+                }
+            }
+        }
+
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html?t=' + Date.now());
+                var sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+
+                setTimeout(function() {
+                    var script = document.createElement('script');
+                    script.src = 'common/scripts.js';
+                    script.onload = function() {
+                        if (typeof initCommonFunctions === 'function') {
+                            initCommonFunctions();
+                        }
+                    };
+                    script.onerror = function() {
+                        console.warn('scripts.js加载失败，跳过公共脚本初始化');
+                    };
+                    document.body.appendChild(script);
+                }, 100);
+            } catch (error) {
+                console.error('加载侧边栏失败:', error);
+            }
+        }
+
+        function initPageFunctions() {
+            // 高级筛选展开/收起
+            document.querySelectorAll('.advanced-filter-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var filterId = this.getAttribute('data-filter');
+                    var filterEl = document.getElementById(filterId);
+                    if (filterEl) {
+                        filterEl.classList.toggle('hidden');
+                        var icon = this.querySelector('i');
+                        if (icon) {
+                            if (filterEl.classList.contains('hidden')) {
+                                icon.setAttribute('data-lucide', 'chevron-down');
+                            } else {
+                                icon.setAttribute('data-lucide', 'chevron-up');
+                            }
+                            lucide.createIcons();
+                        }
+                    }
+                });
+            });
+
+            // 搜索按钮功能
+            document.querySelectorAll('.search-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    alert('执行查询操作');
+                });
+            });
+
+            // 刷新按钮功能
+            document.querySelectorAll('.refresh-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    location.reload();
+                });
+            });
+
+            // 筛选字段选择变化时更新输入框placeholder
+            // 整装项目收入核算任务筛选
+            var filterFieldTask = document.getElementById('filter-field-task');
+            var filterValueTask = document.getElementById('filter-value-task');
+            if (filterFieldTask && filterValueTask) {
+                filterFieldTask.addEventListener('change', function() {
+                    var selectedValue = this.value;
+                    var placeholders = {
+                        'contractNo': '按合同号搜索',
+                        'projectType': '按项目类型搜索',
+                        'period': '按核算期间搜索',
+                        'method': '按核算方法搜索',
+                        'batchNo': '按计算批次号搜索',
+                        'status': '按计算状态搜索'
+                    };
+                    filterValueTask.placeholder = placeholders[selectedValue] || '请输入搜索内容';
+                    filterValueTask.value = '';
+                });
+            }
+
+            // 整装项目核算单筛选
+            var filterFieldAccounting = document.getElementById('filter-field-accounting');
+            var filterValueAccounting = document.getElementById('filter-value-accounting');
+            if (filterFieldAccounting && filterValueAccounting) {
+                filterFieldAccounting.addEventListener('change', function() {
+                    var selectedValue = this.value;
+                    var placeholders = {
+                        'docNo': '按单据编号搜索',
+                        'docType': '按单据类型搜索',
+                        'period': '按会计期间搜索',
+                        'entity': '按财务主体搜索',
+                        'contractNo': '按合同号搜索'
+                    };
+                    filterValueAccounting.placeholder = placeholders[selectedValue] || '请输入搜索内容';
+                    filterValueAccounting.value = '';
+                });
+            }
+
+            // Tab切换
+            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    // 移除所有active状态
+                    document.querySelectorAll('.tab-btn').forEach(function(b) {
+                        b.classList.remove('active', 'border-primary', 'text-primary');
+                        b.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    // 添加active状态到当前按钮
+                    this.classList.add('active', 'border-primary', 'text-primary');
+                    this.classList.remove('border-transparent', 'text-gray-500');
+
+                    // 隐藏所有tab内容
+                    document.querySelectorAll('.tab-content').forEach(function(content) {
+                        content.classList.add('hidden');
+                    });
+                    // 显示对应的tab内容
+                    var tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.remove('hidden');
+
+                    lucide.createIcons();
+                });
+            });
+
+            // 新增任务弹窗
+            var addTaskModal = document.getElementById('add-task-modal');
+            var addTaskBtn = document.getElementById('add-task-btn');
+            var closeTaskModal = document.getElementById('close-task-modal');
+            var cancelTaskBtn = document.getElementById('cancel-task-btn');
+
+            addTaskBtn.addEventListener('click', function() {
+                addTaskModal.classList.remove('hidden');
+            });
+
+            closeTaskModal.addEventListener('click', function() {
+                addTaskModal.classList.add('hidden');
+            });
+
+            cancelTaskBtn.addEventListener('click', function() {
+                addTaskModal.classList.add('hidden');
+            });
+
+            addTaskModal.addEventListener('click', function(e) {
+                if (e.target === addTaskModal) {
+                    addTaskModal.classList.add('hidden');
+                }
+            });
+
+            // 详情弹窗
+            var detailModal = document.getElementById('detail-modal');
+            var closeDetailModal = document.getElementById('close-detail-modal');
+
+            document.querySelectorAll('.view-detail-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    detailModal.classList.remove('hidden');
+                });
+            });
+
+            closeDetailModal.addEventListener('click', function() {
+                detailModal.classList.add('hidden');
+            });
+
+            detailModal.addEventListener('click', function(e) {
+                if (e.target === detailModal) {
+                    detailModal.classList.add('hidden');
+                }
+            });
+
+            // 导出按钮
+            var exportBtn = document.getElementById('export-accounting-btn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function() {
+                    alert('导出核算单列表');
+                });
+            }
+
+            // 确认本期收入按钮
+            var confirmRevenueBtn = document.getElementById('confirm-revenue-btn');
+            if (confirmRevenueBtn) {
+                confirmRevenueBtn.addEventListener('click', function() {
+                    var checkedRows = document.querySelectorAll('.row-check:checked');
+                    if (checkedRows.length === 0) {
+                        alert('请先勾选需要确认收入的单据');
+                        return;
+                    }
+                    // 校验：勾选单据需满足计算状态=已计算 且 确认状态=未确认
+                    var invalidRows = [];
+                    checkedRows.forEach(function(cb) {
+                        var calcStatus = cb.getAttribute('data-calc-status');
+                        var confirmStatus = cb.getAttribute('data-confirm-status');
+                        if (calcStatus !== '已计算' || confirmStatus !== '未确认') {
+                            invalidRows.push(cb.closest('tr').querySelector('td:nth-child(2)').textContent.trim());
+                        }
+                    });
+                    if (invalidRows.length > 0) {
+                        alert('以下单据不满足确认条件（需计算状态=已计算且确认状态=未确认）：\n' + invalidRows.join('\n'));
+                        return;
+                    }
+                    alert('确认本期收入，将发起审批流程。审批通过后确认状态反写为已确认');
+                });
+            }
+
+            // 全选checkbox
+            var checkAll = document.getElementById('checkAll');
+            if (checkAll) {
+                checkAll.addEventListener('change', function() {
+                    document.querySelectorAll('.row-check').forEach(function(cb) {
+                        cb.checked = checkAll.checked;
+                    });
+                });
+            }
+
+            // 报告查询按钮
+            var reportModal = document.getElementById('report-modal');
+            var closeReportModal = document.getElementById('close-report-modal');
+
+            document.querySelectorAll('.view-report-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    reportModal.classList.remove('hidden');
+                });
+            });
+
+            if (closeReportModal) {
+                closeReportModal.addEventListener('click', function() {
+                    reportModal.classList.add('hidden');
+                });
+            }
+
+            // 点击遮罩层关闭报告弹框
+            if (reportModal) {
+                reportModal.addEventListener('click', function(e) {
+                    if (e.target === reportModal) {
+                        reportModal.classList.add('hidden');
+                    }
+                });
+            }
+
+            // 财务组织选择器功能
+            var entityTags = document.getElementById('entity-tags');
+            var entityDropdown = document.getElementById('entity-dropdown');
+            var entityCheckboxes = document.querySelectorAll('#entity-dropdown input[type="checkbox"]');
+            var selectedEntities = document.getElementById('selected-entities');
+
+            if (entityTags && entityDropdown) {
+                // 点击标签容器显示/隐藏下拉框
+                entityTags.addEventListener('click', function() {
+                    entityDropdown.classList.toggle('hidden');
+                });
+
+                // 点击下拉框外区域关闭下拉框
+                document.addEventListener('click', function(e) {
+                    if (!entityTags.contains(e.target) && !entityDropdown.contains(e.target)) {
+                        entityDropdown.classList.add('hidden');
+                    }
+                });
+
+                // 处理复选框变化
+                entityCheckboxes.forEach(function(checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        var value = this.closest('div[data-value]').getAttribute('data-value');
+                        var label = this.nextElementSibling.textContent;
+
+                        if (value === 'all') {
+                            // 全选/取消全选
+                            if (this.checked) {
+                                // 全选
+                                entityCheckboxes.forEach(function(cb) {
+                                    cb.checked = true;
+                                });
+                                // 清空现有标签
+                                entityTags.innerHTML = '';
+                                // 添加所有标签
+                                entityCheckboxes.forEach(function(cb) {
+                                    var cbValue = cb.closest('div[data-value]').getAttribute('data-value');
+                                    if (cbValue !== 'all') {
+                                        var cbLabel = cb.nextElementSibling.textContent;
+                                        addEntityTag(cbValue, cbLabel);
+                                    }
+                                });
+                            } else {
+                                // 取消全选
+                                entityCheckboxes.forEach(function(cb) {
+                                    cb.checked = false;
+                                });
+                                // 清空所有标签
+                                entityTags.innerHTML = '';
+                            }
+                        } else {
+                            // 单个公司选择
+                            if (this.checked) {
+                                addEntityTag(value, label);
+                            } else {
+                                removeEntityTag(value);
+                            }
+
+                            // 检查是否所有公司都被选中
+                            var allSelected = Array.from(entityCheckboxes).every(function(cb) {
+                                var cbValue = cb.closest('div[data-value]').getAttribute('data-value');
+                                return cbValue === 'all' || cb.checked;
+                            });
+                            entityCheckboxes[0].checked = allSelected;
+                        }
+
+                        // 更新隐藏输入值
+                        updateSelectedEntities();
+                    });
+                });
+
+                // 添加标签函数
+                function addEntityTag(value, label) {
+                    if (!entityTags.querySelector('[data-value="' + value + '"]')) {
+                        var tag = document.createElement('div');
+                        tag.className = 'flex items-center bg-secondary text-primary px-2 py-1 rounded-full text-sm';
+                        tag.setAttribute('data-value', value);
+                        tag.innerHTML = '<span>' + label + '</span><button type="button" class="ml-1 text-primary hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button>';
+                        // 标签移除按钮点击事件
+                        tag.querySelector('button').addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            removeEntityTag(value);
+                            // 取消对应复选框
+                            var entityCheckbox = document.getElementById('entity-' + value);
+                            if (entityCheckbox) {
+                                entityCheckbox.checked = false;
+                            }
+                            // 检查全选状态
+                            var allSelected = Array.from(entityCheckboxes).every(function(cb) {
+                                var cbValue = cb.closest('div[data-value]').getAttribute('data-value');
+                                return cbValue === 'all' || cb.checked;
+                            });
+                            entityCheckboxes[0].checked = allSelected;
+                            // 更新隐藏输入值
+                            updateSelectedEntities();
+                        });
+                        entityTags.appendChild(tag);
+                        lucide.createIcons();
+                    }
+                }
+
+                // 移除标签函数
+                function removeEntityTag(value) {
+                    var tag = entityTags.querySelector('[data-value="' + value + '"]');
+                    if (tag) {
+                        tag.remove();
+                    }
+                }
+
+                // 更新选中实体值
+                function updateSelectedEntities() {
+                    var selected = Array.from(entityTags.children).map(function(tag) {
+                        return tag.getAttribute('data-value');
+                    });
+                    selectedEntities.value = selected.join(',');
+                }
+            }
+
+            // 流程查看弹窗功能 [26]
+            var workflowModal = document.getElementById('workflow-modal');
+            var closeWorkflowModal = document.getElementById('close-workflow-modal');
+
+            document.querySelectorAll('button').forEach(function(btn) {
+                if (btn.textContent.trim() === '流程查看') {
+                    btn.addEventListener('click', function() {
+                        if (workflowModal) {
+                            workflowModal.style.zIndex = '10000';
+                            workflowModal.classList.remove('hidden');
+                            lucide.createIcons();
+                        }
+                    });
+                }
+            });
+
+            if (closeWorkflowModal) {
+                closeWorkflowModal.addEventListener('click', function() {
+                    workflowModal.classList.add('hidden');
+                    workflowModal.style.zIndex = '';
+                });
+            }
+
+            if (workflowModal) {
+                workflowModal.addEventListener('click', function(e) {
+                    if (e.target === workflowModal) {
+                        workflowModal.classList.add('hidden');
+                        workflowModal.style.zIndex = '';
+                    }
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                loadSidebar();
+                initPageFunctions();
+            });
+        } else {
+            loadSidebar();
+            initPageFunctions();
+        }
+    </script>
+
+    <!-- 流程查看弹窗 [26] -->
+    <div id="workflow-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto req-marker relative inline-block" id="req-marker-26-modal">
+            <span class="req-badge" data-req="26"
+                  data-title="需求描述：流程查看弹窗"
+                  data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[26] 需求描述：流程查看弹窗</h3><div class="req-section-title">打开方式</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击列表中的<strong>"流程查看"</strong>按钮打开此弹窗</li></ul><div class="req-section-title">显示条件</div><blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666; font-style: italic;">仅当单据存在审批流时才显示此按钮，无审批流时隐藏</blockquote><div class="req-section-title">弹框内容</div><ol style="margin-left: 20px; line-height: 1.8;"><li><strong>流程状态</strong>：进行中/已完成/已驳回等</li><li><strong>流程节点列表</strong>：<ul><li>当前节点（高亮显示）</li><li>历史节点（已完成）</li></ul></li><li><strong>各节点操作人信息</strong></li><li><strong>各节点操作时间</strong></li></ol><div class="req-section-title">交互逻辑</div><ul style="margin-left: 20px; line-height: 1.8;"><li>点击按钮打开弹框</li><li>弹框以模态方式展示，支持关闭</li><li>数据从工作流引擎实时获取</li></ul></div>'>26</span>
+
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-lg font-semibold text-gray-900">流程详情</h3>
+                <button id="close-workflow-modal" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <!-- 流程状态 -->
+                <div class="mb-6 req-marker relative block" id="req-marker-26-status">
+                    <span class="req-badge" data-req="26"
+                          data-title="需求描述：流程状态"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[26] 流程状态</h3><p>展示当前审批流程的整体状态，包括：</p><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>进行中</strong>：橙色标识，表示流程正在审批中</li><li><strong>已完成</strong>：绿色标识，表示流程已通过所有节点</li><li><strong>已驳回</strong>：红色标识，表示流程被驳回</li></ul></div>'>26</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">流程状态</h4>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center">
+                            <span class="status-dot status-orange"></span>
+                            <span class="ml-2 text-sm font-medium text-gray-700">审批中</span>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            发起时间：2026-04-15 14:30
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 流程节点时间线 -->
+                <div class="mb-6 req-marker relative block" id="req-marker-26-nodes">
+                    <span class="req-badge" data-req="26"
+                          data-title="需求描述：流程节点"
+                          data-content='<div class="req-content"><h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">[26] 流程节点</h3><p>以时间线形式展示审批流程的各个节点：</p><ul style="margin-left: 20px; line-height: 1.8;"><li><strong>发起人提交</strong>：流程起始节点</li><li><strong>部门经理审批</strong>：第一级审批</li><li><strong>财务审核</strong>：第二级审批</li><li><strong>总经理审批</strong>：最终审批（如需要）</li></ul><p style="margin-top: 8px;">每个节点包含：</p><ul style="margin-left: 20px; line-height: 1.8;"><li>节点名称</li><li>操作人</li><li>操作时间</li><li>操作结果（同意/驳回）</li><li>备注意见</li></ul></div>'>26</span>
+                    <h4 class="text-base font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">流程节点</h4>
+                    <div class="space-y-4">
+                        <!-- 节点1：已完成的节点 -->
+                        <div class="flex">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                                </div>
+                                <div class="w-0.5 h-full bg-green-200 mt-2"></div>
+                            </div>
+                            <div class="flex-1 pb-6">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h5 class="text-sm font-medium text-gray-900">发起人提交</h5>
+                                        <p class="text-xs text-gray-500 mt-1">操作人：张三 | 时间：2026-04-15 14:30</p>
+                                    </div>
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已通过</span>
+                                </div>
+                                <div class="mt-2 p-3 bg-gray-50 rounded-md">
+                                    <p class="text-sm text-gray-600">提交整装项目核算单确认申请</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 节点2：已完成的节点 -->
+                        <div class="flex">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                                </div>
+                                <div class="w-0.5 h-full bg-green-200 mt-2"></div>
+                            </div>
+                            <div class="flex-1 pb-6">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h5 class="text-sm font-medium text-gray-900">部门经理审批</h5>
+                                        <p class="text-xs text-gray-500 mt-1">操作人：李四 | 时间：2026-04-15 16:45</p>
+                                    </div>
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已通过</span>
+                                </div>
+                                <div class="mt-2 p-3 bg-gray-50 rounded-md">
+                                    <p class="text-sm text-gray-600">同意，数据核算准确</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 节点3：当前进行中的节点 -->
+                        <div class="flex">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center animate-pulse">
+                                    <i data-lucide="clock" class="w-5 h-5 text-orange-600"></i>
+                                </div>
+                                <div class="w-0.5 h-full bg-gray-200 mt-2"></div>
+                            </div>
+                            <div class="flex-1 pb-6">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h5 class="text-sm font-medium text-gray-900">财务审核</h5>
+                                        <p class="text-xs text-gray-500 mt-1">操作人：王五 | 等待中...</p>
+                                    </div>
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">审批中</span>
+                                </div>
+                                <div class="mt-2 p-3 bg-orange-50 rounded-md border-l-4 border-orange-400">
+                                    <p class="text-sm text-orange-700"><em>等待财务人员审核确认...</em></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 节点4：待处理的节点 -->
+                        <div class="flex opacity-50">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <i data-lucide="circle" class="w-5 h-5 text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h5 class="text-sm font-medium text-gray-500">总经理审批</h5>
+                                        <p class="text-xs text-gray-400 mt-1">待处理</p>
+                                    </div>
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600">待处理</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRD Viewer -->
+    <style>
+/* ================= PRD Viewer =================
+ * 原型页面右下角浮动按钮 + 右侧抽屉
+ * 展示本页对应的 PRD 章节 + 变更记录（双 Tab）
+ * =============================================== */
+
+/* 浮动按钮 */
+.prd-viewer-fab {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #003eb3;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 62, 179, 0.35);
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+ transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prd-viewer-fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 62, 179, 0.45);
+}
+
+.prd-viewer-fab::after {
+    content: attr(data-tip);
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.78);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
+
+.prd-viewer-fab:hover::after {
+    opacity: 1;
+}
+
+.prd-viewer-fab svg {
+    width: 22px;
+    height: 22px;
+    pointer-events: none;
+}
+
+/* 遮罩层 */
+.prd-viewer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.prd-viewer-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 抽屉 */
+.prd-viewer-drawer {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 640px;
+    max-width: 100vw;
+    min-width: 420px;
+    background: #fff;
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+    z-index: 10000;
+    transform: translateX(100%);
+    transition: transform 0.28s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 左侧拖拽手柄 */
+.prd-viewer-resizer {
+    position: absolute;
+    left: -3px;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    cursor: ew-resize;
+    z-index: 2;
+    background: transparent;
+    transition: background 0.15s;
+}
+
+.prd-viewer-resizer:hover,
+.prd-viewer-resizer.dragging {
+    background: rgba(0, 62, 179, 0.25);
+}
+
+.prd-viewer-drawer.resizing {
+    transition: none;
+    user-select: none;
+}
+
+.prd-viewer-drawer.open {
+    transform: translateX(0);
+}
+
+/* 头部 */
+.prd-viewer-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.prd-viewer-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.prd-viewer-subtitle {
+font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.prd-viewer-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.prd-viewer-close:hover {
+    color: #1f2937;
+    background: #f3f4f6;
+}
+
+/* Tab 切换 */
+.prd-viewer-tabs {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
+    background: #fafafa;
+}
+
+.prd-viewer-tab {
+    flex: 1;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #6b7280;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.prd-viewer-tab.active {
+    color: #003eb3;
+    border-bottom-color: #003eb3;
+    background: #fff;
+    font-weight: 500;
+}
+
+.prd-viewer-tab .count {
+    display: inline-block;
+    margin-left: 4px;
+    background: #e6f0ff;
+    color: #003eb3;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 10px;
+}
+
+.prd-viewer-tab.active .count {
+    background: #003eb3;
+    color: #fff;
+}
+
+/* 内容区 */
+.prd-viewer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.prd-viewer-pane {
+    display: none;
+}
+
+.prd-viewer-pane.active {
+    display: block;
+}
+
+/* Markdown 渲染 */
+.prd-md {
+    color: #374151;
+    font-size: 13.5px;
+    line-height: 1.7;
+}
+
+.prd-md h1,
+.prd-md h2,
+.prd-md h3,
+.prd-md h4 {
+    color: #111827;
+    margin: 18px 0 8px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.prd-md h1 { font-size: 18px; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+.prd-md h2 { font-size: 16px; }
+.prd-md h3 { font-size: 15px; color: #003eb3; }
+.prd-md h4 { font-size: 14px; color: #4b5563; }
+
+.prd-md h3:first-child,
+.prd-md h2:first-child,
+.prd-md h1:first-child { margin-top: 0; }
+
+.prd-md p { margin: 6px 0; }
+
+.prd-md ul {
+    margin: 4px 0 8px;
+    padding-left: 18px;
+}
+
+.prd-md li {
+    margin: 2px 0;
+}
+
+.prd-md li > ul {
+    margin-top: 2px;
+}
+
+.prd-md code {
+    background: #f3f4f6;
+    color: #003eb3;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.prd-md hr {
+    margin: 16px 0;
+    border: 0;
+    border-top: 1px dashed #d1d5db;
+}
+
+/* 变更时间轴 */
+.prd-changelog-empty {
+    color: #9ca3af;
+    font-size: 13px;
+    text-align: center;
+    padding: 24px 0;
+}
+
+.prd-changelog-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+
+.prd-changelog-list::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: #e5e7eb;
+}
+
+.prd-changelog-item {
+    position: relative;
+    padding: 4px 0 14px 22px;
+}
+
+.prd-changelog-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #003eb3;
+}
+
+.prd-changelog-item:not(:first-child)::before {
+    border-color: #d1d5db;
+}
+
+.prd-changelog-date {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.prd-changelog-scope {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 11px;
+    padding: 1px 6px;
+    background: #e6f0ff;
+    color: #003eb3;
+    border-radius: 10px;
+}
+
+.prd-changelog-summary {
+    color: #374151;
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin-top: 3px;
+}
+
+.prd-changelog-summary code {
+    background: #f3f4f6;
+    color: #003eb3;
+    padding: 0 5px;
+    border-radius: 3px;
+    font-size: 12.5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* 底部操作 */
+.prd-viewer-footer {
+    flex-shrink: 0;
+    padding: 12px 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafafa;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.prd-viewer-footer button {
+    padding: 6px 12px;
+    background: #003eb3;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.prd-viewer-footer button:hover { background: #002b82; }
+
+/* 缺失态 */
+.prd-viewer-missing {
+    text-align: center;
+    color: #9ca3af;
+    padding: 40px 20px;
+}
+
+.prd-viewer-missing code {
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #003eb3;
+}
+
+/* Toast */
+.prd-viewer-toast {
+    position: fixed;
+    left: 50%;
+    top: 20px;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.78);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    z-index: 10001;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.prd-viewer-toast.show { opacity: 1; }
+
+/* 小屏适配 */
+@media (max-width: 640px) {
+    .prd-viewer-drawer { width: 100vw; min-width: 0; }
+    .prd-viewer-fab { right: 16px; bottom: 16px; }
+    .prd-viewer-resizer { display: none; }
+    .prd-viewer-layout { flex-direction: column; }
+    .prd-viewer-toc { width: 100% !important; max-height: 140px; border-right: 0; border-bottom: 1px solid #e5e7eb; }
+}
+
+/* ========== 搜索栏（A） ========== */
+.prd-viewer-searchbar {
+    flex-shrink: 0;
+    padding: 8px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fff;
+    display: none;
+    align-items: center;
+    gap: 8px;
+}
+
+.prd-viewer-searchbar.open {
+    display: flex;
+}
+
+.prd-viewer-searchbar input {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.prd-viewer-searchbar input:focus {
+    border-color: #003eb3;
+    box-shadow: 0 0 0 2px rgba(0, 62, 179, 0.12);
+}
+
+.prd-viewer-search-count {
+    font-size: 12px;
+    color: #6b7280;
+    min-width: 48px;
+    text-align: center;
+}
+
+.prd-viewer-search-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background: #fff;
+    color: #4b5563;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.prd-viewer-search-btn:hover:not(:disabled) {
+    border-color: #003eb3;
+    color: #003eb3;
+}
+
+.prd-viewer-search-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* 搜索高亮 */
+.prd-md mark.prd-hit,
+.prd-changelog-summary mark.prd-hit {
+    background: #fff2b3;
+    color: #1f2937;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.prd-md mark.prd-hit.current,
+.prd-changelog-summary mark.prd-hit.current {
+    background: #ffcf33;
+    box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.35);
+}
+
+/* ========== 目录 + 内容两栏布局（B） ========== */
+.prd-viewer-layout {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.prd-viewer-toc {
+    width: 180px;
+    flex-shrink: 0;
+    border-right: 1px solid #e5e7eb;
+    background: #fafafa;
+    overflow-y: auto;
+    padding: 12px 0;
+}
+
+.prd-viewer-toc-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0 14px 6px;
+}
+
+.prd-viewer-toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.prd-viewer-toc-item {
+    padding: 5px 14px 5px 14px;
+    font-size: 12.5px;
+    color: #4b5563;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    line-height: 1.4;
+    word-break: break-all;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.prd-viewer-toc-item:hover {
+    background: #eef2ff;
+    color: #1f2937;
+}
+
+.prd-viewer-toc-item.active {
+    background: #e6f0ff;
+    color: #003eb3;
+    border-left-color: #003eb3;
+    font-weight: 500;
+}
+
+.prd-viewer-toc-item.level-2 { padding-left: 14px; }
+.prd-viewer-toc-item.level-3 { padding-left: 26px; font-size: 12px; color: #6b7280; }
+.prd-viewer-toc-item.level-4 { padding-left: 38px; font-size: 11.5px; color: #9ca3af; }
+
+.prd-viewer-toc-empty {
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+/* 内容区调整：现在 pane 本身要滚动 */
+.prd-viewer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    min-width: 0;
+    scroll-behavior: smooth;
+}
+
+/* 变更记录 Tab 激活时隐藏左侧目录（目录仅服务于需求描述 Tab） */
+.prd-viewer-layout.tab-changelog .prd-viewer-toc {
+    display: none;
+}
+
+/* 锚点滚动偏移（避免被顶部遮挡） */
+.prd-md [data-anchor] {
+    scroll-margin-top: 12px;
+}
+
+/* ========== 快捷键帮助浮层（C） ========== */
+.prd-viewer-help {
+    position: fixed;
+    right: 24px;
+    bottom: 90px;
+    width: 280px;
+    background: #1f2937;
+    color: #f3f4f6;
+    padding: 12px 14px;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    font-size: 12.5px;
+    line-height: 1.6;
+    z-index: 10002;
+    display: none;
+}
+
+.prd-viewer-help.open {
+    display: block;
+}
+
+.prd-viewer-help-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.prd-viewer-help-close {
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.prd-viewer-help kbd {
+    display: inline-block;
+    min-width: 18px;
+    padding: 1px 6px;
+    background: #374151;
+    border: 1px solid #4b5563;
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: #e5e7eb;
+    text-align: center;
+    margin-right: 2px;
+}
+
+.prd-viewer-help-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 2px 0;
+}
+
+.prd-viewer-help-row span:last-child {
+    color: #9ca3af;
+}
+
+</style>
+    <script>
+/**
+ * PRD Viewer（增强版）
+ * 右下浮动按钮 + 右侧抽屉，展示本页对应的 PRD 章节 + 变更记录。
+ *
+ * 功能：
+ *   A. 抽屉内搜索（高亮 + 上一条/下一条 + 计数）
+ *   B. 锚点目录（h2/h3/h4 自动生成，滚动联动高亮，点击跳转）
+ *   C. 快捷键（? 或 Ctrl/Cmd+K 打开；Esc 关闭；/ 聚焦搜索；↑↓ 导航结果）
+ *   D. 抽屉宽度（默认 640px，左边缘拖拽，localStorage 记忆）
+ *
+ * 数据源：common/prd-sections.json（由 tools/build-prd.py 构建）
+ */
+(function () {
+    'use strict';
+
+    if (window.__prdViewerInjected__) return;
+    window.__prdViewerInjected__ = true;
+
+    // ---------- 常量 ----------
+    var ASSET_PREFIX = '';
+    var DATA_URL = ASSET_PREFIX + 'common/prd-sections.json';
+    var SOURCE_URL = ASSET_PREFIX + 'PRD/prd.md';
+    var FULL_URL = ASSET_PREFIX + 'common/prd-full.html';
+
+    var STORAGE_KEY_WIDTH = 'prd-viewer.width';
+    var DEFAULT_WIDTH = 640;
+    var MIN_WIDTH = 420;
+    // 最大宽度在运行期按视口宽度计算
+
+    // ---------- 工具 ----------
+    function getPageKey() {
+        var name = (window.location.pathname || '').split('/').pop() || '';
+        return name || 'index.html';
+    }
+
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, '\u0026amp;')
+            .replace(/</g, '\u0026lt;')
+            .replace(/>/g, '\u0026gt;')
+            .replace(/"/g, '\u0026quot;')
+            .replace(/'/g, '\u0026#39;');
+    }
+
+    function renderInline(text) {
+        var safe = escapeHtml(text);
+        return safe.replace(/`([^`]+)`/g, function (_m, code) {
+            return '<code>' + code + '</code>';
+        });
+    }
+
+    function slugify(text, seen) {
+        var base = String(text).trim().replace(/\s+/g, '-').replace(/[^\w\-\u4e00-\u9fa5]+/g, '');
+        if (!base) base = 'section';
+        var slug = base;
+        var i = 2;
+        while (seen[slug]) {
+            slug = base + '-' + i++;
+        }
+        seen[slug] = true;
+        return slug;
+    }
+
+    // ---------- Markdown 渲染（带 anchor） ----------
+    /**
+     * @returns {{ html: string, headings: Array<{level:number, text:string, id:string}> }}
+     */
+    function renderMarkdown(md) {
+        if (!md) return { html: '', headings: [] };
+        var lines = md.split(/\r?\n/);
+        var out = [];
+        var headings = [];
+        var seen = {};
+        var listStack = [];
+
+        function closeListsUntil(indent) {
+            while (listStack.length && listStack[listStack.length - 1] > indent) {
+                out.push('</ul>');
+                listStack.pop();
+            }
+        }
+        function closeAllLists() {
+            while (listStack.length) { out.push('</ul>'); listStack.pop(); }
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].replace(/\s+$/, '');
+            if (!line.trim()) { closeAllLists(); continue; }
+
+            var h = /^(#{1,4})\s+(.*)$/.exec(line);
+            if (h) {
+                closeAllLists();
+                var level = h[1].length;
+                var text = h[2];
+                var id = slugify(text, seen);
+                if (level >= 2 && level <= 4) {
+                    headings.push({ level: level, text: text, id: id });
+                }
+                out.push('<h' + level + ' id="' + id + '" data-anchor="' + id + '">' + renderInline(text) + '</h' + level + '>');
+                continue;
+            }
+            if (/^---+\s*$/.test(line)) {
+                closeAllLists();
+                out.push('<hr>');
+                continue;
+            }
+            var li = /^(\s*)-\s+(.*)$/.exec(line);
+            if (li) {
+                var indent = li[1].length;
+                if (!listStack.length || listStack[listStack.length - 1] < indent) {
+                    out.push('<ul>'); listStack.push(indent);
+                } else {
+                    closeListsUntil(indent);
+                    if (!listStack.length || listStack[listStack.length - 1] < indent) {
+                        out.push('<ul>'); listStack.push(indent);
+                    }
+                }
+                out.push('<li>' + renderInline(li[2]) + '</li>');
+                continue;
+            }
+            closeAllLists();
+            out.push('<p>' + renderInline(line) + '</p>');
+        }
+        closeAllLists();
+        return { html: out.join('\n'), headings: headings };
+    }
+
+    function renderChangelog(list) {
+        if (!list || !list.length) {
+            return '<div class="prd-changelog-empty">该页面暂无变更记录</div>';
+        }
+        var html = '<ul class="prd-changelog-list">';
+        list.forEach(function (item) {
+            html += '<li class="prd-changelog-item">' +
+                '<div>' +
+                    '<span class="prd-changelog-date">' + escapeHtml(item.date) + '</span>' +
+                    (item.scope ? '<span class="prd-changelog-scope">' + escapeHtml(item.scope) + '</span>' : '') +
+                '</div>' +
+                '<div class="prd-changelog-summary">' + renderInline(item.summary) + '</div>' +
+            '</li>';
+        });
+        return html + '</ul>';
+    }
+
+    function renderTOC(headings) {
+        if (!headings || !headings.length) {
+            return '<div class="prd-viewer-toc-empty">（无章节标题）</div>';
+        }
+        var html = '<ul class="prd-viewer-toc-list">';
+        headings.forEach(function (h) {
+            html += '<li class="prd-viewer-toc-item level-' + h.level + '" data-target="' + h.id + '">' +
+                    escapeHtml(h.text) + '</li>';
+        });
+        return html + '</ul>';
+    }
+
+    // ---------- 图标 ----------
+    var FAB_ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
+    var CLOSE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>';
+
+    // ---------- DOM 构建 ----------
+    function buildDOM(data, rendered) {
+        var fab = document.createElement('button');
+        fab.className = 'prd-viewer-fab';
+        fab.setAttribute('data-tip', '查看本页 PRD（? 键打开）');
+        fab.setAttribute('aria-label', '查看本页 PRD');
+        fab.innerHTML = FAB_ICON;
+
+        var backdrop = document.createElement('div');
+        backdrop.className = 'prd-viewer-backdrop';
+
+        var drawer = document.createElement('aside');
+        drawer.className = 'prd-viewer-drawer';
+        drawer.setAttribute('role', 'dialog');
+        drawer.setAttribute('aria-label', 'PRD 查看');
+
+        var moduleLabel = data.section
+            ? data.module + ' / ' + data.section
+            : data.module || '未关联模块';
+        var changelogCount = (data.changelog && data.changelog.length) || 0;
+
+        drawer.innerHTML =
+            '<div class="prd-viewer-resizer" title="拖拽调整宽度"></div>' +
+            '<div class="prd-viewer-header">' +
+                '<div>' +
+                    '<div class="prd-viewer-title">' + escapeHtml(data.title || '产品需求') + '</div>' +
+                    '<div class="prd-viewer-subtitle">' + escapeHtml(moduleLabel) + '</div>' +
+                '</div>' +
+                '<div style="display:flex;gap:4px;align-items:center">' +
+                    '<button class="prd-viewer-search-btn" data-act="toggle-search" title="搜索 (/)">🔍</button>' +
+                    '<button class="prd-viewer-search-btn" data-act="toggle-help" title="快捷键 (?)">?</button>' +
+                    '<button class="prd-viewer-close" aria-label="关闭">' + CLOSE_ICON + '</button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="prd-viewer-searchbar">' +
+                '<input type="text" placeholder="在本页 PRD 内搜索..." />' +
+                '<span class="prd-viewer-search-count">0 / 0</span>' +
+                '<button class="prd-viewer-search-btn" data-act="prev" title="上一条 (↑)">▲</button>' +
+                '<button class="prd-viewer-search-btn" data-act="next" title="下一条 (↓)">▼</button>' +
+            '</div>' +
+            '<div class="prd-viewer-tabs">' +
+                '<button class="prd-viewer-tab active" data-tab="prd">需求描述</button>' +
+                '<button class="prd-viewer-tab" data-tab="changelog">变更记录' +
+                    (changelogCount ? '<span class="count">' + changelogCount + '</span>' : '') +
+                '</button>' +
+            '</div>' +
+            '<div class="prd-viewer-layout">' +
+                '<nav class="prd-viewer-toc" aria-label="本页目录">' +
+                    '<div class="prd-viewer-toc-title">目录</div>' +
+                    renderTOC(rendered.headings) +
+                '</nav>' +
+                '<div class="prd-viewer-body">' +
+                    '<div class="prd-viewer-pane active" data-pane="prd">' +
+                        (data.missing
+                            ? '<div class="prd-viewer-missing">该页面暂无 PRD 描述。<br>请在 <code>PRD/prd.md</code> 中补充对应章节。</div>'
+                            : '<div class="prd-md">' + rendered.html + '</div>') +
+                    '</div>' +
+                    '<div class="prd-viewer-pane" data-pane="changelog">' +
+                        renderChangelog(data.changelog) +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="prd-viewer-footer">' +
+                '<a href="' + FULL_URL + '?page=' + encodeURIComponent(getPageKey()) + '" target="_blank" rel="noopener" title="在新标签页打开 PRD 全文并高亮本章节">在 prd.md 中查看完整文档 ↗</a>' +
+                '<button class="prd-copy-btn">复制本页内容</button>' +
+            '</div>';
+
+        var help = document.createElement('div');
+        help.className = 'prd-viewer-help';
+        help.innerHTML =
+            '<div class="prd-viewer-help-title">快捷键 ' +
+                '<button class="prd-viewer-help-close" aria-label="关闭">×</button>' +
+            '</div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>?</kbd> <kbd>Ctrl/⌘</kbd>+<kbd>K</kbd></span><span>打开/关闭抽屉</span></div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>Esc</kbd></span><span>关闭抽屉 / 清除搜索</span></div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>/</kbd></span><span>聚焦搜索框</span></div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>↑</kbd> <kbd>↓</kbd> / <kbd>Enter</kbd></span><span>搜索结果上/下一条</span></div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>1</kbd> <kbd>2</kbd></span><span>切换 Tab（抽屉打开时）</span></div>';
+
+        var toast = document.createElement('div');
+        toast.className = 'prd-viewer-toast';
+
+        document.body.appendChild(fab);
+        document.body.appendChild(backdrop);
+        document.body.appendChild(drawer);
+        document.body.appendChild(help);
+        document.body.appendChild(toast);
+
+        return { fab: fab, backdrop: backdrop, drawer: drawer, help: help, toast: toast };
+    }
+
+    // ---------- 搜索（A） ----------
+    function createSearcher(drawer) {
+        var bar = drawer.querySelector('.prd-viewer-searchbar');
+        var input = bar.querySelector('input');
+        var countEl = bar.querySelector('.prd-viewer-search-count');
+        var btnPrev = bar.querySelector('[data-act="prev"]');
+        var btnNext = bar.querySelector('[data-act="next"]');
+        var hits = [];
+        var current = -1;
+
+        function activePane() {
+            return drawer.querySelector('.prd-viewer-pane.active');
+        }
+
+        function clear() {
+            var pane = activePane();
+            if (!pane) return;
+            pane.querySelectorAll('mark.prd-hit').forEach(function (m) {
+                var parent = m.parentNode;
+                parent.replaceChild(document.createTextNode(m.textContent), m);
+                parent.normalize();
+            });
+            hits = [];
+            current = -1;
+            updateCount();
+        }
+
+        function updateCount() {
+            countEl.textContent = hits.length ? (current + 1) + ' / ' + hits.length : '0 / 0';
+            btnPrev.disabled = btnNext.disabled = hits.length === 0;
+        }
+
+        function highlight(term) {
+            clear();
+            if (!term) return;
+            var pane = activePane();
+            if (!pane) return;
+            var rx = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$\u0026'), 'gi');
+
+            function walk(node) {
+                if (!node) return;
+                if (node.nodeType === Node.TEXT_NODE) {
+                    var text = node.nodeValue;
+                    if (!text || !rx.test(text)) return;
+                    rx.lastIndex = 0;
+                    var frag = document.createDocumentFragment();
+                    var last = 0, m;
+                    while ((m = rx.exec(text)) !== null) {
+                        if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+                        var mk = document.createElement('mark');
+                        mk.className = 'prd-hit';
+                        mk.textContent = m[0];
+                        frag.appendChild(mk);
+                        hits.push(mk);
+                        last = m.index + m[0].length;
+                        if (m[0].length === 0) rx.lastIndex++;
+                    }
+                    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+                    node.parentNode.replaceChild(frag, node);
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    var tag = node.tagName;
+                    if (tag === 'MARK' || tag === 'SCRIPT' || tag === 'STYLE') return;
+                    var children = Array.prototype.slice.call(node.childNodes);
+                    children.forEach(walk);
+                }
+            }
+            walk(pane);
+            if (hits.length) focusHit(0);
+            updateCount();
+        }
+
+        function focusHit(idx) {
+            if (!hits.length) return;
+            if (idx < 0) idx = hits.length - 1;
+            if (idx >= hits.length) idx = 0;
+            hits.forEach(function (m) { m.classList.remove('current'); });
+            hits[idx].classList.add('current');
+            hits[idx].scrollIntoView({ block: 'center', behavior: 'smooth' });
+            current = idx;
+            updateCount();
+        }
+
+        function openBar() {
+            bar.classList.add('open');
+            setTimeout(function () { input.focus(); input.select(); }, 0);
+        }
+        function closeBar() {
+            bar.classList.remove('open');
+            input.value = '';
+            clear();
+        }
+        function isOpen() { return bar.classList.contains('open'); }
+
+        input.addEventListener('input', function () { highlight(input.value.trim()); });
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                focusHit(e.shiftKey ? current - 1 : current + 1);
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                if (input.value) { input.value = ''; clear(); }
+                else closeBar();
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault(); focusHit(current + 1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault(); focusHit(current - 1);
+            }
+        });
+        btnPrev.addEventListener('click', function () { focusHit(current - 1); });
+        btnNext.addEventListener('click', function () { focusHit(current + 1); });
+
+        return {
+            open: openBar,
+            close: closeBar,
+            isOpen: isOpen,
+            clear: clear,
+            rerun: function () { if (input.value.trim()) highlight(input.value.trim()); },
+            next: function () { focusHit(current + 1); },
+            prev: function () { focusHit(current - 1); },
+            focusInput: function () { openBar(); }
+        };
+    }
+
+    // ---------- 目录联动（B） ----------
+    function setupTOC(drawer) {
+        var toc = drawer.querySelector('.prd-viewer-toc');
+        var body = drawer.querySelector('.prd-viewer-body');
+        var items = toc.querySelectorAll('.prd-viewer-toc-item');
+
+        items.forEach(function (it) {
+            it.addEventListener('click', function () {
+                var target = it.getAttribute('data-target');
+                var el = body.querySelector('[data-anchor="' + target + '"]');
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setActive(it);
+                }
+            });
+        });
+
+        function setActive(item) {
+            items.forEach(function (x) { x.classList.toggle('active', x === item); });
+        }
+
+        // 滚动联动：当前可见区域最靠上的标题高亮
+        body.addEventListener('scroll', function () {
+            if (drawer.__tocSyncTimer) cancelAnimationFrame(drawer.__tocSyncTimer);
+            drawer.__tocSyncTimer = requestAnimationFrame(function () {
+                var anchors = body.querySelectorAll('[data-anchor]');
+                if (!anchors.length) return;
+                var top = body.getBoundingClientRect().top;
+                var best = null;
+                for (var i = 0; i < anchors.length; i++) {
+                    var r = anchors[i].getBoundingClientRect();
+                    if (r.top - top <= 24) best = anchors[i]; else break;
+                }
+                if (!best) best = anchors[0];
+                var id = best.getAttribute('data-anchor');
+                var item = toc.querySelector('[data-target="' + id + '"]');
+                if (item) setActive(item);
+            });
+        });
+    }
+
+    // ---------- 宽度拖拽（D） ----------
+    function setupResizer(drawer) {
+        var handle = drawer.querySelector('.prd-viewer-resizer');
+        var stored = parseInt(localStorage.getItem(STORAGE_KEY_WIDTH), 10);
+        if (stored && stored >= MIN_WIDTH) applyWidth(stored);
+
+        function applyWidth(w) {
+            var max = Math.max(MIN_WIDTH, window.innerWidth - 40);
+            w = Math.max(MIN_WIDTH, Math.min(max, w));
+            drawer.style.width = w + 'px';
+        }
+
+        var dragging = false;
+        handle.addEventListener('mousedown', function (e) {
+            dragging = true;
+            drawer.classList.add('resizing');
+            handle.classList.add('dragging');
+            document.body.style.cursor = 'ew-resize';
+            e.preventDefault();
+        });
+        window.addEventListener('mousemove', function (e) {
+            if (!dragging) return;
+            // 宽度 = 视口右缘 - 鼠标 X
+            applyWidth(window.innerWidth - e.clientX);
+        });
+        window.addEventListener('mouseup', function () {
+            if (!dragging) return;
+            dragging = false;
+            drawer.classList.remove('resizing');
+            handle.classList.remove('dragging');
+            document.body.style.cursor = '';
+            try {
+                localStorage.setItem(STORAGE_KEY_WIDTH, parseInt(drawer.style.width, 10));
+            } catch (_) {}
+        });
+
+        // 视口变化时约束宽度不超过视口
+        window.addEventListener('resize', function () {
+            var cur = parseInt(drawer.style.width, 10) || DEFAULT_WIDTH;
+            applyWidth(cur);
+        });
+    }
+
+    // ---------- 交互绑定 ----------
+    function bindEvents(els, data) {
+        var fab = els.fab, backdrop = els.backdrop, drawer = els.drawer, help = els.help, toast = els.toast;
+        var searcher = createSearcher(drawer);
+        setupTOC(drawer);
+        setupResizer(drawer);
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toast.__t);
+            toast.__t = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+        }
+
+        function open() {
+            backdrop.classList.add('open');
+            drawer.classList.add('open');
+        }
+        function close() {
+            backdrop.classList.remove('open');
+            drawer.classList.remove('open');
+            searcher.close();
+            help.classList.remove('open');
+        }
+        function isOpen() { return drawer.classList.contains('open'); }
+        function toggle() { isOpen() ? close() : open(); }
+
+        fab.addEventListener('click', open);
+        backdrop.addEventListener('click', close);
+        drawer.querySelector('.prd-viewer-close').addEventListener('click', close);
+
+        // 头部工具栏按钮
+        drawer.querySelectorAll('[data-act]').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                var act = btn.getAttribute('data-act');
+                if (act === 'toggle-search') searcher.isOpen() ? searcher.close() : searcher.open();
+                else if (act === 'toggle-help') help.classList.toggle('open');
+            });
+        });
+        help.querySelector('.prd-viewer-help-close').addEventListener('click', function () {
+            help.classList.remove('open');
+        });
+
+        // Tab 切换
+        var tabs = drawer.querySelectorAll('.prd-viewer-tab');
+        var panes = drawer.querySelectorAll('.prd-viewer-pane');
+        var layout = drawer.querySelector('.prd-viewer-layout');
+        function switchTab(name) {
+            tabs.forEach(function (t) { t.classList.toggle('active', t.getAttribute('data-tab') === name); });
+            panes.forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-pane') === name); });
+            // 标记当前 Tab，供 CSS 控制目录显示（变更记录 Tab 隐藏目录）
+            if (layout) {
+                layout.classList.toggle('tab-prd', name === 'prd');
+                layout.classList.toggle('tab-changelog', name === 'changelog');
+            }
+            // 切换后重跑搜索（搜索作用于当前 pane）
+            searcher.rerun();
+        }
+        // 初始化标记为需求描述 Tab
+        if (layout) layout.classList.add('tab-prd');
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () { switchTab(tab.getAttribute('data-tab')); });
+        });
+
+        // 复制
+        drawer.querySelector('.prd-copy-btn').addEventListener('click', function () {
+            var text = data.markdown || '';
+            if (data.changelog && data.changelog.length) {
+                text += '\n\n## 变更记录\n';
+                data.changelog.forEach(function (c) {
+                    text += '- ' + c.date + ' [' + (c.scope || '') + '] ' + c.summary + '\n';
+                });
+            }
+            copyText(text, showToast);
+        });
+
+        // 全局快捷键（C）
+        document.addEventListener('keydown', function (e) {
+            var tag = (e.target && e.target.tagName) || '';
+            var typing = tag === 'INPUT' || tag === 'TEXTAREA' || (e.target && e.target.isContentEditable);
+
+            // 打开：? 或 Ctrl/Cmd+K
+            if (!typing && (e.key === '?' || ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')))) {
+                e.preventDefault();
+                toggle();
+                return;
+            }
+            if (!isOpen()) return;
+
+            if (e.key === 'Escape') {
+                // 若搜索栏开着则优先关闭搜索栏
+                if (searcher.isOpen()) { searcher.close(); return; }
+                if (help.classList.contains('open')) { help.classList.remove('open'); return; }
+                close();
+                return;
+            }
+
+            // 抽屉已打开，以下交互不应在编辑框中误触发
+            if (typing) return;
+
+            if (e.key === '/') {
+                e.preventDefault();
+                searcher.focusInput();
+            } else if (e.key === 'ArrowDown') {
+                if (searcher.isOpen()) { e.preventDefault(); searcher.next(); }
+            } else if (e.key === 'ArrowUp') {
+                if (searcher.isOpen()) { e.preventDefault(); searcher.prev(); }
+            } else if (e.key === '1') {
+                switchTab('prd');
+            } else if (e.key === '2') {
+                switchTab('changelog');
+            }
+        });
+    }
+
+    function copyText(text, showToast) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(
+                function () { showToast('已复制到剪贴板'); },
+                function () { fallbackCopy(text, showToast); }
+            );
+        } else {
+            fallbackCopy(text, showToast);
+        }
+    }
+
+    function fallbackCopy(text, showToast) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('已复制到剪贴板'); }
+        catch (_) { showToast('复制失败'); }
+        document.body.removeChild(ta);
+    }
+
+    // ---------- 启动 ----------
+    function init() {
+        var pageKey = getPageKey();
+        fetch(DATA_URL, { cache: 'no-cache' })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (json) {
+                var sections = (json && json.sections) || {};
+                var data = sections[pageKey];
+                if (!data) {
+                    data = { title: '产品需求', module: null, section: null, markdown: '', changelog: [], missing: true };
+                }
+                var rendered = data.missing
+                    ? { html: '', headings: [] }
+                    : renderMarkdown(data.markdown || '');
+                var els = buildDOM(data, rendered);
+                bindEvents(els, data);
+                // 暴露调试接口
+                window.PRDViewer = {
+                    data: data,
+                    open: function () { els.drawer.classList.add('open'); els.backdrop.classList.add('open'); },
+                    close: function () { els.drawer.classList.remove('open'); els.backdrop.classList.remove('open'); }
+                };
+            })
+            .catch(function (err) {
+                console.warn('[prd-viewer] 加载 prd-sections.json 失败：', err);
+                var data = { title: '产品需求', module: null, section: null, markdown: '', changelog: [], missing: true, _loadError: String(err && err.message || err) };
+                var els = buildDOM(data, { html: '', headings: [] });
+                bindEvents(els, data);
+            });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
+</body>
+</html>

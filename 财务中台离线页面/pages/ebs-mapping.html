@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBS映射配置 - 财务中台</title>
+    <link rel="stylesheet" href="../common/tailwind.css">
+    <script src="../common/lucide.min.js"></script>
+    <!-- tailwind.config removed: using precompiled CSS -->
+    <style>
+/* external font import removed for offline speed */
+
+body {
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    transition: width 0.3s ease-in-out;
+    overflow-y: auto;
+    height: 100vh;
+    position: relative;
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.sidebar > div, .sidebar nav {
+    position: relative;
+    z-index: 2;
+}
+
+.sidebar.collapsed {
+    width: 64px;
+}
+
+.sidebar.collapsed .sidebar-text {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-icon {
+    margin: 0 auto;
+}
+
+.sidebar-item {
+    transition: all 0.2s ease-in-out;
+    font-size: 0.875rem;
+}
+
+.sidebar-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 500;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+}
+
+.menu-header h2 {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 二级子菜单样式 */
+.submenu-content {
+    border-left: 1px solid rgba(255,255,255,0.15);
+    margin-left: 12px;
+    margin-top: 2px;
+}
+.submenu-header {
+    user-select: none;
+}
+.submenu-content .sidebar-item.active {
+    background: rgba(255,255,255,0.15);
+}
+
+.drawer {
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(100%);
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 15;
+    display: none;
+}
+
+.drawer-overlay.open {
+    display: block;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #003eb3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* 表格样式 */
+.table-container {
+    overflow-x: auto;
+}
+
+.table-container table {
+    min-width: 100%;
+    border-collapse: collapse;
+}
+
+.table-container th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.table-container td, .table-container th {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table-container tr:hover {
+    background-color: #f9fafb;
+}
+
+/* 按钮样式 */
+.btn {
+    transition: all 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+}
+
+.btn-primary {
+    background-color: #003eb3;
+    color: white;
+    border: 1px solid #003eb3;
+}
+
+.btn-primary:hover {
+    background-color: #0056c7;
+}
+
+.btn-secondary {
+    background-color: white;
+    color: #003eb3;
+    border: 1px solid #003eb3;
+}
+
+.btn-secondary:hover {
+    background-color: #e6f0ff;
+}
+
+.btn-outline {
+    background-color: white;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+}
+
+.btn-outline:hover {
+    background-color: #f3f4f6;
+}
+
+/* 输入框样式 */
+.input-field {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.input-field:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #003eb3;
+    border-color: transparent;
+}
+
+/* 卡片样式 */
+.card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    padding: 1.5rem;
+}
+
+/* 筛选栏样式 */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+/* 分页样式 */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    margin-top: 1.5rem;
+}
+
+.pagination button {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background-color: white;
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #f3f4f6;
+}
+
+.pagination button.active {
+    background-color: #003eb3;
+    color: white;
+    border-color: #003eb3;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 64px;
+    }
+    
+    .sidebar .sidebar-text {
+        display: none;
+    }
+    
+    .sidebar .sidebar-icon {
+        margin: 0 auto;
+    }
+    
+    .main-content {
+        margin-left: 64px;
+    }
+    
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-bar > div {
+        width: 100%;
+    }
+}
+</style>
+</head>
+<body class="bg-neutral">
+    <div class="flex h-screen">
+        
+        <main class="flex-1  p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="space-y-6">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h1 class="text-xl font-semibold text-gray-800">EBS映射配置</h1>
+                    <p class="text-sm text-gray-500 mt-1">维护中台主数据与 EBS 的映射关系（财务主体映射、内部往来映射与部门映射）。</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <!-- 子Tab：财务主体映射 / 内部往来映射 -->
+                    <div class="border-b border-gray-200 mb-4">
+                        <nav class="flex space-x-8">
+                            <button id="subtab-entity-mapping" class="py-3 px-1 border-b-2 border-primary text-primary font-medium">财务主体映射</button>
+                            <button id="subtab-internal-mapping" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">内部往来映射</button>
+                            <button id="subtab-dept-mapping" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">部门映射</button>
+                        </nav>
+                    </div>
+
+                    <!-- 财务主体映射 -->
+                    <div id="content-entity-mapping" class="subtab-content">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-medium text-gray-800">财务主体映射</h2>
+                            <div class="flex items-center space-x-3">
+                                <button class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm">取消</button>
+                                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm">保存</button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-3">校验：同一个中台财务主体只能存在一行映射关系，不可重复。</p>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">中台财务主体</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">EBS公司编码</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">EBS公司id</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作人</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作时间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200" id="entity-mapping-tbody">
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <div class="flex items-center border border-gray-300 rounded-md px-2 py-1 bg-white">
+                                                <input type="text" placeholder="模糊搜索/弹框选择" class="flex-1 text-sm outline-none" value="财务主体1">
+                                                <i data-lucide="search" class="w-4 h-4 text-gray-400 cursor-pointer"></i>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <div class="flex items-center border border-gray-300 rounded-md px-2 py-1 bg-white">
+                                                <input type="text" placeholder="弹框选择" class="flex-1 text-sm outline-none" value="EBS001">
+                                                <i data-lucide="search" class="w-4 h-4 text-gray-400 cursor-pointer"></i>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">
+                                         <input type="text" class="w-full px-2 py-1 border border-gray-200 rounded-md text-sm bg-gray-100" value="100001" readonly>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">张三</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-15 10:32</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <button class="text-red-600 hover:text-red-800 row-delete-btn">删除行</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <div class="flex items-center border border-gray-300 rounded-md px-2 py-1 bg-white">
+                                                <input type="text" placeholder="模糊搜索/弹框选择" class="flex-1 text-sm outline-none" value="财务主体2">
+                                                <i data-lucide="search" class="w-4 h-4 text-gray-400 cursor-pointer"></i>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <div class="flex items-center border border-gray-300 rounded-md px-2 py-1 bg-white">
+                                                <input type="text" placeholder="弹框选择" class="flex-1 text-sm outline-none" value="EBS002">
+                                                <i data-lucide="search" class="w-4 h-4 text-gray-400 cursor-pointer"></i>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">
+                                            <input type="text" class="w-full px-2 py-1 border border-gray-200 rounded-md text-sm bg-gray-100" value="100002" readonly>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">李四</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-16 09:15</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <button class="text-red-600 hover:text-red-800 row-delete-btn">删除行</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button id="add-entity-row" class="mt-3 flex items-center px-3 py-1.5 border border-dashed border-gray-300 rounded-md text-sm text-gray-600 hover:bg-gray-50">
+                            <i data-lucide="plus" class="w-4 h-4 mr-1"></i>新增行
+                        </button>
+                    </div>
+
+                    <!-- 内部往来映射 -->
+                    <div id="content-internal-mapping" class="subtab-content hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-medium text-gray-800">内部往来映射</h2>
+                            <div class="flex items-center space-x-3">
+                                <button class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm">取消</button>
+                                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm">保存</button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-3">校验：同一个中台内部客商只能存在一行映射关系，不可重复。</p>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">中台内部客商</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">EBS内往编码</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">EBS内往id</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作人</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作时间</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200" id="internal-mapping-tbody">
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <div class="flex items-center border border-gray-300 rounded-md px-2 py-1 bg-white">
+                                                <input type="text" placeholder="模糊搜索（内部客商=是）" class="flex-1 text-sm outline-none" value="内部客商A">
+                                                <i data-lucide="search" class="w-4 h-4 text-gray-400 cursor-pointer"></i>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            <div class="flex items-center border border-gray-300 rounded-md px-2 py-1 bg-white">
+                                                <input type="text" placeholder="弹框选择" class="flex-1 text-sm outline-none" value="NW001">
+                                                <i data-lucide="search" class="w-4 h-4 text-gray-400 cursor-pointer"></i>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">
+                                            <input type="text" class="w-full px-2 py-1 border border-gray-200 rounded-md text-sm bg-gray-100" value="200001" readonly>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">王五</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">2026-04-18 14:22</td>
+                                     <td class="px-4 py-2 text-sm text-gray-700">
+                                            <button class="text-red-600 hover:text-red-800 row-delete-btn">删除行</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button id="add-internal-row" class="mt-3 flex items-center px-3 py-1.5 border border-dashed border-gray-300 rounded-md text-sm text-gray-600 hover:bg-gray-50">
+                            <i data-lucide="plus" class="w-4 h-4 mr-1"></i>新增行
+                        </button>
+                    </div>
+
+                    <!-- 部门映射 -->
+                    <div id="content-dept-mapping" class="subtab-content hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-lg font-medium text-gray-800">部门映射</h2>
+                                <p class="text-xs text-gray-500 mt-1">中台部门与 EBS 部门的映射关系由 <b>金蝶</b> 统一维护，中台按部门编码从金蝶同步落库；不提供人工新增/编辑/删除，所有变更以金蝶为准。</p>
+                                <p class="mt-1 inline-flex items-center px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-[11px] text-amber-700">
+                                    <i data-lucide="alert-triangle" class="w-3 h-3 mr-1"></i>
+                                    中间态方案：未来可能演进为"中台自主维护"或"PS 融合后取消映射"，切换方案时字段与交互将重新设计。
+                                </p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-xs text-gray-500">下次定时同步：2026-07-07 02:00</span>
+                                <button id="btn-sync-external-dept" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 text-sm inline-flex items-center" title="从金蝶同步中台部门与 EBS 部门的映射关系">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4 mr-1"></i>同步部门映射
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 筛选条件 -->
+                        <div class="grid grid-cols-5 gap-3 mb-4 p-3 bg-gray-50 rounded-md">
+                            <input type="text" placeholder="中台部门编码/名称" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                            <input type="text" placeholder="EBS 部门编码/名称" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                            <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                <option>所属财务主体（全部）</option>
+                                <option>财务主体1</option>
+                                <option>财务主体2</option>
+                            </select>
+                            <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                <option>状态（全部）</option>
+                                <option>启用</option>
+                                <option>停用</option>
+                                <option>同步失败</option>
+                            </select>
+                            <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                <option>同步结果（全部）</option>
+                                <option>新增</option>
+                                <option>更新</option>
+                                <option>未变化</option>
+                                <option>失败</option>
+                            </select>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">中台部门编码</th>
+                                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">中台部门名称</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">所属财务主体</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">EBS 部门编码</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">EBS 部门名称</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">EBS 所属组织</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">最近同步方式</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">最近同步时间</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">同步结果</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200" id="dept-mapping-tbody">
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-700">D001</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">设计一部</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">财务主体1</td>
+                                        <td class="px-3 py-2 text-sm text-gray-500">EBS-DEPT-1001</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">设计部</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">总部</td>
+                                        <td class="px-3 py-2 text-sm"><span class="px-2 py-0.5 rounded-full text-xs bg-green-50 text-green-700">启用</span></td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">定时</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">2026-07-06 02:00</td>
+                                        <td class="px-3 py-2 text-sm"><span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-700">未变化</span></td>
+                                        <td class="px-3 py-2 text-sm text-primary"><button class="hover:underline">查看变更记录</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-700">D002</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">施工二部</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">财务主体2</td>
+                                        <td class="px-3 py-2 text-sm text-gray-500">EBS-DEPT-1002</td>
+                                <td class="px-3 py-2 text-sm text-gray-700">施工部</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">华东分公司</td>
+                                        <td class="px-3 py-2 text-sm"><span class="px-2 py-0.5 rounded-full text-xs bg-green-50 text-green-700">启用</span></td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">手动</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">2026-07-06 16:52</td>
+                                        <td class="px-3 py-2 text-sm"><span class="px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-700">更新</span></td>
+                                        <td class="px-3 py-2 text-sm text-primary"><button class="hover:underline">查看变更记录</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-700">D003</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">软装事业部</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">财务主体1</td>
+                                        <td class="px-3 py-2 text-sm text-gray-500">EBS-DEPT-1003</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">软装部</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">总部</td>
+                                        <td class="px-3 py-2 text-sm"><span class="px-2 py-0.5 rounded-full text-xs bg-green-50 text-green-700">启用</span></td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">手动</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">2026-07-06 16:52</td>
+                                        <td class="px-3 py-2 text-sm"><span class="px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-700">新增</span></td>
+                                        <td class="px-3 py-2 text-sm text-primary"><button class="hover:underline">查看变更记录</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-400">D099</td>
+                                        <td class="px-3 py-2 text-sm text-gray-400">-</td>
+                                        <td class="px-3 py-2 text-sm text-gray-400">-</td>
+                                        <td class="px-3 py-2 text-sm text-gray-500">EBS-DEPT-1099</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">临时部门</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">总部</td>
+                                        <td class="px-3 py-2 text-sm"><span class="px-2 py-0.5 rounded-full text-xs bg-red-50 text-red-700" title="金蝶返回了 D099 ↔ EBS-DEPT-1099 的映射，但中台部门基础资料中缺失编码 D099，无法建立映射">同步失败</span></td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">手动</td>
+                                        <td class="px-3 py-2 text-sm text-gray-700">2026-07-06 16:52</td>
+                                        <td class="px-3 py-2 text-sm"><span class="px-2 py-0.5 rounded-full text-xs bg-red-50 text-red-700" title="中台部门 D099 缺失，无法建立映射">失败</span></td>
+                                        <td class="px-3 py-2 text-sm text-primary"><button class="hover:underline">查看变更记录</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+                            <div>共 4 条 · 最近一次同步：2026-07-06 16:52（手动） · 新增 1 / 更新 1 / 未变化 1 / 失败 1</div>
+                                <button class="px-2 py-1 border border-gray-300 rounded hover:bg-gray-50">上一页</button>
+                                <span>1 / 1</span>
+                                <button class="px-2 py-1 border border-gray-300 rounded hover:bg-gray-50">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html?t=' + Date.now());
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+                const script = document.createElement('script');
+                script.src = 'common/scripts.js';
+                script.onload = function() { if (typeof initCommonFunctions === 'function') initCommonFunctions(); };
+                document.body.appendChild(script);
+            } catch (error) { console.error('加载侧边栏失败:', error); }
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadSidebar);
+        else loadSidebar();
+
+        // 子Tab切换
+        const subTabs = { 'entity-mapping': 'content-entity-mapping', 'internal-mapping': 'content-internal-mapping', 'dept-mapping': 'content-dept-mapping' };
+        Object.keys(subTabs).forEach(id => {
+            document.getElementById(`subtab-${id}`)?.addEventListener('click', function() {
+                Object.keys(subTabs).forEach(k => {
+                    const btn = document.getElementById(`subtab-${k}`);
+                    const ct = document.getElementById(subTabs[k]);
+                    if (k === id) {
+                        btn.classList.add('border-primary', 'text-primary', 'font-medium');
+                        btn.classList.remove('border-transparent', 'text-gray-500');
+                        ct.classList.remove('hidden');
+                    } else {
+                        btn.classList.remove('border-primary', 'text-primary', 'font-medium');
+                        btn.classList.add('border-transparent', 'text-gray-500');
+                        ct.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        function buildEntityRow() {
+            return `<tr>
+                <td class="px-4 py-2 text-sm text-gray-700"><div class="flex items-center border border-gray-300 rounded-md px-2 py-1 bg-white"><input type="text" placeholder="模糊搜索/弹框选择" class="flex-1 text-sm outline-none"><i data-lucide="search" class="w-4 h-4 text-gray-400 cursor-pointer"></i></div></td>
+                <td class="px-4 py-2 text-sm text-gray-700"><div class="flex items-center border border-gray-300 rounded-md px-2 py-1 bg-white"><input type="text" placeholder="弹框选择" class="flex-1 text-sm outline-none"><i data-lucide="search" class="w-4 h-4 text-gray-400 cursor-pointer"></i></div></td>
+                <td class="px-4 py-2 text-sm text-gray-500"><input type="text" class="w-full px-2 py-1 border border-gray-200 rounded-md text-sm bg-gray-100" readonly></td>
+                <td class="px-4 py-2 text-sm text-gray-700">-</td>
+                <td class="px-4 py-2 text-sm text-gray-700">-</td>
+                <td class="px-4 py-2 text-sm text-gray-700"><button class="text-red-600 hover:text-red-800 row-delete-btn">删除行</button></td>
+            </tr>`;
+        }
+        function buildInternalRow() {
+            return `<tr>
+                <td class="px-4 py-2 text-sm text-gray-700"><div class="flex items-center border border-gray-300 rounded-md px-2 py-1 bg-white"><input type="text" placeholder="模糊搜索（内部客商=是）" class="flex-1 text-sm outline-none"><i data-lucide="search" class="w-4 h-4 text-gray-400 cursor-pointer"></i></div></td>
+                <td class="px-4 py-2 text-sm text-gray-700"><div class="flex items-center border border-gray-300 rounded-md px-2 py-1 bg-white"><input type="text" placeholder="弹框选择" class="flex-1 text-sm outline-none"><i data-lucide="search" class="w-4 h-4 text-gray-400 cursor-pointer"></i></div></td>
+                <td class="px-4 py-2 text-sm text-gray-500"><input type="text" class="w-full px-2 py-1 border border-gray-200 rounded-md text-sm bg-gray-100" readonly></td>
+                <td class="px-4 py-2 text-sm text-gray-700">-</td>
+                <td class="px-4 py-2 text-sm text-gray-700">-</td>
+                <td class="px-4 py-2 text-sm text-gray-700"><button class="text-red-600 hover:text-red-800 row-delete-btn">删除行</button></td>
+            </tr>`;
+        }
+        document.getElementById('add-entity-row')?.addEventListener('click', function() {
+            document.getElementById('entity-mapping-tbody').insertAdjacentHTML('beforeend', buildEntityRow());
+            if (window.lucide) lucide.createIcons();
+        });
+        document.getElementById('add-internal-row')?.addEventListener('click', function() {
+            document.getElementById('internal-mapping-tbody').insertAdjacentHTML('beforeend', buildInternalRow());
+            if (window.lucide) lucide.createIcons();
+        });
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('row-delete-btn')) {
+                if (confirm('确认删除该行？')) e.target.closest('tr').remove();
+            }
+        });
+    </script>
+
+    <!-- PRD Viewer -->
+    <style>
+/* ================= PRD Viewer =================
+ * 原型页面右下角浮动按钮 + 右侧抽屉
+ * 展示本页对应的 PRD 章节 + 变更记录（双 Tab）
+ * =============================================== */
+
+/* 浮动按钮 */
+.prd-viewer-fab {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #003eb3;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 62, 179, 0.35);
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+ transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prd-viewer-fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 62, 179, 0.45);
+}
+
+.prd-viewer-fab::after {
+    content: attr(data-tip);
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.78);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
+
+.prd-viewer-fab:hover::after {
+    opacity: 1;
+}
+
+.prd-viewer-fab svg {
+    width: 22px;
+    height: 22px;
+    pointer-events: none;
+}
+
+/* 遮罩层 */
+.prd-viewer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.prd-viewer-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 抽屉 */
+.prd-viewer-drawer {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 640px;
+    max-width: 100vw;
+    min-width: 420px;
+    background: #fff;
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+    z-index: 10000;
+    transform: translateX(100%);
+    transition: transform 0.28s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 左侧拖拽手柄 */
+.prd-viewer-resizer {
+    position: absolute;
+    left: -3px;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    cursor: ew-resize;
+    z-index: 2;
+    background: transparent;
+    transition: background 0.15s;
+}
+
+.prd-viewer-resizer:hover,
+.prd-viewer-resizer.dragging {
+    background: rgba(0, 62, 179, 0.25);
+}
+
+.prd-viewer-drawer.resizing {
+    transition: none;
+    user-select: none;
+}
+
+.prd-viewer-drawer.open {
+    transform: translateX(0);
+}
+
+/* 头部 */
+.prd-viewer-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.prd-viewer-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.prd-viewer-subtitle {
+font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.prd-viewer-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.prd-viewer-close:hover {
+    color: #1f2937;
+    background: #f3f4f6;
+}
+
+/* Tab 切换 */
+.prd-viewer-tabs {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
+    background: #fafafa;
+}
+
+.prd-viewer-tab {
+    flex: 1;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #6b7280;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.prd-viewer-tab.active {
+    color: #003eb3;
+    border-bottom-color: #003eb3;
+    background: #fff;
+    font-weight: 500;
+}
+
+.prd-viewer-tab .count {
+    display: inline-block;
+    margin-left: 4px;
+    background: #e6f0ff;
+    color: #003eb3;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 10px;
+}
+
+.prd-viewer-tab.active .count {
+    background: #003eb3;
+    color: #fff;
+}
+
+/* 内容区 */
+.prd-viewer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.prd-viewer-pane {
+    display: none;
+}
+
+.prd-viewer-pane.active {
+    display: block;
+}
+
+/* Markdown 渲染 */
+.prd-md {
+    color: #374151;
+    font-size: 13.5px;
+    line-height: 1.7;
+}
+
+.prd-md h1,
+.prd-md h2,
+.prd-md h3,
+.prd-md h4 {
+    color: #111827;
+    margin: 18px 0 8px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.prd-md h1 { font-size: 18px; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+.prd-md h2 { font-size: 16px; }
+.prd-md h3 { font-size: 15px; color: #003eb3; }
+.prd-md h4 { font-size: 14px; color: #4b5563; }
+
+.prd-md h3:first-child,
+.prd-md h2:first-child,
+.prd-md h1:first-child { margin-top: 0; }
+
+.prd-md p { margin: 6px 0; }
+
+.prd-md ul {
+    margin: 4px 0 8px;
+    padding-left: 18px;
+}
+
+.prd-md li {
+    margin: 2px 0;
+}
+
+.prd-md li > ul {
+    margin-top: 2px;
+}
+
+.prd-md code {
+    background: #f3f4f6;
+    color: #003eb3;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.prd-md hr {
+    margin: 16px 0;
+    border: 0;
+    border-top: 1px dashed #d1d5db;
+}
+
+/* 变更时间轴 */
+.prd-changelog-empty {
+    color: #9ca3af;
+    font-size: 13px;
+    text-align: center;
+    padding: 24px 0;
+}
+
+.prd-changelog-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+
+.prd-changelog-list::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: #e5e7eb;
+}
+
+.prd-changelog-item {
+    position: relative;
+    padding: 4px 0 14px 22px;
+}
+
+.prd-changelog-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #003eb3;
+}
+
+.prd-changelog-item:not(:first-child)::before {
+    border-color: #d1d5db;
+}
+
+.prd-changelog-date {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.prd-changelog-scope {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 11px;
+    padding: 1px 6px;
+    background: #e6f0ff;
+    color: #003eb3;
+    border-radius: 10px;
+}
+
+.prd-changelog-summary {
+    color: #374151;
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin-top: 3px;
+}
+
+.prd-changelog-summary code {
+    background: #f3f4f6;
+    color: #003eb3;
+    padding: 0 5px;
+    border-radius: 3px;
+    font-size: 12.5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* 底部操作 */
+.prd-viewer-footer {
+    flex-shrink: 0;
+    padding: 12px 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafafa;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.prd-viewer-footer button {
+    padding: 6px 12px;
+    background: #003eb3;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.prd-viewer-footer button:hover { background: #002b82; }
+
+/* 缺失态 */
+.prd-viewer-missing {
+    text-align: center;
+    color: #9ca3af;
+    padding: 40px 20px;
+}
+
+.prd-viewer-missing code {
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #003eb3;
+}
+
+/* Toast */
+.prd-viewer-toast {
+    position: fixed;
+    left: 50%;
+    top: 20px;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.78);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    z-index: 10001;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.prd-viewer-toast.show { opacity: 1; }
+
+/* 小屏适配 */
+@media (max-width: 640px) {
+    .prd-viewer-drawer { width: 100vw; min-width: 0; }
+    .prd-viewer-fab { right: 16px; bottom: 16px; }
+    .prd-viewer-resizer { display: none; }
+    .prd-viewer-layout { flex-direction: column; }
+    .prd-viewer-toc { width: 100% !important; max-height: 140px; border-right: 0; border-bottom: 1px solid #e5e7eb; }
+}
+
+/* ========== 搜索栏（A） ========== */
+.prd-viewer-searchbar {
+    flex-shrink: 0;
+    padding: 8px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fff;
+    display: none;
+    align-items: center;
+    gap: 8px;
+}
+
+.prd-viewer-searchbar.open {
+    display: flex;
+}
+
+.prd-viewer-searchbar input {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.prd-viewer-searchbar input:focus {
+    border-color: #003eb3;
+    box-shadow: 0 0 0 2px rgba(0, 62, 179, 0.12);
+}
+
+.prd-viewer-search-count {
+    font-size: 12px;
+    color: #6b7280;
+    min-width: 48px;
+    text-align: center;
+}
+
+.prd-viewer-search-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background: #fff;
+    color: #4b5563;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.prd-viewer-search-btn:hover:not(:disabled) {
+    border-color: #003eb3;
+    color: #003eb3;
+}
+
+.prd-viewer-search-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* 搜索高亮 */
+.prd-md mark.prd-hit,
+.prd-changelog-summary mark.prd-hit {
+    background: #fff2b3;
+    color: #1f2937;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.prd-md mark.prd-hit.current,
+.prd-changelog-summary mark.prd-hit.current {
+    background: #ffcf33;
+    box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.35);
+}
+
+/* ========== 目录 + 内容两栏布局（B） ========== */
+.prd-viewer-layout {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.prd-viewer-toc {
+    width: 180px;
+    flex-shrink: 0;
+    border-right: 1px solid #e5e7eb;
+    background: #fafafa;
+    overflow-y: auto;
+    padding: 12px 0;
+}
+
+.prd-viewer-toc-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0 14px 6px;
+}
+
+.prd-viewer-toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.prd-viewer-toc-item {
+    padding: 5px 14px 5px 14px;
+    font-size: 12.5px;
+    color: #4b5563;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    line-height: 1.4;
+    word-break: break-all;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.prd-viewer-toc-item:hover {
+    background: #eef2ff;
+    color: #1f2937;
+}
+
+.prd-viewer-toc-item.active {
+    background: #e6f0ff;
+    color: #003eb3;
+    border-left-color: #003eb3;
+    font-weight: 500;
+}
+
+.prd-viewer-toc-item.level-2 { padding-left: 14px; }
+.prd-viewer-toc-item.level-3 { padding-left: 26px; font-size: 12px; color: #6b7280; }
+.prd-viewer-toc-item.level-4 { padding-left: 38px; font-size: 11.5px; color: #9ca3af; }
+
+.prd-viewer-toc-empty {
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+/* 内容区调整：现在 pane 本身要滚动 */
+.prd-viewer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    min-width: 0;
+    scroll-behavior: smooth;
+}
+
+/* 变更记录 Tab 激活时隐藏左侧目录（目录仅服务于需求描述 Tab） */
+.prd-viewer-layout.tab-changelog .prd-viewer-toc {
+    display: none;
+}
+
+/* 锚点滚动偏移（避免被顶部遮挡） */
+.prd-md [data-anchor] {
+    scroll-margin-top: 12px;
+}
+
+/* ========== 快捷键帮助浮层（C） ========== */
+.prd-viewer-help {
+    position: fixed;
+    right: 24px;
+    bottom: 90px;
+    width: 280px;
+    background: #1f2937;
+    color: #f3f4f6;
+    padding: 12px 14px;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    font-size: 12.5px;
+    line-height: 1.6;
+    z-index: 10002;
+    display: none;
+}
+
+.prd-viewer-help.open {
+    display: block;
+}
+
+.prd-viewer-help-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.prd-viewer-help-close {
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.prd-viewer-help kbd {
+    display: inline-block;
+    min-width: 18px;
+    padding: 1px 6px;
+    background: #374151;
+    border: 1px solid #4b5563;
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: #e5e7eb;
+    text-align: center;
+    margin-right: 2px;
+}
+
+.prd-viewer-help-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 2px 0;
+}
+
+.prd-viewer-help-row span:last-child {
+    color: #9ca3af;
+}
+
+</style>
+    <script>
+/**
+ * PRD Viewer（增强版）
+ * 右下浮动按钮 + 右侧抽屉，展示本页对应的 PRD 章节 + 变更记录。
+ *
+ * 功能：
+ *   A. 抽屉内搜索（高亮 + 上一条/下一条 + 计数）
+ *   B. 锚点目录（h2/h3/h4 自动生成，滚动联动高亮，点击跳转）
+ *   C. 快捷键（? 或 Ctrl/Cmd+K 打开；Esc 关闭；/ 聚焦搜索；↑↓ 导航结果）
+ *   D. 抽屉宽度（默认 640px，左边缘拖拽，localStorage 记忆）
+ *
+ * 数据源：common/prd-sections.json（由 tools/build-prd.py 构建）
+ */
+(function () {
+    'use strict';
+
+    if (window.__prdViewerInjected__) return;
+    window.__prdViewerInjected__ = true;
+
+    // ---------- 常量 ----------
+    var ASSET_PREFIX = '';
+    var DATA_URL = ASSET_PREFIX + 'common/prd-sections.json';
+    var SOURCE_URL = ASSET_PREFIX + 'PRD/prd.md';
+    var FULL_URL = ASSET_PREFIX + 'common/prd-full.html';
+
+    var STORAGE_KEY_WIDTH = 'prd-viewer.width';
+    var DEFAULT_WIDTH = 640;
+    var MIN_WIDTH = 420;
+    // 最大宽度在运行期按视口宽度计算
+
+    // ---------- 工具 ----------
+    function getPageKey() {
+        var name = (window.location.pathname || '').split('/').pop() || '';
+        return name || 'index.html';
+    }
+
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, '\u0026amp;')
+            .replace(/</g, '\u0026lt;')
+            .replace(/>/g, '\u0026gt;')
+            .replace(/"/g, '\u0026quot;')
+            .replace(/'/g, '\u0026#39;');
+    }
+
+    function renderInline(text) {
+        var safe = escapeHtml(text);
+        return safe.replace(/`([^`]+)`/g, function (_m, code) {
+            return '<code>' + code + '</code>';
+        });
+    }
+
+    function slugify(text, seen) {
+        var base = String(text).trim().replace(/\s+/g, '-').replace(/[^\w\-\u4e00-\u9fa5]+/g, '');
+        if (!base) base = 'section';
+        var slug = base;
+        var i = 2;
+        while (seen[slug]) {
+            slug = base + '-' + i++;
+        }
+        seen[slug] = true;
+        return slug;
+    }
+
+    // ---------- Markdown 渲染（带 anchor） ----------
+    /**
+     * @returns {{ html: string, headings: Array<{level:number, text:string, id:string}> }}
+     */
+    function renderMarkdown(md) {
+        if (!md) return { html: '', headings: [] };
+        var lines = md.split(/\r?\n/);
+        var out = [];
+        var headings = [];
+        var seen = {};
+        var listStack = [];
+
+        function closeListsUntil(indent) {
+            while (listStack.length && listStack[listStack.length - 1] > indent) {
+                out.push('</ul>');
+                listStack.pop();
+            }
+        }
+        function closeAllLists() {
+            while (listStack.length) { out.push('</ul>'); listStack.pop(); }
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].replace(/\s+$/, '');
+            if (!line.trim()) { closeAllLists(); continue; }
+
+            var h = /^(#{1,4})\s+(.*)$/.exec(line);
+            if (h) {
+                closeAllLists();
+                var level = h[1].length;
+                var text = h[2];
+                var id = slugify(text, seen);
+                if (level >= 2 && level <= 4) {
+                    headings.push({ level: level, text: text, id: id });
+                }
+                out.push('<h' + level + ' id="' + id + '" data-anchor="' + id + '">' + renderInline(text) + '</h' + level + '>');
+                continue;
+            }
+            if (/^---+\s*$/.test(line)) {
+                closeAllLists();
+                out.push('<hr>');
+                continue;
+            }
+            var li = /^(\s*)-\s+(.*)$/.exec(line);
+            if (li) {
+                var indent = li[1].length;
+                if (!listStack.length || listStack[listStack.length - 1] < indent) {
+                    out.push('<ul>'); listStack.push(indent);
+                } else {
+                    closeListsUntil(indent);
+                    if (!listStack.length || listStack[listStack.length - 1] < indent) {
+                        out.push('<ul>'); listStack.push(indent);
+                    }
+                }
+                out.push('<li>' + renderInline(li[2]) + '</li>');
+                continue;
+            }
+            closeAllLists();
+            out.push('<p>' + renderInline(line) + '</p>');
+        }
+        closeAllLists();
+        return { html: out.join('\n'), headings: headings };
+    }
+
+    function renderChangelog(list) {
+        if (!list || !list.length) {
+            return '<div class="prd-changelog-empty">该页面暂无变更记录</div>';
+        }
+        var html = '<ul class="prd-changelog-list">';
+        list.forEach(function (item) {
+            html += '<li class="prd-changelog-item">' +
+                '<div>' +
+                    '<span class="prd-changelog-date">' + escapeHtml(item.date) + '</span>' +
+                    (item.scope ? '<span class="prd-changelog-scope">' + escapeHtml(item.scope) + '</span>' : '') +
+                '</div>' +
+                '<div class="prd-changelog-summary">' + renderInline(item.summary) + '</div>' +
+            '</li>';
+        });
+        return html + '</ul>';
+    }
+
+    function renderTOC(headings) {
+        if (!headings || !headings.length) {
+            return '<div class="prd-viewer-toc-empty">（无章节标题）</div>';
+        }
+        var html = '<ul class="prd-viewer-toc-list">';
+        headings.forEach(function (h) {
+            html += '<li class="prd-viewer-toc-item level-' + h.level + '" data-target="' + h.id + '">' +
+                    escapeHtml(h.text) + '</li>';
+        });
+        return html + '</ul>';
+    }
+
+    // ---------- 图标 ----------
+    var FAB_ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
+    var CLOSE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>';
+
+    // ---------- DOM 构建 ----------
+    function buildDOM(data, rendered) {
+        var fab = document.createElement('button');
+        fab.className = 'prd-viewer-fab';
+        fab.setAttribute('data-tip', '查看本页 PRD（? 键打开）');
+        fab.setAttribute('aria-label', '查看本页 PRD');
+        fab.innerHTML = FAB_ICON;
+
+        var backdrop = document.createElement('div');
+        backdrop.className = 'prd-viewer-backdrop';
+
+        var drawer = document.createElement('aside');
+        drawer.className = 'prd-viewer-drawer';
+        drawer.setAttribute('role', 'dialog');
+        drawer.setAttribute('aria-label', 'PRD 查看');
+
+        var moduleLabel = data.section
+            ? data.module + ' / ' + data.section
+            : data.module || '未关联模块';
+        var changelogCount = (data.changelog && data.changelog.length) || 0;
+
+        drawer.innerHTML =
+            '<div class="prd-viewer-resizer" title="拖拽调整宽度"></div>' +
+            '<div class="prd-viewer-header">' +
+                '<div>' +
+                    '<div class="prd-viewer-title">' + escapeHtml(data.title || '产品需求') + '</div>' +
+                    '<div class="prd-viewer-subtitle">' + escapeHtml(moduleLabel) + '</div>' +
+                '</div>' +
+                '<div style="display:flex;gap:4px;align-items:center">' +
+                    '<button class="prd-viewer-search-btn" data-act="toggle-search" title="搜索 (/)">🔍</button>' +
+                    '<button class="prd-viewer-search-btn" data-act="toggle-help" title="快捷键 (?)">?</button>' +
+                    '<button class="prd-viewer-close" aria-label="关闭">' + CLOSE_ICON + '</button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="prd-viewer-searchbar">' +
+                '<input type="text" placeholder="在本页 PRD 内搜索..." />' +
+                '<span class="prd-viewer-search-count">0 / 0</span>' +
+                '<button class="prd-viewer-search-btn" data-act="prev" title="上一条 (↑)">▲</button>' +
+                '<button class="prd-viewer-search-btn" data-act="next" title="下一条 (↓)">▼</button>' +
+            '</div>' +
+            '<div class="prd-viewer-tabs">' +
+                '<button class="prd-viewer-tab active" data-tab="prd">需求描述</button>' +
+                '<button class="prd-viewer-tab" data-tab="changelog">变更记录' +
+                    (changelogCount ? '<span class="count">' + changelogCount + '</span>' : '') +
+                '</button>' +
+            '</div>' +
+            '<div class="prd-viewer-layout">' +
+                '<nav class="prd-viewer-toc" aria-label="本页目录">' +
+                    '<div class="prd-viewer-toc-title">目录</div>' +
+                    renderTOC(rendered.headings) +
+                '</nav>' +
+                '<div class="prd-viewer-body">' +
+                    '<div class="prd-viewer-pane active" data-pane="prd">' +
+                        (data.missing
+                            ? '<div class="prd-viewer-missing">该页面暂无 PRD 描述。<br>请在 <code>PRD/prd.md</code> 中补充对应章节。</div>'
+                            : '<div class="prd-md">' + rendered.html + '</div>') +
+                    '</div>' +
+                    '<div class="prd-viewer-pane" data-pane="changelog">' +
+                        renderChangelog(data.changelog) +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="prd-viewer-footer">' +
+                '<a href="' + FULL_URL + '?page=' + encodeURIComponent(getPageKey()) + '" target="_blank" rel="noopener" title="在新标签页打开 PRD 全文并高亮本章节">在 prd.md 中查看完整文档 ↗</a>' +
+                '<button class="prd-copy-btn">复制本页内容</button>' +
+            '</div>';
+
+        var help = document.createElement('div');
+        help.className = 'prd-viewer-help';
+        help.innerHTML =
+            '<div class="prd-viewer-help-title">快捷键 ' +
+                '<button class="prd-viewer-help-close" aria-label="关闭">×</button>' +
+            '</div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>?</kbd> <kbd>Ctrl/⌘</kbd>+<kbd>K</kbd></span><span>打开/关闭抽屉</span></div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>Esc</kbd></span><span>关闭抽屉 / 清除搜索</span></div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>/</kbd></span><span>聚焦搜索框</span></div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>↑</kbd> <kbd>↓</kbd> / <kbd>Enter</kbd></span><span>搜索结果上/下一条</span></div>' +
+            '<div class="prd-viewer-help-row"><span><kbd>1</kbd> <kbd>2</kbd></span><span>切换 Tab（抽屉打开时）</span></div>';
+
+        var toast = document.createElement('div');
+        toast.className = 'prd-viewer-toast';
+
+        document.body.appendChild(fab);
+        document.body.appendChild(backdrop);
+        document.body.appendChild(drawer);
+        document.body.appendChild(help);
+        document.body.appendChild(toast);
+
+        return { fab: fab, backdrop: backdrop, drawer: drawer, help: help, toast: toast };
+    }
+
+    // ---------- 搜索（A） ----------
+    function createSearcher(drawer) {
+        var bar = drawer.querySelector('.prd-viewer-searchbar');
+        var input = bar.querySelector('input');
+        var countEl = bar.querySelector('.prd-viewer-search-count');
+        var btnPrev = bar.querySelector('[data-act="prev"]');
+        var btnNext = bar.querySelector('[data-act="next"]');
+        var hits = [];
+        var current = -1;
+
+        function activePane() {
+            return drawer.querySelector('.prd-viewer-pane.active');
+        }
+
+        function clear() {
+            var pane = activePane();
+            if (!pane) return;
+            pane.querySelectorAll('mark.prd-hit').forEach(function (m) {
+                var parent = m.parentNode;
+                parent.replaceChild(document.createTextNode(m.textContent), m);
+                parent.normalize();
+            });
+            hits = [];
+            current = -1;
+            updateCount();
+        }
+
+        function updateCount() {
+            countEl.textContent = hits.length ? (current + 1) + ' / ' + hits.length : '0 / 0';
+            btnPrev.disabled = btnNext.disabled = hits.length === 0;
+        }
+
+        function highlight(term) {
+            clear();
+            if (!term) return;
+            var pane = activePane();
+            if (!pane) return;
+            var rx = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$\u0026'), 'gi');
+
+            function walk(node) {
+                if (!node) return;
+                if (node.nodeType === Node.TEXT_NODE) {
+                    var text = node.nodeValue;
+                    if (!text || !rx.test(text)) return;
+                    rx.lastIndex = 0;
+                    var frag = document.createDocumentFragment();
+                    var last = 0, m;
+                    while ((m = rx.exec(text)) !== null) {
+                        if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+                        var mk = document.createElement('mark');
+                        mk.className = 'prd-hit';
+                        mk.textContent = m[0];
+                        frag.appendChild(mk);
+                        hits.push(mk);
+                        last = m.index + m[0].length;
+                        if (m[0].length === 0) rx.lastIndex++;
+                    }
+                    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+                    node.parentNode.replaceChild(frag, node);
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    var tag = node.tagName;
+                    if (tag === 'MARK' || tag === 'SCRIPT' || tag === 'STYLE') return;
+                    var children = Array.prototype.slice.call(node.childNodes);
+                    children.forEach(walk);
+                }
+            }
+            walk(pane);
+            if (hits.length) focusHit(0);
+            updateCount();
+        }
+
+        function focusHit(idx) {
+            if (!hits.length) return;
+            if (idx < 0) idx = hits.length - 1;
+            if (idx >= hits.length) idx = 0;
+            hits.forEach(function (m) { m.classList.remove('current'); });
+            hits[idx].classList.add('current');
+            hits[idx].scrollIntoView({ block: 'center', behavior: 'smooth' });
+            current = idx;
+            updateCount();
+        }
+
+        function openBar() {
+            bar.classList.add('open');
+            setTimeout(function () { input.focus(); input.select(); }, 0);
+        }
+        function closeBar() {
+            bar.classList.remove('open');
+            input.value = '';
+            clear();
+        }
+        function isOpen() { return bar.classList.contains('open'); }
+
+        input.addEventListener('input', function () { highlight(input.value.trim()); });
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                focusHit(e.shiftKey ? current - 1 : current + 1);
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                if (input.value) { input.value = ''; clear(); }
+                else closeBar();
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault(); focusHit(current + 1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault(); focusHit(current - 1);
+            }
+        });
+        btnPrev.addEventListener('click', function () { focusHit(current - 1); });
+        btnNext.addEventListener('click', function () { focusHit(current + 1); });
+
+        return {
+            open: openBar,
+            close: closeBar,
+            isOpen: isOpen,
+            clear: clear,
+            rerun: function () { if (input.value.trim()) highlight(input.value.trim()); },
+            next: function () { focusHit(current + 1); },
+            prev: function () { focusHit(current - 1); },
+            focusInput: function () { openBar(); }
+        };
+    }
+
+    // ---------- 目录联动（B） ----------
+    function setupTOC(drawer) {
+        var toc = drawer.querySelector('.prd-viewer-toc');
+        var body = drawer.querySelector('.prd-viewer-body');
+        var items = toc.querySelectorAll('.prd-viewer-toc-item');
+
+        items.forEach(function (it) {
+            it.addEventListener('click', function () {
+                var target = it.getAttribute('data-target');
+                var el = body.querySelector('[data-anchor="' + target + '"]');
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setActive(it);
+                }
+            });
+        });
+
+        function setActive(item) {
+            items.forEach(function (x) { x.classList.toggle('active', x === item); });
+        }
+
+        // 滚动联动：当前可见区域最靠上的标题高亮
+        body.addEventListener('scroll', function () {
+            if (drawer.__tocSyncTimer) cancelAnimationFrame(drawer.__tocSyncTimer);
+            drawer.__tocSyncTimer = requestAnimationFrame(function () {
+                var anchors = body.querySelectorAll('[data-anchor]');
+                if (!anchors.length) return;
+                var top = body.getBoundingClientRect().top;
+                var best = null;
+                for (var i = 0; i < anchors.length; i++) {
+                    var r = anchors[i].getBoundingClientRect();
+                    if (r.top - top <= 24) best = anchors[i]; else break;
+                }
+                if (!best) best = anchors[0];
+                var id = best.getAttribute('data-anchor');
+                var item = toc.querySelector('[data-target="' + id + '"]');
+                if (item) setActive(item);
+            });
+        });
+    }
+
+    // ---------- 宽度拖拽（D） ----------
+    function setupResizer(drawer) {
+        var handle = drawer.querySelector('.prd-viewer-resizer');
+        var stored = parseInt(localStorage.getItem(STORAGE_KEY_WIDTH), 10);
+        if (stored && stored >= MIN_WIDTH) applyWidth(stored);
+
+        function applyWidth(w) {
+            var max = Math.max(MIN_WIDTH, window.innerWidth - 40);
+            w = Math.max(MIN_WIDTH, Math.min(max, w));
+            drawer.style.width = w + 'px';
+        }
+
+        var dragging = false;
+        handle.addEventListener('mousedown', function (e) {
+            dragging = true;
+            drawer.classList.add('resizing');
+            handle.classList.add('dragging');
+            document.body.style.cursor = 'ew-resize';
+            e.preventDefault();
+        });
+        window.addEventListener('mousemove', function (e) {
+            if (!dragging) return;
+            // 宽度 = 视口右缘 - 鼠标 X
+            applyWidth(window.innerWidth - e.clientX);
+        });
+        window.addEventListener('mouseup', function () {
+            if (!dragging) return;
+            dragging = false;
+            drawer.classList.remove('resizing');
+            handle.classList.remove('dragging');
+            document.body.style.cursor = '';
+            try {
+                localStorage.setItem(STORAGE_KEY_WIDTH, parseInt(drawer.style.width, 10));
+            } catch (_) {}
+        });
+
+        // 视口变化时约束宽度不超过视口
+        window.addEventListener('resize', function () {
+            var cur = parseInt(drawer.style.width, 10) || DEFAULT_WIDTH;
+            applyWidth(cur);
+        });
+    }
+
+    // ---------- 交互绑定 ----------
+    function bindEvents(els, data) {
+        var fab = els.fab, backdrop = els.backdrop, drawer = els.drawer, help = els.help, toast = els.toast;
+        var searcher = createSearcher(drawer);
+        setupTOC(drawer);
+        setupResizer(drawer);
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toast.__t);
+            toast.__t = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+        }
+
+        function open() {
+            backdrop.classList.add('open');
+            drawer.classList.add('open');
+        }
+        function close() {
+            backdrop.classList.remove('open');
+            drawer.classList.remove('open');
+            searcher.close();
+            help.classList.remove('open');
+        }
+        function isOpen() { return drawer.classList.contains('open'); }
+        function toggle() { isOpen() ? close() : open(); }
+
+        fab.addEventListener('click', open);
+        backdrop.addEventListener('click', close);
+        drawer.querySelector('.prd-viewer-close').addEventListener('click', close);
+
+        // 头部工具栏按钮
+        drawer.querySelectorAll('[data-act]').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                var act = btn.getAttribute('data-act');
+                if (act === 'toggle-search') searcher.isOpen() ? searcher.close() : searcher.open();
+                else if (act === 'toggle-help') help.classList.toggle('open');
+            });
+        });
+        help.querySelector('.prd-viewer-help-close').addEventListener('click', function () {
+            help.classList.remove('open');
+        });
+
+        // Tab 切换
+        var tabs = drawer.querySelectorAll('.prd-viewer-tab');
+        var panes = drawer.querySelectorAll('.prd-viewer-pane');
+        var layout = drawer.querySelector('.prd-viewer-layout');
+        function switchTab(name) {
+            tabs.forEach(function (t) { t.classList.toggle('active', t.getAttribute('data-tab') === name); });
+            panes.forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-pane') === name); });
+            // 标记当前 Tab，供 CSS 控制目录显示（变更记录 Tab 隐藏目录）
+            if (layout) {
+                layout.classList.toggle('tab-prd', name === 'prd');
+                layout.classList.toggle('tab-changelog', name === 'changelog');
+            }
+            // 切换后重跑搜索（搜索作用于当前 pane）
+            searcher.rerun();
+        }
+        // 初始化标记为需求描述 Tab
+        if (layout) layout.classList.add('tab-prd');
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () { switchTab(tab.getAttribute('data-tab')); });
+        });
+
+        // 复制
+        drawer.querySelector('.prd-copy-btn').addEventListener('click', function () {
+            var text = data.markdown || '';
+            if (data.changelog && data.changelog.length) {
+                text += '\n\n## 变更记录\n';
+                data.changelog.forEach(function (c) {
+                    text += '- ' + c.date + ' [' + (c.scope || '') + '] ' + c.summary + '\n';
+                });
+            }
+            copyText(text, showToast);
+        });
+
+        // 全局快捷键（C）
+        document.addEventListener('keydown', function (e) {
+            var tag = (e.target && e.target.tagName) || '';
+            var typing = tag === 'INPUT' || tag === 'TEXTAREA' || (e.target && e.target.isContentEditable);
+
+            // 打开：? 或 Ctrl/Cmd+K
+            if (!typing && (e.key === '?' || ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')))) {
+                e.preventDefault();
+                toggle();
+                return;
+            }
+            if (!isOpen()) return;
+
+            if (e.key === 'Escape') {
+                // 若搜索栏开着则优先关闭搜索栏
+                if (searcher.isOpen()) { searcher.close(); return; }
+                if (help.classList.contains('open')) { help.classList.remove('open'); return; }
+                close();
+                return;
+            }
+
+            // 抽屉已打开，以下交互不应在编辑框中误触发
+            if (typing) return;
+
+            if (e.key === '/') {
+                e.preventDefault();
+                searcher.focusInput();
+            } else if (e.key === 'ArrowDown') {
+                if (searcher.isOpen()) { e.preventDefault(); searcher.next(); }
+            } else if (e.key === 'ArrowUp') {
+                if (searcher.isOpen()) { e.preventDefault(); searcher.prev(); }
+            } else if (e.key === '1') {
+                switchTab('prd');
+            } else if (e.key === '2') {
+                switchTab('changelog');
+            }
+        });
+    }
+
+    function copyText(text, showToast) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(
+                function () { showToast('已复制到剪贴板'); },
+                function () { fallbackCopy(text, showToast); }
+            );
+        } else {
+            fallbackCopy(text, showToast);
+        }
+    }
+
+    function fallbackCopy(text, showToast) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('已复制到剪贴板'); }
+        catch (_) { showToast('复制失败'); }
+        document.body.removeChild(ta);
+    }
+
+    // ---------- 启动 ----------
+    function init() {
+        var pageKey = getPageKey();
+        fetch(DATA_URL, { cache: 'no-cache' })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (json) {
+                var sections = (json && json.sections) || {};
+                var data = sections[pageKey];
+                if (!data) {
+                    data = { title: '产品需求', module: null, section: null, markdown: '', changelog: [], missing: true };
+                }
+                var rendered = data.missing
+                    ? { html: '', headings: [] }
+                    : renderMarkdown(data.markdown || '');
+                var els = buildDOM(data, rendered);
+                bindEvents(els, data);
+                // 暴露调试接口
+                window.PRDViewer = {
+                    data: data,
+                    open: function () { els.drawer.classList.add('open'); els.backdrop.classList.add('open'); },
+                    close: function () { els.drawer.classList.remove('open'); els.backdrop.classList.remove('open'); }
+                };
+            })
+            .catch(function (err) {
+                console.warn('[prd-viewer] 加载 prd-sections.json 失败：', err);
+                var data = { title: '产品需求', module: null, section: null, markdown: '', changelog: [], missing: true, _loadError: String(err && err.message || err) };
+                var els = buildDOM(data, { html: '', headings: [] });
+                bindEvents(els, data);
+            });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
+</body>
+</html>

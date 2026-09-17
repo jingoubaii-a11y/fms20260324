@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财务中台 · 快速原型</title>
+<style>
+/* external font import removed */
+
+body {
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    transition: width 0.3s ease-in-out;
+    overflow-y: auto;
+    height: 100vh;
+    position: relative;
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.sidebar > div, .sidebar nav {
+    position: relative;
+    z-index: 2;
+}
+
+.sidebar.collapsed {
+    width: 64px;
+}
+
+.sidebar.collapsed .sidebar-text {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-icon {
+    margin: 0 auto;
+}
+
+.sidebar-item {
+    transition: all 0.2s ease-in-out;
+    font-size: 0.875rem;
+}
+
+.sidebar-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 500;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+}
+
+.menu-header h2 {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 二级子菜单样式 */
+.submenu-content {
+    border-left: 1px solid rgba(255,255,255,0.15);
+    margin-left: 12px;
+    margin-top: 2px;
+}
+.submenu-header {
+    user-select: none;
+}
+.submenu-content .sidebar-item.active {
+    background: rgba(255,255,255,0.15);
+}
+
+.drawer {
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(100%);
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 15;
+    display: none;
+}
+
+.drawer-overlay.open {
+    display: block;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #003eb3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* 表格样式 */
+.table-container {
+    overflow-x: auto;
+}
+
+.table-container table {
+    min-width: 100%;
+    border-collapse: collapse;
+}
+
+.table-container th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.table-container td, .table-container th {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table-container tr:hover {
+    background-color: #f9fafb;
+}
+
+/* 按钮样式 */
+.btn {
+    transition: all 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+}
+
+.btn-primary {
+    background-color: #003eb3;
+    color: white;
+    border: 1px solid #003eb3;
+}
+
+.btn-primary:hover {
+    background-color: #0056c7;
+}
+
+.btn-secondary {
+    background-color: white;
+    color: #003eb3;
+    border: 1px solid #003eb3;
+}
+
+.btn-secondary:hover {
+    background-color: #e6f0ff;
+}
+
+.btn-outline {
+    background-color: white;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+}
+
+.btn-outline:hover {
+    background-color: #f3f4f6;
+}
+
+/* 输入框样式 */
+.input-field {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.input-field:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #003eb3;
+    border-color: transparent;
+}
+
+/* 卡片样式 */
+.card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    padding: 1.5rem;
+}
+
+/* 筛选栏样式 */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+/* 分页样式 */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    margin-top: 1.5rem;
+}
+
+.pagination button {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background-color: white;
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #f3f4f6;
+}
+
+.pagination button.active {
+    background-color: #003eb3;
+    color: white;
+    border-color: #003eb3;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 64px;
+    }
+    
+    .sidebar .sidebar-text {
+        display: none;
+    }
+    
+    .sidebar .sidebar-icon {
+        margin: 0 auto;
+    }
+    
+    .main-content {
+        margin-left: 64px;
+    }
+    
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-bar > div {
+        width: 100%;
+    }
+}
+
+#sidebar-container aside.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 16rem; z-index: 10; overflow-y: auto; color: #fff; }
+#sidebar-container .w-64 { width: 16rem; }
+#sidebar-container .flex { display: flex; }
+#sidebar-container .items-center { align-items: center; }
+#sidebar-container .justify-between { justify-content: space-between; }
+#sidebar-container .p-2 { padding: .5rem; }
+#sidebar-container .p-4 { padding: 1rem; }
+#sidebar-container .px-2 { padding-left: .5rem; padding-right: .5rem; }
+#sidebar-container .px-4 { padding-left: 1rem; padding-right: 1rem; }
+#sidebar-container .py-1\.5 { padding-top: .375rem; padding-bottom: .375rem; }
+#sidebar-container .py-2 { padding-top: .5rem; padding-bottom: .5rem; }
+#sidebar-container .py-3 { padding-top: .75rem; padding-bottom: .75rem; }
+#sidebar-container .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+#sidebar-container .pl-6 { padding-left: 1.5rem; }
+#sidebar-container .mr-2 { margin-right: .5rem; }
+#sidebar-container .mr-3 { margin-right: .75rem; }
+#sidebar-container .mt-4 { margin-top: 1rem; }
+#sidebar-container .ml-auto { margin-left: auto; }
+#sidebar-container .border-b { border-bottom: 1px solid rgba(255,255,255,.2); }
+#sidebar-container .rounded-md { border-radius: .375rem; }
+#sidebar-container .rounded-full { border-radius: 9999px; }
+#sidebar-container .text-white\/90 { color: rgba(255,255,255,.9); }
+#sidebar-container .text-white\/80 { color: rgba(255,255,255,.8); }
+#sidebar-container .text-white\/70 { color: rgba(255,255,255,.7); }
+#sidebar-container .text-xs { font-size: .75rem; line-height: 1rem; }
+#sidebar-container .text-sm { font-size: .875rem; }
+#sidebar-container .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+#sidebar-container .text-\[10px\] { font-size: 10px; }
+#sidebar-container .font-semibold { font-weight: 600; }
+#sidebar-container .uppercase { text-transform: uppercase; }
+#sidebar-container .tracking-wider { letter-spacing: .05em; }
+#sidebar-container .cursor-pointer { cursor: pointer; }
+#sidebar-container .transition-transform { transition: transform .2s; }
+#sidebar-container .hidden { display: none !important; }
+#sidebar-container .bg-red-500 { background: #ef4444; color: #fff; }
+#sidebar-container .px-1\.5 { padding-left: .375rem; padding-right: .375rem; }
+#sidebar-container .py-0\.5 { padding-top: .125rem; padding-bottom: .125rem; }
+#sidebar-container a, #sidebar-container a:hover, #sidebar-container a:visited, #sidebar-container a:focus { text-decoration: none; color: inherit; }
+#sidebar-container button:hover, #sidebar-container a:hover { background: rgba(255,255,255,.1); }
+#sidebar-container .w-3\.5 { width: .875rem; } #sidebar-container .h-3\.5 { height: .875rem; }
+#sidebar-container .w-4 { width: 1rem; } #sidebar-container .h-4 { height: 1rem; }
+#sidebar-container .w-5 { width: 1.25rem; } #sidebar-container .h-5 { height: 1.25rem; }
+#page-frame { position: absolute; left: 16rem; top: 0; right: 0; bottom: 0; width: calc(100% - 16rem); height: 100%; border: 0; }
+
+html, body { height: 100%; margin: 0; }
+.app { position: relative; height: 100vh; }
+.notice { position: fixed; right: 12px; bottom: 12px; background: rgba(0,0,0,0.6); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 12px; z-index: 9999; }
+</style>
+</head>
+<body class="bg-neutral">
+<div class="app">
+  <div id="sidebar-container"></div>
+  <iframe id="page-frame" title="page" src="pages/index.html"></iframe>
+</div>
+<div class="notice">财务中台原型 · 快速版</div>
+
+<script>
+// 注入侧边栏
+document.getElementById('sidebar-container').innerHTML = "<aside id=\"sidebar\" class=\"sidebar gradient-bg text-white shadow-sm fixed left-0 top-0 bottom-0 w-64 overflow-y-auto z-10\">\n    <div class=\"p-4 flex items-center justify-between border-b border-white/20\">\n        <h1 class=\"text-xl font-semibold\">\u8d22\u52a1\u4e2d\u53f0</h1>\n        <button id=\"toggle-sidebar\" class=\"p-2 rounded-md hover:bg-white/10\">\n            <i data-lucide=\"menu\"></i>\n        </button>\n    </div>\n    <nav class=\"py-4\">\n        <!-- \u4eea\u8868\u76d8 -->\n        <a href=\"index.html\" class=\"sidebar-item flex items-center px-4 py-3 text-white/90 hover:text-white rounded-md\">\n            <i data-lucide=\"home\" class=\"sidebar-icon w-5 h-5 mr-3\"></i>\n            <span class=\"sidebar-text\">\u4eea\u8868\u76d8</span>\n        </a>\n\n        <!-- \u5de5\u5355\u4e2d\u5fc3 -->\n        <a href=\"ticket-center.html\" class=\"sidebar-item flex items-center px-4 py-3 text-white/90 hover:text-white rounded-md\">\n            <i data-lucide=\"clipboard-check\" class=\"sidebar-icon w-5 h-5 mr-3\"></i>\n            <span class=\"sidebar-text\">\u5de5\u5355\u4e2d\u5fc3</span>\n            <span class=\"ml-auto text-[10px] bg-red-500 text-white rounded-full px-1.5 py-0.5\">3</span>\n        </a>\n\n        <!-- \u57fa\u7840\u8d44\u6599 -->\n        <div class=\"mt-4\">\n            <div class=\"menu-header flex items-center justify-between px-4 py-2 cursor-pointer\" data-menu=\"basic-data\">\n                <h2 class=\"text-xs font-semibold uppercase tracking-wider\">\u57fa\u7840\u8d44\u6599</h2>\n                <i data-lucide=\"chevron-down\" class=\"menu-icon w-4 h-4 text-white/70 transition-transform\"></i>\n            </div>\n            <div class=\"menu-content px-2 py-2\" id=\"basic-data-content\">\n                <a href=\"financial-entity.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"building\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u8d22\u52a1\u4e3b\u4f53</span>\n                </a>\n                <a href=\"merchant.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"users\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u5ba2\u5546</span>\n                </a>\n                <a href=\"project.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"clipboard-list\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u9879\u76ee</span>\n                </a>\n                <a href=\"material.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"package\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u7269\u6599</span>\n                </a>\n                <a href=\"cost-ratio.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"pie-chart\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u6210\u672c\u6bd4\u4f8b\u914d\u7f6e</span>\n                </a>\n            </div>\n        </div>\n        \n        <!-- \u516c\u5171\u8d44\u6599 -->\n        <div class=\"mt-4\">\n            <div class=\"menu-header flex items-center justify-between px-4 py-2 cursor-pointer\" data-menu=\"public-data\">\n                <h2 class=\"text-xs font-semibold uppercase tracking-wider\">\u516c\u5171\u8d44\u6599</h2>\n                <i data-lucide=\"chevron-down\" class=\"menu-icon w-4 h-4 text-white/70 transition-transform\"></i>\n            </div>\n            <div class=\"menu-content px-2 py-2\" id=\"public-data-content\">\n                <a href=\"currency.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"dollar-sign\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u5e01\u522b</span>\n                </a>\n                <a href=\"accounting-calendar.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"calendar\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u4f1a\u8ba1\u65e5\u5386</span>\n                </a>\n                <a href=\"document-type.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"file-text\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u5355\u636e\u7c7b\u578b</span>\n                </a>\n                <a href=\"business-type.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"layers\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u4e1a\u52a1\u7c7b\u578b</span>\n                </a>\n                <a href=\"tax-rate.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"percent\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u7a0e\u7387</span>\n                </a>\n                <a href=\"invoice-type.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"receipt\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u53d1\u7968\u7c7b\u578b</span>\n                </a>\n                <a href=\"unit.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"ruler\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u8ba1\u91cf\u5355\u4f4d</span>\n                </a>\n                <a href=\"requirement-type.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"list-checks\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u9700\u6c42\u7c7b\u578b</span>\n                </a>\n                <a href=\"source-system.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"cloud\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u6765\u6e90\u7cfb\u7edf</span>\n                </a>\n            </div>\n        </div>\n        \n        <!-- \u9879\u76ee\u6838\u7b97 -->\n        <div class=\"mt-4\">\n            <div class=\"menu-header flex items-center justify-between px-4 py-2 cursor-pointer\" data-menu=\"project-management\">\n                <h2 class=\"text-xs font-semibold uppercase tracking-wider\">\u9879\u76ee\u6838\u7b97</h2>\n                <i data-lucide=\"chevron-down\" class=\"menu-icon w-4 h-4 text-white/70 transition-transform\"></i>\n            </div>\n            <div class=\"menu-content px-2 py-2\" id=\"project-management-content\">\n                <a href=\"accounting-method.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"calculator\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u6838\u7b97\u65b9\u6cd5\u7ba1\u7406</span>\n                </a>\n                <a href=\"accounting-workbench.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"layout-dashboard\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u6838\u7b97\u5de5\u4f5c\u53f0</span>\n                </a>\n                \n                <!-- \u6574\u88c5\u6838\u7b97 -->\n                <a href=\"decoration-accounting.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"building\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u6574\u88c5\u6838\u7b97</span>\n                </a>\n                \n                <!-- \u8f6f\u88c5\u6838\u7b97 -->\n                <a href=\"soft-accounting.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"sofa\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u8f6f\u88c5\u6838\u7b97</span>\n                </a>\n                \n                <!-- \u8bbe\u8ba1\u8d39\u6838\u7b97 -->\n                <a href=\"shejifei-accounting.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"pencil-ruler\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u8bbe\u8ba1\u8d39\u6838\u7b97</span>\n                </a>\n                \n                <!-- \u6536\u5165\u6210\u672c\u8c03\u6574 -->\n                <a href=\"revenue-cost-adjustment.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                    <i data-lucide=\"edit-3\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                    <span class=\"sidebar-text\">\u6536\u5165\u6210\u672c\u8c03\u6574</span>\n                </a>\n\n                <!-- \u552e\u540e\u7ef4\u4fee\u8ba1\u63d0\uff08\u542b\u5b50\u83dc\u5355\uff09 -->\n                <div class=\"sidebar-submenu\">\n                    <div class=\"sidebar-item submenu-header flex items-center justify-between px-4 py-2 text-white/90 hover:text-white rounded-md cursor-pointer\" data-submenu=\"after-sales-sub\">\n                        <div class=\"flex items-center\">\n                            <i data-lucide=\"wrench\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                            <span class=\"sidebar-text\">\u552e\u540e\u7ef4\u4fee\u8ba1\u63d0</span>\n                        </div>\n                        <i data-lucide=\"chevron-down\" class=\"submenu-icon w-3.5 h-3.5 text-white/70 transition-transform\"></i>\n                    </div>\n                    <div class=\"submenu-content pl-6\" id=\"after-sales-sub-content\">\n                        <a href=\"after-sales-accrual.html\" class=\"sidebar-item flex items-center px-4 py-1.5 text-white/80 hover:text-white rounded-md text-sm\">\n                            <i data-lucide=\"layout-dashboard\" class=\"sidebar-icon w-3.5 h-3.5 mr-2\"></i>\n                            <span class=\"sidebar-text\">\u8ba1\u63d0\u5de5\u4f5c\u53f0</span>\n                        </a>\n                        <a href=\"accrual-rate.html\" class=\"sidebar-item flex items-center px-4 py-1.5 text-white/80 hover:text-white rounded-md text-sm\">\n                            <i data-lucide=\"percent\" class=\"sidebar-icon w-3.5 h-3.5 mr-2\"></i>\n                            <span class=\"sidebar-text\">\u8ba1\u63d0\u6bd4\u4f8b\u914d\u7f6e</span>\n                        </a>\n                        <a href=\"warranty-period.html\" class=\"sidebar-item flex items-center px-4 py-1.5 text-white/80 hover:text-white rounded-md text-sm\">\n                            <i data-lucide=\"shield-check\" class=\"sidebar-icon w-3.5 h-3.5 mr-2\"></i>\n                            <span class=\"sidebar-text\">\u8d28\u4fdd\u5e74\u9650\u7ef4\u62a4</span>\n                        </a>\n                        <a href=\"after-sales-balance.html\" class=\"sidebar-item flex items-center px-4 py-1.5 text-white/80 hover:text-white rounded-md text-sm\">\n                            <i data-lucide=\"wallet\" class=\"sidebar-icon w-3.5 h-3.5 mr-2\"></i>\n                            <span class=\"sidebar-text\">\u9884\u8ba1\u8d1f\u503a\u4f59\u989d\u8868</span>\n                        </a>\n                        <a href=\"after-sales-init.html\" class=\"sidebar-item flex items-center px-4 py-1.5 text-white/80 hover:text-white rounded-md text-sm\">\n                            <i data-lucide=\"database\" class=\"sidebar-icon w-3.5 h-3.5 mr-2\"></i>\n                            <span class=\"sidebar-text\">\u671f\u521d\u5bfc\u5165</span>\n                  </a>\n                    </div>\n                </div>\n            </div>\n        </div>\n        \n        <!-- \u5e93\u5b58\u7ba1\u7406 -->\n                <div class=\"mt-4\">\n                    <div class=\"menu-header flex items-center justify-between px-4 py-2 cursor-pointer\" data-menu=\"inventory-management\">\n                        <h2 class=\"text-xs font-semibold uppercase tracking-wider\">\u5e93\u5b58\u7ba1\u7406</h2>\n                        <i data-lucide=\"chevron-down\" class=\"menu-icon w-4 h-4 text-white/70 transition-transform\"></i>\n                    </div>\n                    <div class=\"menu-content px-2 py-2\" id=\"inventory-management-content\">\n                        <a href=\"sales-outbound.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                            <i data-lucide=\"truck\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                            <span class=\"sidebar-text\">\u9500\u552e\u51fa\u5e93</span>\n                        </a>\n                    </div>\n                </div>\n\n                <!-- \u5e94\u6536\u7ba1\u7406 -->\n                <div class=\"mt-4\">\n                    <div class=\"menu-header flex items-center justify-between px-4 py-2 cursor-pointer\" data-menu=\"receivable-management\">\n                        <h2 class=\"text-xs font-semibold uppercase tracking-wider\">\u5e94\u6536\u7ba1\u7406</h2>\n                        <i data-lucide=\"chevron-down\" class=\"menu-icon w-4 h-4 text-white/70 transition-transform\"></i>\n                    </div>\n                    <div class=\"menu-content px-2 py-2\" id=\"receivable-management-content\">\n                        <a href=\"receivable.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                            <i data-lucide=\"credit-card\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                            <span class=\"sidebar-text\">\u5e94\u6536\u5355</span>\n                        </a>\n                        <a href=\"receipt.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\" style=\"display: none;\">\n                            <i data-lucide=\"cash\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                            <span class=\"sidebar-text\">\u6536\u6b3e\u5355</span>\n                        </a>\n                    </div>\n                </div>\n\n                <!-- \u5bf9\u8d26\u4e2d\u5fc3 -->\n                <div class=\"mt-4\">\n                    <div class=\"menu-header flex items-center justify-between px-4 py-2 cursor-pointer\" data-menu=\"reconciliation\">\n                        <h2 class=\"text-xs font-semibold uppercase tracking-wider\">\u5bf9\u8d26\u4e2d\u5fc3</h2>\n                        <i data-lucide=\"chevron-down\" class=\"menu-icon w-4 h-4 text-white/70 transition-transform\"></i>\n                    </div>\n                    <div class=\"menu-content px-2 py-2\" id=\"reconciliation-content\">\n                        <a href=\"reconciliation-dashboard.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                            <i data-lucide=\"layout-dashboard\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                            <span class=\"sidebar-text\">\u5bf9\u8d26\u770b\u677f</span>\n                        </a>\n                        <a href=\"reconciliation-diff.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                            <i data-lucide=\"alert-triangle\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                            <span class=\"sidebar-text\">\u5dee\u5f02\u7ba1\u7406</span>\n                        </a>\n                        <a href=\"reconciliation-result.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                            <i data-lucide=\"clipboard-check\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                            <span class=\"sidebar-text\">\u5bf9\u8d26\u7ed3\u679c</span>\n                        </a>\n                        <a href=\"reconciliation-rule.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                            <i data-lucide=\"settings-2\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                            <span class=\"sidebar-text\">\u89c4\u5219\u914d\u7f6e</span>\n                        </a>\n                    </div>\n                </div>\n\n                <!-- \u671f\u672b\u5904\u7406 -->\n                <div class=\"mt-4\">\n                    <div class=\"menu-header flex items-center justify-between px-4 py-2 cursor-pointer\" data-menu=\"period-end\">\n                        <h2 class=\"text-xs font-semibold uppercase tracking-wider\">\u671f\u672b\u5904\u7406</h2>\n                        <i data-lucide=\"chevron-down\" class=\"menu-icon w-4 h-4 text-white/70 transition-transform\"></i>\n                    </div>\n                    <div class=\"menu-content px-2 py-2\" id=\"period-end-content\">\n                        <a href=\"period-end.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                            <i data-lucide=\"calendar-check\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                            <span class=\"sidebar-text\">\u671f\u672b\u5904\u7406</span>\n                        </a>\n                    </div>\n                </div>\n\n                <!-- \u96c6\u6210\u7ba1\u7406 -->\n                <div class=\"mt-4\">\n                    <div class=\"menu-header flex items-center justify-between px-4 py-2 cursor-pointer\" data-menu=\"integration-management\">\n                        <h2 class=\"text-xs font-semibold uppercase tracking-wider\">\u96c6\u6210\u7ba1\u7406</h2>\n                        <i data-lucide=\"chevron-down\" class=\"menu-icon w-4 h-4 text-white/70 transition-transform\"></i>\n                    </div>\n                    <div class=\"menu-content px-2 py-2\" id=\"integration-management-content\">\n                        <a href=\"ebs-mapping.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                            <i data-lucide=\"git-merge\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                            <span class=\"sidebar-text\">EBS\u6620\u5c04\u914d\u7f6e</span>\n                        </a>\n                        <a href=\"sync-log.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                            <i data-lucide=\"refresh-cw\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                            <span class=\"sidebar-text\">\u540c\u6b65\u65e5\u5fd7</span>\n                        </a>\n                    </div>\n                </div>\n\n                <!-- \u6d4b\u8bd5\u83dc\u5355 -->\n                <div class=\"mt-4\" style=\"display: none;\">\n                    <div class=\"menu-header flex items-center justify-between px-4 py-2 cursor-pointer\" data-menu=\"test-menu\">\n                        <h2 class=\"text-xs font-semibold uppercase tracking-wider\">\u6d4b\u8bd5\u83dc\u5355</h2>\n                        <i data-lucide=\"chevron-down\" class=\"menu-icon w-4 h-4 text-white/70 transition-transform\"></i>\n                    </div>\n                    <div class=\"menu-content px-2 py-2\" id=\"test-menu-content\">\n                        <a href=\"test.html\" class=\"sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md\">\n                            <i data-lucide=\"test-tube\" class=\"sidebar-icon w-4 h-4 mr-3\"></i>\n                            <span class=\"sidebar-text\">\u6d4b\u8bd5\u9879\u76ee</span>\n                        </a>\n                    </div>\n                </div>\n    </nav>\n</aside>";
+
+// 事件委托:侧边栏点击 -> 切 iframe.src
+document.getElementById('sidebar-container').addEventListener('click', function(e) {
+  const a = e.target.closest('a[href]');
+  if (!a) return;
+  const href = a.getAttribute('href') || '';
+  const m = href.match(/([\w\-]+\.html)(?:[?#].*)?$/);
+  if (m) {
+    e.preventDefault();
+    e.stopPropagation();
+    loadPage(m[1]);
+  }
+}, true);
+
+// 加载 scripts.js(侧边栏折叠等)
+(function(){
+  const s = document.createElement('script');
+  s.textContent = "// \u521d\u59cb\u5316Lucide\u56fe\u6807\nfunction initLucideIcons() {\n    if (typeof lucide !== 'undefined') {\n        lucide.createIcons();\n    }\n}\n\n// \u4fa7\u8fb9\u680f\u6298\u53e0/\u5c55\u5f00\u529f\u80fd\nfunction initSidebar() {\n    const toggleSidebar = document.getElementById('toggle-sidebar');\n    const sidebar = document.getElementById('sidebar');\n    const mainContent = document.getElementById('main-content');\n    \n    if (toggleSidebar && sidebar && mainContent) {\n        // \u79fb\u9664\u53ef\u80fd\u5b58\u5728\u7684\u65e7\u4e8b\u4ef6\u76d1\u542c\u5668\n        toggleSidebar.removeEventListener('click', handleSidebarToggle);\n        \n        // \u5b9a\u4e49\u5904\u7406\u51fd\u6570\n        function handleSidebarToggle() {\n            sidebar.classList.toggle('collapsed');\n            if (sidebar.classList.contains('collapsed')) {\n                mainContent.classList.remove('ml-64');\n                mainContent.classList.add('ml-16');\n            } else {\n                mainContent.classList.remove('ml-16');\n                mainContent.classList.add('ml-64');\n            }\n        }\n        \n        // \u6dfb\u52a0\u65b0\u7684\u4e8b\u4ef6\u76d1\u542c\u5668\n        toggleSidebar.addEventListener('click', handleSidebarToggle);\n    }\n}\n\n// \u83dc\u5355\u5c55\u5f00/\u6536\u62e2\u529f\u80fd\nfunction initMenu() {\n    const menuHeaders = document.querySelectorAll('.menu-header');\n    \n    menuHeaders.forEach(header => {\n        // \u79fb\u9664\u53ef\u80fd\u5b58\u5728\u7684\u65e7\u4e8b\u4ef6\u76d1\u542c\u5668\n        header.removeEventListener('click', handleMenuToggle);\n        \n        // \u5b9a\u4e49\u5904\u7406\u51fd\u6570\n        function handleMenuToggle() {\n            const menuName = header.getAttribute('data-menu');\n            const content = document.getElementById(`${menuName}-content`);\n            const icon = header.querySelector('.menu-icon');\n            \n            if (content && icon) {\n                // \u5207\u6362\u5185\u5bb9\u663e\u793a/\u9690\u85cf\n                content.classList.toggle('hidden');\n                \n                // \u5207\u6362\u56fe\u6807\u65cb\u8f6c\n                if (content.classList.contains('hidden')) {\n                    icon.style.transform = 'rotate(0deg)';\n                } else {\n                    icon.style.transform = 'rotate(180deg)';\n                }\n            }\n        }\n        \n        // \u6dfb\u52a0\u65b0\u7684\u4e8b\u4ef6\u76d1\u542c\u5668\n        header.addEventListener('click', handleMenuToggle);\n    });\n}\n\n// \u4e8c\u7ea7\u53ef\u6298\u53e0\u5b50\u83dc\u5355 (submenu-header + submenu-content)\nfunction initSubmenu() {\n    const submenuHeaders = document.querySelectorAll('.submenu-header');\n    submenuHeaders.forEach(header => {\n        function handleToggle(e) {\n            e.stopPropagation();\n            const name = header.getAttribute('data-submenu');\n            const content = document.getElementById(`${name}-content`);\n            const icon = header.querySelector('.submenu-icon');\n            if (content && icon) {\n                content.classList.toggle('hidden');\n                icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';\n            }\n        }\n        header.addEventListener('click', handleToggle);\n    });\n}\n\n// \u9ad8\u4eae\u5f53\u524d\u9875\u9762\u7684\u5bfc\u822a\u9879\nfunction highlightCurrentPage() {\n    const currentPath = window.location.pathname;\n    const sidebarItems = document.querySelectorAll('.sidebar-item');\n    \n    sidebarItems.forEach(item => {\n        const href = item.getAttribute('href');\n        if (href && currentPath.includes(href)) {\n            item.classList.add('active');\n\n            // \u5c55\u5f00\u5305\u542b\u5f53\u524d\u9875\u9762\u7684\u4e8c\u7ea7\u5b50\u83dc\u5355\n            const submenuContent = item.closest('.submenu-content');\n            if (submenuContent) {\n                submenuContent.classList.remove('hidden');\n                const submenuHeader = submenuContent.previousElementSibling;\n                if (submenuHeader) {\n                    const subIcon = submenuHeader.querySelector('.submenu-icon');\n                    if (subIcon) subIcon.style.transform = 'rotate(180deg)';\n                }\n            }\n\n            // \u5c55\u5f00\u5305\u542b\u5f53\u524d\u9875\u9762\u7684\u83dc\u5355\n            const menuContent = item.closest('.menu-content');\n            if (menuContent) {\n                menuContent.classList.remove('hidden');\n                const menuHeader = menuContent.previousElementSibling;\n                if (menuHeader) {\n                    const icon = menuHeader.querySelector('.menu-icon');\n                    if (icon) {\n                        icon.style.transform = 'rotate(180deg)';\n                    }\n                }\n            }\n        }\n    });\n}\n\n// \u62bd\u5c49\u529f\u80fd\nfunction initDrawers() {\n    // \u521b\u5efa\u62bd\u5c49\u906e\u7f69\u5c42\n    let drawerOverlay = document.getElementById('drawer-overlay');\n    if (!drawerOverlay) {\n        drawerOverlay = document.createElement('div');\n        drawerOverlay.className = 'drawer-overlay';\n        drawerOverlay.id = 'drawer-overlay';\n        document.body.appendChild(drawerOverlay);\n    }\n    \n    // \u6253\u5f00\u62bd\u5c49\n    window.openDrawer = function(drawer) {\n        if (drawer && typeof drawer === 'object') {\n            drawer.classList.add('open');\n            drawerOverlay.classList.add('open');\n        }\n    };\n    \n    // \u5173\u95ed\u62bd\u5c49\n    window.closeDrawer = function(drawer) {\n        if (drawer && typeof drawer === 'object') {\n            drawer.classList.remove('open');\n            drawerOverlay.classList.remove('open');\n        }\n    };\n    \n    // \u70b9\u51fb\u906e\u7f69\u5c42\u5173\u95ed\u6240\u6709\u62bd\u5c49\n    drawerOverlay.removeEventListener('click', handleDrawerOverlayClick);\n    function handleDrawerOverlayClick() {\n        document.querySelectorAll('.drawer').forEach(drawer => {\n            drawer.classList.remove('open');\n        });\n        drawerOverlay.classList.remove('open');\n    }\n    drawerOverlay.addEventListener('click', handleDrawerOverlayClick);\n}\n\n// \u9ad8\u7ea7\u7b5b\u9009\u529f\u80fd\nfunction initAdvancedFilter() {\n    const advancedFilterBtn = document.getElementById('advanced-filter-btn');\n    const advancedFilter = document.getElementById('advanced-filter');\n    \n    if (advancedFilterBtn && advancedFilter) {\n        advancedFilterBtn.removeEventListener('click', handleAdvancedFilterToggle);\n        function handleAdvancedFilterToggle() {\n            advancedFilter.classList.toggle('hidden');\n            \n            // \u5207\u6362\u6309\u94ae\u6587\u672c\u548c\u56fe\u6807\n            if (!advancedFilter.classList.contains('hidden')) {\n                this.innerHTML = '\u6536\u8d77\u7b5b\u9009 <i data-lucide=\"chevron-up\" class=\"w-4 h-4 ml-1\"></i>';\n            } else {\n                this.innerHTML = '\u9ad8\u7ea7\u7b5b\u9009 <i data-lucide=\"chevron-down\" class=\"w-4 h-4 ml-1\"></i>';\n            }\n            \n            // \u91cd\u65b0\u521d\u59cb\u5316\u56fe\u6807\n            initLucideIcons();\n        }\n        advancedFilterBtn.addEventListener('click', handleAdvancedFilterToggle);\n    }\n}\n\n// \u7b5b\u9009\u6761\u4ef6\u9009\u62e9\u5668\u529f\u80fd\nfunction initFilterSelect() {\n    const filterSelect = document.getElementById('filter-select');\n    const filterInput = document.getElementById('filter-input');\n    \n    if (filterSelect && filterInput) {\n        filterSelect.removeEventListener('change', handleFilterSelectChange);\n        function handleFilterSelectChange() {\n            const selectedValue = this.value;\n            \n            // \u6839\u636e\u9009\u62e9\u7684\u7b5b\u9009\u6761\u4ef6\u66f4\u65b0\u5360\u4f4d\u7b26\n            if (selectedValue === 'code') {\n                filterInput.placeholder = '\u6309\u7f16\u7801\u641c\u7d22';\n            } else if (selectedValue === 'name') {\n                filterInput.placeholder = '\u6309\u540d\u79f0\u641c\u7d22';\n            } else if (selectedValue === 'status') {\n                filterInput.placeholder = '\u6309\u72b6\u6001\u641c\u7d22';\n            }\n            \n            // \u6e05\u7a7a\u8f93\u5165\u6846\n            filterInput.value = '';\n        }\n        filterSelect.addEventListener('change', handleFilterSelectChange);\n    }\n}\n\n// \u6279\u91cf\u64cd\u4f5c\u529f\u80fd\nfunction initBatchOperations() {\n    const selectAllCheckbox = document.querySelector('input[type=\"checkbox\"]');\n    if (selectAllCheckbox) {\n        selectAllCheckbox.removeEventListener('change', handleSelectAllChange);\n        function handleSelectAllChange() {\n            const checkboxes = document.querySelectorAll('table input[type=\"checkbox\"]');\n            checkboxes.forEach(checkbox => {\n                checkbox.checked = this.checked;\n            });\n        }\n        selectAllCheckbox.addEventListener('change', handleSelectAllChange);\n    }\n}\n\n// \u521d\u59cb\u5316\u6240\u6709\u529f\u80fd\nfunction initCommonFunctions() {\n    // \u786e\u4fddDOM\u5b8c\u5168\u52a0\u8f7d\n    if (document.readyState === 'loading') {\n        document.addEventListener('DOMContentLoaded', function() {\n            performInit();\n        });\n    } else {\n        performInit();\n    }\n    \n    function performInit() {\n        // \u7b49\u5f85\u4e00\u5c0f\u6bb5\u65f6\u95f4\u786e\u4fdd\u4fa7\u8fb9\u680f\u5b8c\u5168\u52a0\u8f7d\n        setTimeout(() => {\n            initLucideIcons();\n            initSidebar();\n            initMenu();\n            initSubmenu();\n            highlightCurrentPage();\n            initDrawers();\n            initAdvancedFilter();\n            initFilterSelect();\n            initBatchOperations();\n        }, 200);\n    }\n}\n\n// \u5bfc\u51fa\u521d\u59cb\u5316\u51fd\u6570\uff0c\u65b9\u4fbf\u52a8\u6001\u52a0\u8f7d\u65f6\u8c03\u7528\nwindow.initCommonFunctions = initCommonFunctions;";
+  document.body.appendChild(s);
+  if (typeof window.initCommonFunctions === 'function') {
+    try { window.initCommonFunctions(); } catch(err) { console.warn(err); }
+  }
+})();
+
+function loadPage(name) {
+  const frame = document.getElementById('page-frame');
+  frame.src = 'pages/' + name;
+  document.querySelectorAll('#sidebar a').forEach(a => a.classList.remove('active'));
+}
+
+// 监听 iframe 内跳转
+window.addEventListener('message', (e) => {
+  const data = e.data || {};
+  if (data.type === 'navigate' && data.page) loadPage(data.page);
+});
+
+// 侧边栏图标空闲加载(不阻塞首屏)
+function loadShellLucide() {
+  const s = document.createElement('script');
+  s.src = 'common/lucide.min.js';
+  s.onload = function() {
+    if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+  };
+  document.body.appendChild(s);
+}
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(loadShellLucide, { timeout: 2000 });
+} else {
+  setTimeout(loadShellLucide, 300);
+}
+</script>
+</body>
+</html>

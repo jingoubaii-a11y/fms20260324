@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>期初导入 - 售后维修计提 - 财务中台</title>
+    <link rel="stylesheet" href="../common/tailwind.css">
+    <script src="../common/lucide.min.js"></script>
+    <!-- tailwind.config removed: using precompiled CSS -->
+    <style>
+/* external font import removed for offline speed */
+
+body {
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    transition: width 0.3s ease-in-out;
+    overflow-y: auto;
+    height: 100vh;
+    position: relative;
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.sidebar > div, .sidebar nav {
+    position: relative;
+    z-index: 2;
+}
+
+.sidebar.collapsed {
+    width: 64px;
+}
+
+.sidebar.collapsed .sidebar-text {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-icon {
+    margin: 0 auto;
+}
+
+.sidebar-item {
+    transition: all 0.2s ease-in-out;
+    font-size: 0.875rem;
+}
+
+.sidebar-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 500;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+}
+
+.menu-header h2 {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 二级子菜单样式 */
+.submenu-content {
+    border-left: 1px solid rgba(255,255,255,0.15);
+    margin-left: 12px;
+    margin-top: 2px;
+}
+.submenu-header {
+    user-select: none;
+}
+.submenu-content .sidebar-item.active {
+    background: rgba(255,255,255,0.15);
+}
+
+.drawer {
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(100%);
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 15;
+    display: none;
+}
+
+.drawer-overlay.open {
+    display: block;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #003eb3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* 表格样式 */
+.table-container {
+    overflow-x: auto;
+}
+
+.table-container table {
+    min-width: 100%;
+    border-collapse: collapse;
+}
+
+.table-container th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.table-container td, .table-container th {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table-container tr:hover {
+    background-color: #f9fafb;
+}
+
+/* 按钮样式 */
+.btn {
+    transition: all 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+}
+
+.btn-primary {
+    background-color: #003eb3;
+    color: white;
+    border: 1px solid #003eb3;
+}
+
+.btn-primary:hover {
+    background-color: #0056c7;
+}
+
+.btn-secondary {
+    background-color: white;
+    color: #003eb3;
+    border: 1px solid #003eb3;
+}
+
+.btn-secondary:hover {
+    background-color: #e6f0ff;
+}
+
+.btn-outline {
+    background-color: white;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+}
+
+.btn-outline:hover {
+    background-color: #f3f4f6;
+}
+
+/* 输入框样式 */
+.input-field {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.input-field:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #003eb3;
+    border-color: transparent;
+}
+
+/* 卡片样式 */
+.card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    padding: 1.5rem;
+}
+
+/* 筛选栏样式 */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+/* 分页样式 */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    margin-top: 1.5rem;
+}
+
+.pagination button {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background-color: white;
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #f3f4f6;
+}
+
+.pagination button.active {
+    background-color: #003eb3;
+    color: white;
+    border-color: #003eb3;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 64px;
+    }
+    
+    .sidebar .sidebar-text {
+        display: none;
+    }
+    
+    .sidebar .sidebar-icon {
+        margin: 0 auto;
+    }
+    
+    .main-content {
+        margin-left: 64px;
+    }
+    
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-bar > div {
+        width: 100%;
+    }
+}
+</style>
+    <style>
+        .step-node { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; }
+        .step-active { background: #003eb3; color: #fff; }
+        .step-done { background: #10b981; color: #fff; }
+        .step-todo { background: #e5e7eb; color: #6b7280; }
+        .step-line { flex: 1; height: 2px; background: #e5e7eb; margin: 0 8px; }
+        .step-line-done { background: #10b981; }
+        .tab-active { color: #003eb3; border-bottom-color: #003eb3; }
+    </style>
+</head>
+<body class="bg-neutral">
+    <div class="flex h-screen">
+        
+        <main class="flex-1  p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="space-y-6">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="text-xs text-gray-500 mb-2">项目核算 / 售后维修计提 / 期初导入</div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-xl font-semibold text-gray-800">期初导入</h1>
+                            <p class="text-sm text-gray-500 mt-1">系统上线前的存量数据迁移入口。<strong>仅由财务管理员在初始化窗口期使用</strong>，操作全程留痕、支持试算与回滚。</p>
+                        </div>
+                        <span class="px-3 py-1 text-xs rounded-full bg-amber-100 text-amber-800 flex items-center gap-1"><i data-lucide="lock" class="w-3 h-3"></i>初始化窗口期：2026-09-01 ~ 2026-09-30</span>
+                    </div>
+                </div>
+
+                <!-- 规则提示 -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-start gap-2">
+                        <i data-lucide="lightbulb" class="w-4 h-4 text-blue-600 mt-0.5"></i>
+                        <div class="text-sm text-blue-900">
+                            <p class="font-medium mb-1">初始化流程说明</p>
+                            <ul class="list-disc list-inside space-y-1 text-blue-800">
+                                <li><strong>期初导入</strong>：把切换日之前尚在质保期内的合同（含累计计提、累计核销数据）导入中台，作为后续增量计算的起点。</li>
+                                <li>期初导入建议先"试算"再"正式导入"，试算不会写入正式账簿；正式导入后 72 小时内可申请回滚。</li>
+                                <li><strong>存量旧余额冲销</strong>为一次性上线动作，由核算会计在 EBS 侧一次性处理，<strong>财务中台不承载</strong>，此处不提供冲销操作。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab -->
+                <div class="bg-white rounded-lg shadow-sm">
+                    <div class="border-b border-gray-200 flex px-6">
+                        <button data-tab="tab2" class="tab-btn tab-active px-4 py-3 text-sm border-b-2 -mb-px">期初导入</button>
+                        <button data-tab="tab3" class="tab-btn px-4 py-3 text-sm border-b-2 border-transparent text-gray-500 hover:text-primary -mb-px">初始化历史</button>
+                    </div>
+
+                    <!-- Tab2: 期初导入 -->
+                    <div id="tab2" class="tab-content p-6">
+                        <div class="flex items-center mb-6">
+                            <div class="flex flex-col items-center"><span class="step-node step-done"><i data-lucide="check" class="w-4 h-4"></i></span><span class="text-xs mt-1 text-gray-600">下载模板</span></div>
+                            <div class="step-line step-line-done"></div>
+                            <div class="flex flex-col items-center"><span class="step-node step-done"><i data-lucide="check" class="w-4 h-4"></i></span><span class="text-xs mt-1 text-gray-600">上传 Excel</span></div>
+                            <div class="step-line step-line-done"></div>
+                            <div class="flex flex-col items-center"><span class="step-node step-active">3</span><span class="text-xs mt-1 text-primary font-medium">试算校验</span></div>
+                            <div class="step-line"></div>
+                            <div class="flex flex-col items-center"><span class="step-node step-todo">4</span><span class="text-xs mt-1 text-gray-500">正式导入</span></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                            <div class="border border-gray-200 rounded-lg p-4 bg-white">
+                                <div class="flex items-center gap-2 mb-2 text-primary"><i data-lucide="file-down" class="w-4 h-4"></i><span class="text-sm font-medium">1. 下载模板</span></div>
+                                <p class="text-xs text-gray-500 mb-2">模板列（9 列，带 * 为必填）：</p>
+                                <ul class="text-xs text-gray-500 mb-3 list-disc pl-4 space-y-0.5">
+                                    <li>财务主体 *、客户编码 *、合同编码 *</li>
+                                    <li>项目类型 *（整装/软装）、竣工日 *</li>
+                                    <li>应收总额 *（不含设计费）、税率 *、质保年限 *</li>
+                                    <li>期初预计负债余额（可直填，或留空按"应收总额÷(1+税率)×计提比例−已核销"重算）</li>
+                                </ul>
+                                <button class="w-full px-3 py-2 text-sm text-primary border border-primary rounded-md hover:bg-blue-50">下载 Excel 模板</button>
+                            </div>
+                            <div class="border border-gray-200 rounded-lg p-4 bg-white">
+                                <div class="flex items-center gap-2 mb-2 text-primary"><i data-lucide="upload" class="w-4 h-4"></i><span class="text-sm font-medium">2. 上传文件</span></div>
+                                <p class="text-xs text-gray-500 mb-3">支持 .xlsx，单次上传上限 1 万行。</p>
+                                <div class="border-2 border-dashed border-gray-300 rounded-md p-4 text-center text-xs text-gray-500 cursor-pointer hover:border-primary hover:bg-blue-50">
+                                    <i data-lucide="cloud-upload" class="w-6 h-6 mx-auto text-gray-400"></i>
+                                    <p class="mt-1">点击上传，或拖拽文件到这里</p>
+                                    <p class="mt-1 text-primary">✓ 期初导入模板-2026Q3.xlsx（3,286 行）</p>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 rounded-lg p-4 bg-white">
+                                <div class="flex items-center gap-2 mb-2 text-primary"><i data-lucide="calculator" class="w-4 h-4"></i><span class="text-sm font-medium">3. 试算 / 4. 正式导入</span></div>
+                                <p class="text-xs text-gray-500 mb-3">试算校验字段格式、合同存在性、金额平衡，不写入账簿。</p>
+                                <div class="flex gap-2">
+                                    <button class="flex-1 px-3 py-2 text-sm border border-primary text-primary rounded-md hover:bg-blue-50">开始试算</button>
+                                    <button class="flex-1 px-3 py-2 text-sm bg-primary text-white rounded-md hover:bg-blue-700 opacity-50 cursor-not-allowed" disabled>正式导入</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg">
+                            <div class="bg-gray-50 px-4 py-2 flex items-center justify-between">
+                                <div class="text-sm font-medium text-gray-700">试算结果 <span class="text-xs text-gray-500 ml-2">最新试算时间 2026-08-30 15:22</span></div>
+                                <div class="flex items-center gap-3 text-xs">
+                                    <span class="text-green-600 flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>校验通过 3,241</span>
+                                    <span class="text-red-600 flex items-center gap-1"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i>失败 45</span>
+                                </div>
+                            </div>
+                            <table class="min-w-full text-sm">
+                                <thead class="bg-white border-b border-gray-200"><tr>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">行号</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">合同号</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">校验项</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">错误说明</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">建议</th>
+                                </tr></thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr><td class="px-3 py-2">128</td><td class="px-3 py-2">HT-JZ-2024-01288</td><td class="px-3 py-2">合同存在性</td><td class="px-3 py-2 text-red-600">CRM 中未找到该合同号</td><td class="px-3 py-2">先在 CRM 补录再重传</td></tr>
+                                    <tr><td class="px-3 py-2">356</td><td class="px-3 py-2">HT-JZ-2024-03565</td><td class="px-3 py-2">金额平衡</td><td class="px-3 py-2 text-red-600">累计计提 < 累计核销</td><td class="px-3 py-2">核对补提数据后修正</td></tr>
+                                    <tr><td class="px-3 py-2">712</td><td class="px-3 py-2">HT-JZ-2024-07128</td><td class="px-3 py-2">质保年限</td><td class="px-3 py-2 text-red-600">整装质保年限未在字典中</td><td class="px-3 py-2">先到质保年限维护补配置</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab3: 历史 -->
+                    <div id="tab3" class="tab-content p-6 hidden">
+                        <table class="min-w-full text-sm border border-gray-200 rounded">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">批次号</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">类型</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500">影响记录</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">操作人</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">时间</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">状态</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-2 text-primary">INIT-2026-0827-001</td>
+                                    <td class="px-4 py-2">期初导入</td>
+                             <td class="px-4 py-2 text-right">3,241</td>
+                                    <td class="px-4 py-2">李财务</td>
+                                    <td class="px-4 py-2">2026-08-27 10:34</td>
+                                    <td class="px-4 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">已导入</span></td>
+                                    <td class="px-4 py-2"><button class="text-primary hover:underline mr-2" onclick="document.getElementById('detail-modal').classList.remove('hidden')">明细</button><button class="text-red-600 hover:underline">申请回滚</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-primary">INIT-2026-0825-001</td>
+                                    <td class="px-4 py-2">期初导入（试算）</td>
+                                    <td class="px-4 py-2 text-right">3,286</td>
+                                    <td class="px-4 py-2">李财务</td>
+                                    <td class="px-4 py-2">2026-08-25 09:48</td>
+                                    <td class="px-4 py-2"><span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">试算完成</span></td>
+                                    <td class="px-4 py-2"><button class="text-primary hover:underline">查看报告</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 期初余额明细弹窗 -->
+    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-[1000px] max-w-[96vw] max-h-[88vh] flex flex-col">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-800">期初余额明细 · 批次 INIT-2026-0827-001</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">导入时间 2026-08-27 10:34 · 操作人 李财务 · 影响记录 3,241 条 · 数据来源标记「期初导入」，已归入计提工作台统一管理</p>
+                </div>
+                <button onclick="document.getElementById('detail-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="px-6 py-3 border-b border-gray-100 grid grid-cols-4 gap-3 text-sm">
+                <div><div class="text-xs text-gray-500">合同数</div><div class="font-semibold text-gray-800">3,241</div></div>
+                <div><div class="text-xs text-gray-500">期初预计负债余额合计</div><div class="font-semibold text-gray-800">¥ 4,286,510.28</div></div>
+                <div><div class="text-xs text-gray-500">累计计提合计</div><div class="font-semibold text-gray-800">¥ 6,120,880.00</div></div>
+                <div><div class="text-xs text-gray-500">累计核销合计</div><div class="font-semibold text-gray-800">¥ 1,834,369.72</div></div>
+            </div>
+            <div class="p-4 flex items-center gap-2 flex-wrap border-b border-gray-100">
+                <input type="text" placeholder="合同号 / 客户" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm w-56">
+                <select class="px-3 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部财务主体</option><option>北京家装</option><option>上海家装</option><option>广州家装</option></select>
+                <select class="px-3 py-1.5 border border-gray-300 rounded-md text-sm"><option>全部项目类型</option><option>整装</option><option>软装</option></select>
+                <button class="px-3 py-1.5 bg-primary text-white rounded-md text-sm">查询</button>
+                <button class="ml-auto px-3 py-1.5 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm flex items-center gap-1"><i data-lucide="download" class="w-4 h-4"></i>导出明细</button>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">合同号</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">财务主体</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">客户</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">项目类型</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">竣工日</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">质保期满日</th>
+                            <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">应收总额</th>
+                            <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">累计计提</th>
+                            <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">累计核销</th>
+                            <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">期初预计负债余额</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-3 py-2 text-primary">HT-JZ-2024-00821</td><td class="px-3 py-2">北京家装</td><td class="px-3 py-2">张先生</td><td class="px-3 py-2">整装</td><td class="px-3 py-2">2024-05-12</td><td class="px-3 py-2">2026-05-12</td>
+                            <td class="px-3 py-2 text-right">167,567.84</td><td class="px-3 py-2 text-right">2,965.80</td><td class="px-3 py-2 text-right">1,200.00</td><td class="px-3 py-2 text-right font-medium">1,765.80</td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-2 text-primary">HT-RZ-2024-01033</td><td class="px-3 py-2">上海家装</td><td class="px-3 py-2">李女士</td><td class="px-3 py-2">软装</td><td class="px-3 py-2">2024-07-20</td><td class="px-3 py-2">2025-07-20</td>
+                            <td class="px-3 py-2 text-right">88,400.00</td><td class="px-3 py-2 text-right">1,173.45</td><td class="px-3 py-2 text-right">960.00</td><td class="px-3 py-2 text-right font-medium">213.45</td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-2 text-primary">HT-JZ-2024-02218</td><td class="px-3 py-2">广州家装</td><td class="px-3 py-2">王先生</td><td class="px-3 py-2">整装</td><td class="px-3 py-2">2024-09-01</td><td class="px-3 py-2">2026-09-01</td>
+                            <td class="px-3 py-2 text-right">203,110.00</td><td class="px-3 py-2 text-right">3,594.87</td><td class="px-3 py-2 text-right">0.00</td><td class="px-3 py-2 text-right font-medium">3,594.87</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-6 py-3 border-t border-gray-200 flex items-center justify-between text-xs text-gray-500">
+                <span>共 3,241 条，当前展示前 3 条示例</span>
+                <button onclick="document.getElementById('detail-modal').classList.add('hidden')" class="px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadSidebar() {
+            try {
+                const response = await fetch('common/sidebar.html?t=' + Date.now());
+                document.getElementById('sidebar-container').innerHTML = await response.text();
+                const script = document.createElement('script');
+                script.src = 'common/scripts.js';
+                script.onload = () => { if (typeof initCommonFunctions === 'function') initCommonFunctions(); };
+                document.body.appendChild(script);
+            } catch (e) { console.error(e); }
+        }
+        function bindTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('tab-active'); b.classList.add('border-transparent','text-gray-500'); });
+                    btn.classList.add('tab-active'); btn.classList.remove('border-transparent','text-gray-500');
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                    document.getElementById(btn.dataset.tab).classList.remove('hidden');
+                    if (window.lucide) lucide.createIcons();
+                });
+            });
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { loadSidebar(); bindTabs(); });
+        else { loadSidebar(); bindTabs(); }
+    </script>
+</body>
+</html>
